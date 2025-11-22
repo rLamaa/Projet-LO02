@@ -4,7 +4,7 @@ public class TestDesFonctions {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		 	Carte c1 = new CarteCouleur(Couleur.PIQUE, 2);
+		 	Carte c1 = new CarteCouleur(Couleur.PIQUE, 7);
 	        Carte c2 = new CarteCouleur(Couleur.COEUR, 1);
 	        Carte j = new Joker();
 

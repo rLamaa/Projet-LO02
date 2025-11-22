@@ -3,7 +3,7 @@ package jest_package1;
 import java.util.*;
 
 public class Partie {
-	private Pioche pioche;
+	private Pioche pioche=new Pioche();
 	private List<Carte> trophees;
 	private List<Joueur> joueurs;
 	private RegleJeu regleJeu;
@@ -64,7 +64,9 @@ public class Partie {
 	}
 	
 	public void attribuerTrophees() {
+		Carte trophee1=pioche.pop();
 		
+		//List<Carte> trophees=
 	}
 	
 	public Joueur calculerGagnant() {
