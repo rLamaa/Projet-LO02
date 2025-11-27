@@ -1,5 +1,7 @@
 package jest_package1;
 
+import java.util.*;
+
 public class TestDesFonctions {
 
 	public static void main(String[] args) {
@@ -16,7 +18,20 @@ public class TestDesFonctions {
 	        //while (!p.estVide()) System.out.println(p.piocher());
 	        JoueurHumain j1 = new JoueurHumain("Léna");
 	        System.out.println(j1.getNom());
-	        System.out.println(j1.getJest());
+	        System.out.println(j1.getJest().getCartes());
+	        j1.getJest().getCartes().add(c1);
+	        j1.getJest().getCartes().add(c2);
+
+	        System.out.println("");
+	        j1.faireOffre();
+	        
+	        System.out.println("Cachée "+j1.getOffreCourante().getCarteCachee());
+	        System.out.println("Visible "+j1.getOffreCourante().getCarteVisible());
+
+	        
+	        
+	        
+	        
 	}
 
 }

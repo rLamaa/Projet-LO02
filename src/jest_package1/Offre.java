@@ -5,7 +5,7 @@ public class Offre {
 	private Carte carteCachee;
 	private Joueur proprietaire;
 
-	public Offre(Carte carteVisible, Carte carteCachee, Joueur proprietaire) {
+	public Offre(Carte carteCachee, Carte carteVisible, Joueur proprietaire) {
 		super();
 		this.carteVisible = carteVisible;
 		this.carteCachee = carteCachee;

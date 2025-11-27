@@ -1,15 +1,18 @@
 package jest_package1;
 
-import java.util.List;
+import java.util.*;
 
 public class Jest {
     private List<Carte> cartes;
     private List<Carte> trophees;
 
-    public void ajouterCarte(Carte carte) {}
-    public void ajouterTrophee(Carte carte) {}
-    public List<Carte> getCartes() { return null; }
-    public List<Carte> getTrophees() { return null; }
-    public boolean contientCouleur(Couleur c) { return false; }
-    public int compterCouleur(Couleur c) { return 0; }
-    public int accepter(VisiteurScore visiteur) { return 0; }}
+    public Jest() {
+        this.cartes = new ArrayList<>();
+        this.trophees = new ArrayList<>();
+    }
+
+    public void ajouterCarte(Carte carte) { cartes.add(carte); }
+    public void ajouterTrophee(Carte carte) { trophees.add(carte); }
+    public List<Carte> getCartes() { return cartes; }
+    public List<Carte> getTrophees() { return trophees; }
+}

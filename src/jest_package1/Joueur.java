@@ -12,11 +12,16 @@ public abstract class Joueur {
     protected Jest jest;
     protected Offre offreCourante;
 
-    public void faireOffre(Carte c1, Carte c2) {}
+    public void faireOffre() {}
     public ChoixCarte choisirCarte(List<Offre> offres) { return null; }
     public void ajouterCarteJest(Carte carte) {}
-    public Jest getJest() { return null; }
+    public Jest getJest() { return jest; }
     public String getNom() { return nom; }
+    public Offre getOffreCourante() {
+        return offreCourante;
+    }
+
+    
 }
 
 

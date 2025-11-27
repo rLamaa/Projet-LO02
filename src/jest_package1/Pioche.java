@@ -8,6 +8,7 @@ public class Pioche {
 	private Stack<Carte> pioche= new Stack<>();
 
     //ajouter les nouvelles cartes si on ajoute une extension
+	
 	public void initialiser(boolean avecExtension) {
     	for (Couleur c : Couleur.values()) {
             for (int v = 1; v <= 4; v++) {
@@ -17,6 +18,8 @@ public class Pioche {
         pioche.add(new Joker());
         melanger();
     }
+	
+	
 	//on mélange la pioche
     public void melanger() {
     	Collections.shuffle(pioche);

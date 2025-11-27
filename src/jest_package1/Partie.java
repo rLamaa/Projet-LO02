@@ -12,7 +12,7 @@ public class Partie {
 	private Joueur joueurActif;
 	
 	public void initialiser(List<Joueur> joueurs,RegleJeu regleJeu,Extension extension) {
-
+		//todo :expliquer le code
 	    List<Joueur> joueursInitialises = new ArrayList<>();
 
 	    for (Joueur p : joueurs) {
@@ -31,6 +31,10 @@ public class Partie {
 	    this.numeroManche=1;
 	    }
 	
+    private void initialiserTrophees() {
+        trophees.add(pioche.piocher());
+        trophees.add(pioche.piocher());
+    }
 	public void jouerManche() {
 		
 	}
@@ -39,16 +43,21 @@ public class Partie {
 		
 	}
 	
-	public void creerOffres() {
-		
-	}
+    public void creerOffres() {
+        offresActuelles = new ArrayList<>();
+
+        for (Joueur j : joueurs) { // boucle qui permet d'aller voir tout les joueurs
+            j.faireOffre(); // le joueur fait son offre
+            offresActuelles.add(j.getOffreCourante()); // on l'ajoute aux offres courantes
+        }
+    }
 	
 	public void resoudreTour() {
-		
+		//todo: apres l'implementation des méthodes d'autres classes mais avant le score (agit comme un main)
 	}
 	
 	public Joueur determinerJoueurActif() {
-		return null;
+		return joueurActif; // attribut présent dans la classe, on peut juste l'appeler
 	}
 	
 	public void prendreCarteOffre(Joueur joueurchoisi, Offre offrechoisie, Carte cartechoisie) {
@@ -56,20 +65,24 @@ public class Partie {
 	}
 	
 	public boolean verifierFinManche() {
-		return false;
+		   for (Offre o : offresActuelles) { // boucle qui permet de tourner dans toutes les offres
+		        if (o.estComplete()) {
+		            return false;  // il reste une offre complète, la manche continue
+		        }
+		    }
+		    return true; // toutes les offres ont exactement 1 carte
 	}
 	
 	public boolean verifierFinJeu() {
-		return false;
+		return pioche.estVide(); // regarde si la pioche est vide
 	}
 	
 	public void attribuerTrophees() {
-		Carte trophee1=pioche.pop();
-		
-		//List<Carte> trophees=
+		//todo : attribution finale des trophées, faire à la fin
 	}
 	
 	public Joueur calculerGagnant() {
+		//todo : attribution des points a implementer avant
 		return null;
 	}
 }
