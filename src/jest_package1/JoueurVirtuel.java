@@ -37,7 +37,7 @@ public class JoueurVirtuel extends Joueur {
         Offre offreChoisie = null;
 
         for (Offre o : offres) {
-            Carte c = o.getCarteFaceVisible();
+            Carte c = o.getCarteVisible();
             if (meilleureCarte == null || c.getValeur() > meilleureCarte.getValeur()) {
                 meilleureCarte = c;
                 offreChoisie = o;

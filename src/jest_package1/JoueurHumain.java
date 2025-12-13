@@ -14,15 +14,16 @@ public class JoueurHumain extends Joueur {
 	@Override
 	public Offre faireOffre() {
 		String choix = "0";
-		System.out.println("Quelle carte doit être cachée?");
+		System.out.println("\n[" + this.nom + "] Quelle carte doit être cachée?");
 		List<Carte> cartes = this.getJest().getCartes();
 		for (int i = 0; i < cartes.size(); i++) {
-			System.out.println("Choix " + (i + 1) + ": " + cartes.get(i));
+			System.out.println(
+					"  Choix " + (i + 1) + ": " + cartes.get(i).getValeur() + " de "
+							+ cartes.get(i).getCouleur().toString());
 		}
 
-		Scanner myObj = new Scanner(System.in); // Create a Scanner object
-		System.out.println("La 1 ou la 2?");
-		choix = myObj.nextLine(); // Read user input
+		System.out.print("[" + this.nom + "] La 1 ou la 2? ");
+		choix = Jeu.scanner.nextLine().trim(); // Read user input and trim whitespace
 		Carte c1;
 		Carte c2;
 		if (choix.equals("1")) {

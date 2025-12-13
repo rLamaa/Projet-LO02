@@ -3,57 +3,101 @@ package jest_package1;
 import java.util.*;
 
 public class Jeu {
-    private List<Joueur> joueurs;
-    private RegleJeu regleJeu;
-    private Extension extension;
-    private Partie partieCourante;
-    private EtatPartie etat;
+	private List<Joueur> joueurs;
+	private RegleJeu regleJeu;
+	private Extension extension;
+	private Partie partieCourante;
+	private EtatPartie etat;
+	public static Scanner scanner = new Scanner(System.in);
 
-    public Jeu() {
-        this.joueurs = new ArrayList<>();
-        this.etat = EtatPartie.CONFIGURATION;
-    }
+	public Jeu() {
+		this.joueurs = new ArrayList<>();
+		this.etat = EtatPartie.CONFIGURATION;
+	}
 
 	public void configurerJeu() {
-		
+		// configuration par défaut
+		this.regleJeu = new RegleStandard();
+		this.extension = null;
+		// configurer les joueurs en ligne de commandes
+		System.out.println("Configuration du jeu Jest");
+		int nbJoueurs = 0;
+		while (nbJoueurs < 1 || nbJoueurs > 4) {
+			System.out.print(
+					"Entrez le nombre de joueurs physique (3-4), si il n'y en a pas assez, des bots seront ajouté automatiquement : ");
+			nbJoueurs = scanner.nextInt();
+			scanner.nextLine(); // Consume the leftover newline
+		}
+		System.out.println("[DEBUG] " + nbJoueurs + " joueur(s) humain(s) configuré(s).");
+		if (nbJoueurs < 3) {
+			System.out.println(
+					"Le nombre de joueurs physique est inférieur à 3, des joueurs virtuels seront ajoutés automatiquement.");
+		}
+		for (int i = 1; i <= nbJoueurs; i++) {
+			System.out.print("Entrez le nom du joueur " + i + " : ");
+			String nom = scanner.next();
+			scanner.nextLine(); // Consume the leftover newline
+			Joueur joueur = new JoueurHumain(nom);
+			ajouterJoueur(joueur);
+		}
+		for (int i = joueurs.size() + 1; i <= 3; i++) {
+			String nomVirtuel = "Bot_" + i;
+			System.out.println("[DEBUG] Ajout du joueur virtuel : " + nomVirtuel);
+			JoueurVirtuel joueurVirtuel = new JoueurVirtuel(nomVirtuel);
+			ajouterJoueur(joueurVirtuel);
+		}
+		System.out.println("Configuration terminée.");
+		System.out.println("[DEBUG] Joueurs en jeu: " + joueurs.stream().map(Joueur::getNom).toArray());
 	}
-	
+
 	public void ajouterJoueur(Joueur joueurs) {
-		 if (etat != EtatPartie.CONFIGURATION) { //verification si le jeu est en config
-	            System.out.println("Impossible d'ajouter des joueurs : jeu déjà démarré.");
-	            return;
-	        }
+		if (etat != EtatPartie.CONFIGURATION) { // verification si le jeu est en config
+			System.out.println("Impossible d'ajouter des joueurs : jeu déjà démarré.");
+			return;
+		}
 		this.joueurs.add(joueurs);
 	}
-	
+
 	public void choisirRegle(RegleJeu regleJeu) {
 		if (etat != EtatPartie.CONFIGURATION) {
-            System.out.println("Impossible de changer les règles : jeu déjà démarré.");
-            return;
-        }
-		this.regleJeu=regleJeu;
+			System.out.println("Impossible de changer les règles : jeu déjà démarré.");
+			return;
+		}
+		this.regleJeu = regleJeu;
 	}
-	
-	   public void activerExtension(Extension extension) {
-	        if (etat != EtatPartie.CONFIGURATION) {
-	            System.out.println("Impossible d'activer une extension : jeu déjà démarré.");
-	            return;
-	        }
-	        this.extension = extension;
-	    }
-	
+
+	public void activerExtension(Extension extension) {
+		if (etat != EtatPartie.CONFIGURATION) {
+			System.out.println("Impossible d'activer une extension : jeu déjà démarré.");
+			return;
+		}
+		this.extension = extension;
+	}
+
 	public void demarrer() {
-		this.etat=EtatPartie.EN_COURS;
+		this.etat = EtatPartie.EN_COURS;
+		this.partieCourante = new Partie();
+		partieCourante.initialiser(joueurs, regleJeu, extension);
+		// debug
+		// System.out.println(partieCourante.verifierFinJeu());
+		while (!partieCourante.verifierFinJeu()) {
+			System.out.println("Début de la manche " + partieCourante.getNumeroManche());
+			partieCourante.jouerManche();
+
+		}
 	}
-	
+
 	public void sauvegarder(String fichier) {
-		
+
 	}
-	
+
 	public void charger(String fichier) {
-		
+
 	}
 
-
+	public static void main(String[] args) {
+		Jeu jeu = new Jeu();
+		jeu.configurerJeu();
+		jeu.demarrer();
+	}
 }
-

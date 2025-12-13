@@ -27,8 +27,12 @@ public class Partie {
 			// on ajoute le joueur à la liste
 			joueursInitialises.add(joueur);
 		}
+		// initialisation de la pioche
+		pioche.initialiser(false);
+		System.out.println("Pioche initialisée avec " + pioche.getTaille() + " cartes.");
 		// on melange la pioche
 		pioche.melanger();
+		System.out.println("Pioche mélangée.");
 		// on initialise les trophées
 		initialiserTrophees();
 		// on assigne les attributs
@@ -38,6 +42,7 @@ public class Partie {
 	}
 
 	private void initialiserTrophees() {
+		trophees = new ArrayList<>();
 		trophees.add(pioche.piocher());
 		trophees.add(pioche.piocher());
 	}
@@ -80,10 +85,12 @@ public class Partie {
 
 	public void creerOffres() {
 		offresActuelles = new ArrayList<>();
+		System.out.println("\n=== Création des offres ===");
 		for (Joueur j : joueurs) { // boucle qui permet d'aller voir tout les joueurs
 			j.faireOffre(); // le joueur fait son offre
 			offresActuelles.add(j.getOffreCourante()); // on l'ajoute aux offres courantes
 		}
+		System.out.println("[DEBUG] " + offresActuelles.size() + " offres créées.");
 	}
 
 	public void resoudreTour() {
@@ -119,5 +126,9 @@ public class Partie {
 	public Joueur calculerGagnant() {
 		// todo : attribution des points a implementer avant
 		return null;
+	}
+
+	public int getNumeroManche() {
+		return numeroManche;
 	}
 }
