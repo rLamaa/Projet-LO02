@@ -10,12 +10,18 @@ public class Pioche {
     // ajouter les nouvelles cartes si on ajoute une extension
     public void initialiser(boolean avecExtension) {
         for (Couleur c : Couleur.values()) {
-            for (int v = 1; v <= 4; v++) {
+            for (Valeur v : Valeur.values()) {
                 pioche.add(new CarteCouleur(c, v));
             }
         }
         pioche.add(new Joker());
         melanger();
+    }
+    
+    public void afficherPioche() {
+    	for(Carte c : pioche) {
+    		System.out.println(c);
+    	}
     }
 
     // on mélange la pioche

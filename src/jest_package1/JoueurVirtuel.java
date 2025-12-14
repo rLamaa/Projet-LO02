@@ -20,7 +20,7 @@ public class JoueurVirtuel extends Joueur {
         Carte c1 = cartes.get(0);
         Carte c2 = cartes.get(1);
 
-        if (c1.getValeur() > c2.getValeur()) {
+        if (c1.getValeurNumerique() > c2.getValeurNumerique()) {
             Carte temp = c1;
             c1 = c2;
             c2 = temp;
@@ -38,7 +38,7 @@ public class JoueurVirtuel extends Joueur {
 
         for (Offre o : offres) {
             Carte c = o.getCarteVisible();
-            if (meilleureCarte == null || c.getValeur() > meilleureCarte.getValeur()) {
+            if (meilleureCarte == null || c.getValeurNumerique() > meilleureCarte.getValeurNumerique()) {
                 meilleureCarte = c;
                 offreChoisie = o;
             }

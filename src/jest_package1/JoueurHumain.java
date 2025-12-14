@@ -8,6 +8,7 @@ public class JoueurHumain extends Joueur {
 	}
 
 	public ChoixCarte choisirCarte(List<Offre> offres) {
+		
 		return null;
 	}
 
@@ -17,9 +18,13 @@ public class JoueurHumain extends Joueur {
 		System.out.println("\n[" + this.nom + "] Quelle carte doit être cachée?");
 		List<Carte> cartes = this.getJest().getCartes();
 		for (int i = 0; i < cartes.size(); i++) {
-			System.out.println(
-					"  Choix " + (i + 1) + ": " + cartes.get(i).getValeur() + " de "
-							+ cartes.get(i).getCouleur().toString());
+			if(!(cartes.get(i) instanceof Joker)) {
+				System.out.println(
+						"  Choix " + (i + 1) + ": " + cartes.get(i).getValeur() + " de "
+								+ cartes.get(i).getCouleur().getSymbole());
+			} else {
+				System.out.println("  Choix " + (i + 1) + ": Joker");
+			}
 		}
 
 		System.out.print("[" + this.nom + "] La 1 ou la 2? ");

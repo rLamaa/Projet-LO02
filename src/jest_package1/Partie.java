@@ -33,6 +33,7 @@ public class Partie {
 		// on melange la pioche
 		pioche.melanger();
 		System.out.println("Pioche mélangée.");
+		// pioche.afficherPioche();
 		// on initialise les trophées
 		initialiserTrophees();
 		// on assigne les attributs
@@ -47,6 +48,14 @@ public class Partie {
 		trophees.add(pioche.piocher());
 	}
 
+	public List<Carte> getTrophees() {
+		return trophees;
+	}
+
+	public void setTrophees(List<Carte> trophees) {
+		this.trophees = trophees;
+	}
+
 	public void jouerManche() {
 		// apres avoir initialisé la partie, on peut commencer la manche
 		// distribution des cartes
@@ -55,9 +64,9 @@ public class Partie {
 		creerOffres();
 		// boucle de la manche
 		while (!verifierFinManche() && !verifierFinJeu()) {
-			joueurActif = determinerJoueurActif();
 			// a faire
 			resoudreTour();
+
 		}
 	}
 
@@ -81,6 +90,7 @@ public class Partie {
 				}
 			}
 		}
+		System.out.println("Les cartes sont distribuées");
 	}
 
 	public void creerOffres() {
@@ -94,11 +104,57 @@ public class Partie {
 	}
 
 	public void resoudreTour() {
-		// todo: apres l'implementation des méthodes d'autres classes mais avant le
-		// score (agit comme un main)
+		List<Joueur> listJoueursTemp = joueurs;
+		for (Joueur i : joueurs) {
+			Joueur joueurActif = determinerJoueurActif();
+			listJoueursTemp.remove(joueurActif);
+			for (int k = 0; k < joueurs.size(); k++) {
+				System.out.println("Les offres sont : ");
+				int numOffre = 1;
+				for (Joueur j : listJoueursTemp) {
+					if (j.getOffreCourante().estComplete()) {
+						System.out.println("\nOffre " + numOffre + " : " + j.getOffreCourante().getCarteVisible());
+					} else {
+						System.out.println("L'offre " + numOffre + " n'est plus complète. Pas possible de la choisir");
+					}
+					numOffre++;
+				}
+				
+				int choixOffre = 0;
+				System.out.println("\n[" + joueurActif.nom + "] Choisissez l'offre qui vous intéresse (1, 2 ou 3) :");
+				choixOffre = Integer.parseInt(Jeu.scanner.nextLine().trim()); // Read user input and trim whitespace
+				String choixCarte = "0";
+				System.out.println("\n[" + joueurActif.nom + "] Quelle carte voulez-vous ?");
+				System.out.println(" Choix 1 : " + joueurs.get(choixOffre).getOffreCourante().getCarteVisible());
+				System.out.println(" Choix 2 : Carte cachée");
+				System.out.print("[" + joueurActif.nom + "] La 1 ou la 2? ");
+				choixCarte = Jeu.scanner.nextLine().trim(); // Read user input and trim whitespace
+				while (choixCarte != "1" && choixCarte != "2") {
+					if (choixCarte.equals("1")) {
+						joueurActif.ajouterCarteJest(joueurs.get(choixOffre).getOffreCourante().getCarteVisible());
+					} else if (choixCarte.equals("2")) {
+						joueurActif.ajouterCarteJest(joueurs.get(choixOffre).getOffreCourante().getCarteCachee());
+					}
+				}
+			}
+
+		}
 	}
 
 	public Joueur determinerJoueurActif() {
+		int valeurMax = -1;
+		int valeur;
+		for (Joueur j : joueurs) {
+			if(!(j.getOffreCourante().getCarteVisible() instanceof Joker)) {
+				valeur = j.getOffreCourante().getCarteVisible().getValeurNumerique();
+			} else {
+				valeur = 0;
+			}
+			if (valeur > valeurMax) {
+				valeurMax = valeur;
+				joueurActif = j;
+			}
+		}
 		return joueurActif; // attribut présent dans la classe, on peut juste l'appeler
 	}
 

@@ -6,10 +6,10 @@ public class TestDesFonctions {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		 	Carte c1 = new CarteCouleur(Couleur.PIQUE, 7);
-	        Carte c2 = new CarteCouleur(Couleur.COEUR, 1);
+		 	Carte c1 = new CarteCouleur(Couleur.PIQUE, Valeur.TROIS);
+	        Carte c2 = new CarteCouleur(Couleur.COEUR, Valeur.AS);
 	        Carte j = new Joker();
-
+	        
 	        System.out.println(c1); // 3♠
 	        System.out.println(c2); // 1♥
 	        System.out.println(j);  // Joker

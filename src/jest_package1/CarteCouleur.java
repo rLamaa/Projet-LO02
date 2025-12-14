@@ -2,7 +2,7 @@ package jest_package1;
 
 public class CarteCouleur extends Carte {
 
-    public CarteCouleur(Couleur couleur, int valeur) {
+    public CarteCouleur(Couleur couleur, Valeur valeur) {
         this.couleur = couleur;
         this.valeur = valeur;
     }

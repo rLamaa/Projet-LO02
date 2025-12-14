@@ -47,7 +47,7 @@ public class Jeu {
 			ajouterJoueur(joueurVirtuel);
 		}
 		System.out.println("Configuration terminée.");
-		System.out.println("[DEBUG] Joueurs en jeu: " + joueurs.stream().map(Joueur::getNom).toArray());
+		System.out.println("[DEBUG] Joueurs en jeu: " + java.util.Arrays.toString(joueurs.stream().map(Joueur::getNom).toArray()));
 	}
 
 	public void ajouterJoueur(Joueur joueurs) {
@@ -78,14 +78,26 @@ public class Jeu {
 		this.etat = EtatPartie.EN_COURS;
 		this.partieCourante = new Partie();
 		partieCourante.initialiser(joueurs, regleJeu, extension);
+		List<Carte> trophees = partieCourante.getTrophees();
+		System.out.println("Les trophées sont : ");
+		for(Carte c : trophees) {
+			if(!(c instanceof Joker)) {
+				System.out.println(c.getValeur() + c.getCouleur().getSymbole());
+			} else {
+				System.out.println("Joker");
+			}
+			
+		}
 		// debug
 		// System.out.println(partieCourante.verifierFinJeu());
 		while (!partieCourante.verifierFinJeu()) {
-			System.out.println("Début de la manche " + partieCourante.getNumeroManche());
+			System.out.println("\n     Début de la manche " + partieCourante.getNumeroManche());
 			partieCourante.jouerManche();
 
 		}
 	}
+	
+	
 
 	public void sauvegarder(String fichier) {
 
