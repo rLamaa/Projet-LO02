@@ -1,6 +1,9 @@
 package jest_package1;
 
-public class Offre {
+import java.io.Serializable;
+
+public class Offre implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private Carte carteVisible;
 	private Carte carteCachee;
 	private Joueur proprietaire;

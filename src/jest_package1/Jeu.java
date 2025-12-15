@@ -1,8 +1,16 @@
 package jest_package1;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.*;
 
-public class Jeu {
+public class Jeu implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private List<Joueur> joueurs;
 	private RegleJeu regleJeu;
 	private Extension extension;
@@ -47,7 +55,8 @@ public class Jeu {
 			ajouterJoueur(joueurVirtuel);
 		}
 		System.out.println("Configuration terminée.");
-		System.out.println("[DEBUG] Joueurs en jeu: " + java.util.Arrays.toString(joueurs.stream().map(Joueur::getNom).toArray()));
+		System.out.println(
+				"[DEBUG] Joueurs en jeu: " + java.util.Arrays.toString(joueurs.stream().map(Joueur::getNom).toArray()));
 	}
 
 	public void ajouterJoueur(Joueur joueurs) {
@@ -80,13 +89,13 @@ public class Jeu {
 		partieCourante.initialiser(joueurs, regleJeu, extension);
 		List<Carte> trophees = partieCourante.getTrophees();
 		System.out.println("Les trophées sont : ");
-		for(Carte c : trophees) {
-			if(!(c instanceof Joker)) {
+		for (Carte c : trophees) {
+			if (!(c instanceof Joker)) {
 				System.out.println(c.getValeur() + c.getCouleur().getSymbole());
 			} else {
 				System.out.println("Joker");
 			}
-			
+
 		}
 		// debug
 		// System.out.println(partieCourante.verifierFinJeu());
@@ -96,15 +105,32 @@ public class Jeu {
 
 		}
 	}
-	
-	
 
-	public void sauvegarder(String fichier) {
+	public void sauvegarder() {
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("sauvegarde_jeu.dat"))) {
 
+			oos.writeObject(this);
+
+			System.out.println("✔ Partie sauvegardée dans sauvegarde_jeu.dat");
+
+		} catch (IOException e) {
+			System.err.println("❌ Erreur lors de la sauvegarde");
+			e.printStackTrace();
+		}
 	}
 
-	public void charger(String fichier) {
+	public static Jeu charger(String fichier) {
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fichier))) {
 
+			Jeu jeu = (Jeu) ois.readObject();
+			System.out.println("✔ Partie chargée depuis " + fichier);
+			return jeu;
+
+		} catch (IOException | ClassNotFoundException e) {
+			System.err.println("❌ Erreur lors du chargement");
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public static void main(String[] args) {

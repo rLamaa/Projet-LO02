@@ -1,10 +1,12 @@
 package jest_package1;
 
+import java.io.Serializable;
 
-public class Joker extends Carte {
-	
+public class Joker extends Carte implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     public Joker() {
-        this.couleur = null;  // Joker n’a pas de couleur
+        this.couleur = null; // Joker n’a pas de couleur
     }
 
     @Override

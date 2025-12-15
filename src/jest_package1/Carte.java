@@ -1,6 +1,9 @@
 package jest_package1;
 
-public abstract class Carte {
+import java.io.Serializable;
+
+public abstract class Carte implements Serializable {
+    private static final long serialVersionUID = 1L;
     protected Couleur couleur;
     protected Valeur valeur;
 
@@ -15,15 +18,17 @@ public abstract class Carte {
     public Valeur getValeur() {
         return valeur;
     }
-    
+
     public int getValeurNumerique() {
-    	return valeur.getValeur();
+        return valeur.getValeur();
     }
 
     // C'est quoi l'utilité de cette methode ?
-    /*public boolean estAs() {
-        return this.valeur == 1;
-    }*/
+    /*
+     * public boolean estAs() {
+     * return this.valeur == 1;
+     * }
+     */
 
     public String toString() {
         return "";

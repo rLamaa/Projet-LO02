@@ -1,8 +1,10 @@
 package jest_package1;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Partie {
+public class Partie implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private Pioche pioche = new Pioche();
 	private List<Carte> trophees;
 	private List<Joueur> joueurs;
@@ -119,7 +121,7 @@ public class Partie {
 					}
 					numOffre++;
 				}
-				
+
 				int choixOffre = 0;
 				System.out.println("\n[" + joueurActif.nom + "] Choisissez l'offre qui vous intéresse (1, 2 ou 3) :");
 				choixOffre = Integer.parseInt(Jeu.scanner.nextLine().trim()); // Read user input and trim whitespace
@@ -145,7 +147,7 @@ public class Partie {
 		int valeurMax = -1;
 		int valeur;
 		for (Joueur j : joueurs) {
-			if(!(j.getOffreCourante().getCarteVisible() instanceof Joker)) {
+			if (!(j.getOffreCourante().getCarteVisible() instanceof Joker)) {
 				valeur = j.getOffreCourante().getCarteVisible().getValeurNumerique();
 			} else {
 				valeur = 0;

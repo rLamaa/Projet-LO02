@@ -1,14 +1,17 @@
 package jest_package1;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class JoueurHumain extends Joueur {
+public class JoueurHumain extends Joueur implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	public JoueurHumain(String nom) {
 		super(nom);
 	}
 
 	public ChoixCarte choisirCarte(List<Offre> offres) {
-		
+
 		return null;
 	}
 
@@ -18,7 +21,7 @@ public class JoueurHumain extends Joueur {
 		System.out.println("\n[" + this.nom + "] Quelle carte doit être cachée?");
 		List<Carte> cartes = this.getJest().getCartes();
 		for (int i = 0; i < cartes.size(); i++) {
-			if(!(cartes.get(i) instanceof Joker)) {
+			if (!(cartes.get(i) instanceof Joker)) {
 				System.out.println(
 						"  Choix " + (i + 1) + ": " + cartes.get(i).getValeur() + " de "
 								+ cartes.get(i).getCouleur().getSymbole());

@@ -1,9 +1,11 @@
 package jest_package1;
 
+import java.io.Serializable;
 import java.util.*;
 
 //finie sauf problèmes d'intégration
-public class Pioche {
+public class Pioche implements Serializable {
+    private static final long serialVersionUID = 1L;
     // création de la pioche
     private Stack<Carte> pioche = new Stack<>();
 
@@ -17,11 +19,11 @@ public class Pioche {
         pioche.add(new Joker());
         melanger();
     }
-    
+
     public void afficherPioche() {
-    	for(Carte c : pioche) {
-    		System.out.println(c);
-    	}
+        for (Carte c : pioche) {
+            System.out.println(c);
+        }
     }
 
     // on mélange la pioche

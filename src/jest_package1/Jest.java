@@ -1,8 +1,10 @@
 package jest_package1;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Jest {
+public class Jest implements Serializable {
+    private static final long serialVersionUID = 1L;
     private List<Carte> cartes;
     private List<Carte> trophees;
 
@@ -11,8 +13,19 @@ public class Jest {
         this.trophees = new ArrayList<>();
     }
 
-    public void ajouterCarte(Carte carte) { cartes.add(carte); }
-    public void ajouterTrophee(Carte carte) { trophees.add(carte); }
-    public List<Carte> getCartes() { return cartes; }
-    public List<Carte> getTrophees() { return trophees; }
+    public void ajouterCarte(Carte carte) {
+        cartes.add(carte);
+    }
+
+    public void ajouterTrophee(Carte carte) {
+        trophees.add(carte);
+    }
+
+    public List<Carte> getCartes() {
+        return cartes;
+    }
+
+    public List<Carte> getTrophees() {
+        return trophees;
+    }
 }
