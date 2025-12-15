@@ -3,8 +3,14 @@ package jest_package1;
 import java.io.Serializable;
 import java.util.*;
 
+/**
+ * Classe Partie implémentant le patron Singleton.
+ * Gère le déroulement d'une partie de Jest.
+ */
 public class Partie implements Serializable {
 	private static final long serialVersionUID = 1L;
+	private static Partie instance;
+
 	private Pioche pioche = new Pioche();
 	private List<Carte> trophees;
 	private List<Joueur> joueurs;
@@ -12,33 +18,57 @@ public class Partie implements Serializable {
 	private int numeroManche;
 	private List<Offre> offresActuelles;
 	private Joueur joueurActif;
+	private transient Jeu jeuReference;
+
+	/**
+	 * Constructeur privé pour le pattern Singleton
+	 */
+	private Partie() {
+		this.numeroManche = 0;
+	}
+
+	/**
+	 * Retourne l'instance unique de Partie
+	 */
+	public static Partie getInstance() {
+		if (instance == null) {
+			instance = new Partie();
+		}
+		return instance;
+	}
+
+	/**
+	 * Réinitialise l'instance (utile pour démarrer une nouvelle partie)
+	 */
+	public static void reinitialiser() {
+		instance = new Partie();
+	}
 
 	public void initialiser(List<Joueur> joueurs, RegleJeu regleJeu, Extension extension) {
-		// Créer de nouveaux joueurs pour éviter les références partagées
 		List<Joueur> joueursInitialises = new ArrayList<>();
-		// Boucle pour chaque joueur dans la liste fournie
+
 		for (Joueur p : joueurs) {
 			Joueur joueur = null;
-
 			if (p instanceof JoueurHumain) {
 				joueur = new JoueurHumain(p.getNom());
-			} else if (p instanceof JoueurVirtuel) { // Vérifie si le joueur est un JoueurVirtuel
-				joueur = new JoueurVirtuel(p.getNom()); // pour le nom on pourra faire une enumeration de noms
-														// predefinis
+			} else if (p instanceof JoueurVirtuel) {
+				joueur = new JoueurVirtuel(p.getNom());
 			}
-			// on ajoute le joueur à la liste
 			joueursInitialises.add(joueur);
 		}
-		// initialisation de la pioche
-		pioche.initialiser(false);
+
+		// Initialisation de la pioche avec extension si présente
+		pioche.initialiser(extension != null);
+		if (extension != null && extension.estActive()) {
+			pioche.ajouterCartes(new ArrayList<>(extension.getCartes()));
+		}
+
 		System.out.println("Pioche initialisée avec " + pioche.getTaille() + " cartes.");
-		// on melange la pioche
 		pioche.melanger();
 		System.out.println("Pioche mélangée.");
-		// pioche.afficherPioche();
-		// on initialise les trophées
+
 		initialiserTrophees();
-		// on assigne les attributs
+
 		this.joueurs = joueursInitialises;
 		this.regleJeu = regleJeu;
 		this.numeroManche = 1;
@@ -46,50 +76,62 @@ public class Partie implements Serializable {
 
 	private void initialiserTrophees() {
 		trophees = new ArrayList<>();
-		trophees.add(pioche.piocher());
-		trophees.add(pioche.piocher());
+		int nbTrophees = (joueurs != null && joueurs.size() == 4) ? 1 : 2;
+		for (int i = 0; i < nbTrophees; i++) {
+			trophees.add(pioche.piocher());
+		}
 	}
 
 	public List<Carte> getTrophees() {
 		return trophees;
 	}
 
-	public void setTrophees(List<Carte> trophees) {
-		this.trophees = trophees;
-	}
-
 	public void jouerManche() {
-		// apres avoir initialisé la partie, on peut commencer la manche
-		// distribution des cartes
 		distribuerCartes();
-		// creations des offres
-		creerOffres();
-		// boucle de la manche
-		while (!verifierFinManche() && !verifierFinJeu()) {
-			// a faire
-			resoudreTour();
 
+		if (jeuReference != null && jeuReference.proposerSauvegardeOuQuitter()) {
+			return;
 		}
+
+		creerOffres();
+
+		while (!verifierFinManche() && !verifierFinJeu()) {
+			resoudreTour();
+		}
+
+		numeroManche++;
 	}
 
 	public void distribuerCartes() {
 		if (numeroManche == 1) {
-			// Distribution initiale
 			for (Joueur j : joueurs) {
-				// On pioche 2 cartes à mettre dans le Jest (face-down)
 				List<Carte> cartesInitiales = pioche.piocher(2);
 				for (Carte c : cartesInitiales) {
 					j.ajouterCarteJest(c);
 				}
 			}
 		} else {
-			// Pour les manches suivantes
-			for (Joueur j : joueurs) {
-				// On pioche 2 cartes par joueur (à ajouter à Jest)
-				List<Carte> cartesManche = pioche.piocher(2);
-				for (Carte c : cartesManche) {
-					j.ajouterCarteJest(c);
+			// Récupérer les cartes non choisies
+			List<Carte> cartesRestantes = new ArrayList<>();
+			for (Offre o : offresActuelles) {
+				if (o.getCarteVisible() != null) {
+					cartesRestantes.add(o.getCarteVisible());
 				}
+				if (o.getCarteCachee() != null) {
+					cartesRestantes.add(o.getCarteCachee());
+				}
+			}
+
+			// Ajouter des cartes de la pioche
+			int nbCartesAPiocher = joueurs.size();
+			cartesRestantes.addAll(pioche.piocher(nbCartesAPiocher));
+
+			Collections.shuffle(cartesRestantes);
+
+			// Distribuer 2 cartes à chaque joueur
+			for (int i = 0; i < joueurs.size(); i++) {
+				joueurs.get(i).ajouterCarteJest(cartesRestantes.get(i * 2));
+				joueurs.get(i).ajouterCarteJest(cartesRestantes.get(i * 2 + 1));
 			}
 		}
 		System.out.println("Les cartes sont distribuées");
@@ -98,95 +140,121 @@ public class Partie implements Serializable {
 	public void creerOffres() {
 		offresActuelles = new ArrayList<>();
 		System.out.println("\n=== Création des offres ===");
-		for (Joueur j : joueurs) { // boucle qui permet d'aller voir tout les joueurs
-			j.faireOffre(); // le joueur fait son offre
-			offresActuelles.add(j.getOffreCourante()); // on l'ajoute aux offres courantes
+
+		for (Joueur j : joueurs) {
+			Offre offre = j.faireOffre();
+			offresActuelles.add(offre);
+
+			System.out.println("[" + j.getNom() + "] Offre créée - Visible: " +
+					offre.getCarteVisible() + " | Cachée: [?]");
 		}
-		System.out.println("[DEBUG] " + offresActuelles.size() + " offres créées.");
 	}
 
 	public void resoudreTour() {
-		List<Joueur> listJoueursTemp = joueurs;
-		for (Joueur i : joueurs) {
-			Joueur joueurActif = determinerJoueurActif();
-			listJoueursTemp.remove(joueurActif);
-			for (int k = 0; k < joueurs.size(); k++) {
-				System.out.println("Les offres sont : ");
-				int numOffre = 1;
-				for (Joueur j : listJoueursTemp) {
-					if (j.getOffreCourante().estComplete()) {
-						System.out.println("\nOffre " + numOffre + " : " + j.getOffreCourante().getCarteVisible());
-					} else {
-						System.out.println("L'offre " + numOffre + " n'est plus complète. Pas possible de la choisir");
-					}
-					numOffre++;
-				}
+		// Trier les joueurs par ordre décroissant de leur carte visible
+		List<Joueur> ordreJoueurs = new ArrayList<>(joueurs);
+		ordreJoueurs.sort((j1, j2) -> {
+			int val1 = 0, val2 = 0;
+			if (!(j1.getOffreCourante().getCarteVisible() instanceof Joker)) {
+				val1 = j1.getOffreCourante().getCarteVisible().getValeurNumerique();
+			}
+			if (!(j2.getOffreCourante().getCarteVisible() instanceof Joker)) {
+				val2 = j2.getOffreCourante().getCarteVisible().getValeurNumerique();
+			}
+			return Integer.compare(val2, val1); // Ordre décroissant
+		});
 
-				int choixOffre = 0;
-				System.out.println("\n[" + joueurActif.nom + "] Choisissez l'offre qui vous intéresse (1, 2 ou 3) :");
-				choixOffre = Integer.parseInt(Jeu.scanner.nextLine().trim()); // Read user input and trim whitespace
-				String choixCarte = "0";
-				System.out.println("\n[" + joueurActif.nom + "] Quelle carte voulez-vous ?");
-				System.out.println(" Choix 1 : " + joueurs.get(choixOffre).getOffreCourante().getCarteVisible());
-				System.out.println(" Choix 2 : Carte cachée");
-				System.out.print("[" + joueurActif.nom + "] La 1 ou la 2? ");
-				choixCarte = Jeu.scanner.nextLine().trim(); // Read user input and trim whitespace
-				while (choixCarte != "1" && choixCarte != "2") {
-					if (choixCarte.equals("1")) {
-						joueurActif.ajouterCarteJest(joueurs.get(choixOffre).getOffreCourante().getCarteVisible());
-					} else if (choixCarte.equals("2")) {
-						joueurActif.ajouterCarteJest(joueurs.get(choixOffre).getOffreCourante().getCarteCachee());
-					}
-				}
+		// Chaque joueur prend son tour une fois
+		for (Joueur actif : ordreJoueurs) {
+			if (verifierFinManche()) {
+				break; // La manche est finie
 			}
 
-		}
-	}
+			System.out.println("\n--- Tour de " + actif.getNom() + " ---");
 
-	public Joueur determinerJoueurActif() {
-		int valeurMax = -1;
-		int valeur;
-		for (Joueur j : joueurs) {
-			if (!(j.getOffreCourante().getCarteVisible() instanceof Joker)) {
-				valeur = j.getOffreCourante().getCarteVisible().getValeurNumerique();
-			} else {
-				valeur = 0;
-			}
-			if (valeur > valeurMax) {
-				valeurMax = valeur;
-				joueurActif = j;
+			ChoixCarte choix = actif.choisirCarte(offresActuelles);
+
+			if (choix != null) {
+				Carte carteChoisie = choix.getCarte();
+				Offre offreChoisie = choix.getOffre();
+
+				actif.ajouterCarteJest(carteChoisie);
+				offreChoisie.retirerCarte(carteChoisie);
+
+				System.out.println("[" + actif.getNom() + "] a pris: " + carteChoisie);
 			}
 		}
-		return joueurActif; // attribut présent dans la classe, on peut juste l'appeler
-	}
-
-	public void prendreCarteOffre(Joueur joueurchoisi, Offre offrechoisie, Carte cartechoisie) {
-
 	}
 
 	public boolean verifierFinManche() {
-		for (Offre o : offresActuelles) { // boucle qui permet de tourner dans toutes les offres
+		for (Offre o : offresActuelles) {
 			if (o.estComplete()) {
-				return false; // il reste une offre complète, la manche continue
+				return false;
 			}
 		}
-		return true; // toutes les offres ont exactement 1 carte
+		return true;
 	}
 
 	public boolean verifierFinJeu() {
-		return pioche.estVide(); // regarde si la pioche est vide
+		return pioche.estVide();
+	}
+
+	public void terminerPartie() {
+		System.out.println("\n=== FIN DE LA PARTIE ===");
+
+		// Chaque joueur prend sa dernière carte
+		for (int i = 0; i < joueurs.size(); i++) {
+			Offre offre = offresActuelles.get(i);
+			Carte derniereCarte = offre.getCarteVisible() != null ? offre.getCarteVisible() : offre.getCarteCachee();
+			joueurs.get(i).ajouterCarteJest(derniereCarte);
+		}
+
+		attribuerTrophees();
+		calculerGagnant();
 	}
 
 	public void attribuerTrophees() {
-		// todo : attribution finale des trophées, faire à la fin
+		System.out.println("\n=== Attribution des trophées ===");
+
+		for (Carte trophee : trophees) {
+			Joueur gagnant = regleJeu.determinerGagnantTrophee(joueurs, trophee);
+			if (gagnant != null) {
+				gagnant.getJest().ajouterTrophee(trophee);
+				System.out.println("Trophée " + trophee + " attribué à " + gagnant.getNom());
+			}
+		}
 	}
 
 	public Joueur calculerGagnant() {
-		// todo : attribution des points a implementer avant
-		return null;
+		System.out.println("\n=== Calcul des scores ===");
+
+		VisiteurScore calculateur = new CalculateurScoreStandard();
+		int scoreMax = Integer.MIN_VALUE;
+		Joueur gagnant = null;
+
+		for (Joueur j : joueurs) {
+			int score = calculateur.calculerScore(j.getJest());
+			System.out.println("[" + j.getNom() + "] Score: " + score);
+
+			if (score > scoreMax) {
+				scoreMax = score;
+				gagnant = j;
+			}
+		}
+
+		System.out.println("\n🏆 GAGNANT: " + gagnant.getNom() + " avec " + scoreMax + " points!");
+		return gagnant;
 	}
 
 	public int getNumeroManche() {
 		return numeroManche;
+	}
+
+	public void setJeuReference(Jeu jeu) {
+		this.jeuReference = jeu;
+	}
+
+	public List<Joueur> getJoueurs() {
+		return joueurs;
 	}
 }

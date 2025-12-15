@@ -21,4 +21,10 @@ public class VarianteStrategique implements RegleJeu, Serializable {
 
     public void appliquerReglesSpeciales(Jeu jeu) {
     }
+
+    @Override
+    public Joueur determinerGagnantTrophee(List<Joueur> joueurs, Carte trophee) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'determinerGagnantTrophee'");
+    }
 }

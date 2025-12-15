@@ -1,16 +1,24 @@
 package jest_package1;
 
-import java.io.Serializable;
 import java.util.List;
 
-public class JoueurVirtuel extends Joueur implements Serializable {
+/**
+ * Joueur virtuel utilisant une stratégie pour prendre ses décisions
+ */
+public class JoueurVirtuel extends Joueur {
     private static final long serialVersionUID = 1L;
+    private Strategie strategie;
 
     public JoueurVirtuel(String nom) {
         super(nom);
+        // Stratégie par défaut: offensive
+        this.strategie = new StrategieOffensive();
     }
 
-    private Strategie strategie;
+    public JoueurVirtuel(String nom, Strategie strategie) {
+        super(nom);
+        this.strategie = strategie;
+    }
 
     @Override
     public Offre faireOffre() {
@@ -19,39 +27,50 @@ public class JoueurVirtuel extends Joueur implements Serializable {
             throw new IllegalStateException("Pas assez de cartes pour faire une offre");
         }
 
-        // On choisit la carte de plus faible valeur pour la cacher
-        Carte c1 = cartes.get(0);
-        Carte c2 = cartes.get(1);
+        Carte c1 = cartes.remove(0);
+        Carte c2 = cartes.remove(0);
 
-        if (c1.getValeurNumerique() > c2.getValeurNumerique()) {
-            Carte temp = c1;
-            c1 = c2;
-            c2 = temp;
-        }
+        // Utiliser la stratégie pour choisir quelle carte cacher
+        Offre offre = strategie.choisirCartesOffre(c1, c2);
+        this.offreCourante = new Offre(offre.getCarteCachee(), offre.getCarteVisible(), this);
 
-        this.offreCourante = new Offre(c1, c2, this);
+        System.out.println("[" + nom + "] (Bot) Offre créée - Visible: " +
+                this.offreCourante.getCarteVisible());
+
         return this.offreCourante;
     }
 
     @Override
     public ChoixCarte choisirCarte(List<Offre> offres) {
-        // Stratégie simple: choisir la carte face-up avec la plus grande valeur
-        Carte meilleureCarte = null;
-        Offre offreChoisie = null;
-
+        // Filtrer les offres complètes qui ne sont pas les nôtres
+        List<Offre> offresDisponibles = new java.util.ArrayList<>();
         for (Offre o : offres) {
-            Carte c = o.getCarteVisible();
-            if (meilleureCarte == null || c.getValeurNumerique() > meilleureCarte.getValeurNumerique()) {
-                meilleureCarte = c;
-                offreChoisie = o;
+            if (o.estComplete() && o.getProprietaire() != this) {
+                offresDisponibles.add(o);
             }
         }
 
-        return new ChoixCarte(offreChoisie, meilleureCarte);
+        if (offresDisponibles.isEmpty()) {
+            return null;
+        }
+
+        // Utiliser la stratégie pour choisir
+        ChoixCarte choix = strategie.choisirCarte(offresDisponibles, jest);
+
+        if (choix != null) {
+            System.out.println("[" + nom + "] (Bot) choisit la carte " +
+                    choix.getCarte() + " de l'offre de " +
+                    choix.getOffre().getProprietaire().getNom());
+        }
+
+        return choix;
     }
 
     public void setStrategie(Strategie strategie) {
         this.strategie = strategie;
     }
 
+    public Strategie getStrategie() {
+        return strategie;
+    }
 }

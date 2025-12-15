@@ -1,11 +1,6 @@
 package jest_package1;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.util.*;
 
 public class Jeu implements Serializable {
@@ -24,47 +19,130 @@ public class Jeu implements Serializable {
 	}
 
 	public void configurerJeu() {
-		// configuration par défaut
-		this.regleJeu = new RegleStandard();
-		this.extension = null;
-		// configurer les joueurs en ligne de commandes
-		System.out.println("Configuration du jeu Jest");
-		int nbJoueurs = 0;
-		while (nbJoueurs < 1 || nbJoueurs > 4) {
-			System.out.print(
-					"Entrez le nombre de joueurs physique (3-4), si il n'y en a pas assez, des bots seront ajouté automatiquement : ");
-			nbJoueurs = scanner.nextInt();
-			scanner.nextLine(); // Consume the leftover newline
-		}
-		System.out.println("[DEBUG] " + nbJoueurs + " joueur(s) humain(s) configuré(s).");
-		if (nbJoueurs < 3) {
-			System.out.println(
-					"Le nombre de joueurs physique est inférieur à 3, des joueurs virtuels seront ajoutés automatiquement.");
-		}
-		for (int i = 1; i <= nbJoueurs; i++) {
-			System.out.print("Entrez le nom du joueur " + i + " : ");
-			String nom = scanner.next();
-			scanner.nextLine(); // Consume the leftover newline
-			Joueur joueur = new JoueurHumain(nom);
-			ajouterJoueur(joueur);
-		}
-		for (int i = joueurs.size() + 1; i <= 3; i++) {
-			String nomVirtuel = "Bot_" + i;
-			System.out.println("[DEBUG] Ajout du joueur virtuel : " + nomVirtuel);
-			JoueurVirtuel joueurVirtuel = new JoueurVirtuel(nomVirtuel);
-			ajouterJoueur(joueurVirtuel);
-		}
-		System.out.println("Configuration terminée.");
-		System.out.println(
-				"[DEBUG] Joueurs en jeu: " + java.util.Arrays.toString(joueurs.stream().map(Joueur::getNom).toArray()));
+		System.out.println("\n╔════════════════════════════════════╗");
+		System.out.println("║   Configuration du jeu JEST        ║");
+		System.out.println("╚════════════════════════════════════╝\n");
+
+		// Configuration des joueurs
+		configurerJoueurs();
+
+		// Choix de la variante
+		choisirVariante();
+
+		// Choix de l'extension
+		choisirExtension();
+
+		System.out.println("\n✓ Configuration terminée!");
+		afficherRecapitulatif();
 	}
 
-	public void ajouterJoueur(Joueur joueurs) {
+	private void configurerJoueurs() {
+		int nbJoueurs = 0;
+		while (nbJoueurs < 1 || nbJoueurs > 4) {
+			System.out.print("Nombre de joueurs humains (1-4): ");
+			try {
+				nbJoueurs = scanner.nextInt();
+				scanner.nextLine();
+			} catch (InputMismatchException e) {
+				scanner.nextLine();
+				System.out.println("⚠ Veuillez entrer un nombre valide");
+			}
+		}
+
+		// Joueurs humains
+		for (int i = 1; i <= nbJoueurs; i++) {
+			System.out.print("Nom du joueur " + i + ": ");
+			String nom = scanner.nextLine().trim();
+			if (nom.isEmpty())
+				nom = "Joueur" + i;
+			ajouterJoueur(new JoueurHumain(nom));
+		}
+
+		// Compléter avec des bots jusqu'à 3 joueurs minimum
+		int nbBots = Math.max(0, 3 - nbJoueurs);
+		String[] nomsBots = { "Alpha", "Beta", "Gamma", "Delta" };
+		Strategie[] strategies = {
+				new StrategieOffensive(),
+				new StrategieDefensive(),
+				new StrategieAleatoire()
+		};
+
+		for (int i = 0; i < nbBots; i++) {
+			String nomBot = "Bot_" + nomsBots[i];
+			JoueurVirtuel bot = new JoueurVirtuel(nomBot);
+			bot.setStrategie(strategies[i % strategies.length]);
+			ajouterJoueur(bot);
+			System.out.println("✓ " + nomBot + " ajouté (Stratégie: " +
+					bot.getStrategie().getClass().getSimpleName() + ")");
+		}
+	}
+
+	private void choisirVariante() {
+		System.out.println("\n=== Choix de la variante ===");
+		System.out.println("1. Règles Standard");
+		System.out.println("2. Variante Rapide (5 manches max)");
+		System.out.println("3. Variante Stratégique (offres visibles, scores modifiés)");
+		System.out.print("Votre choix (1-3): ");
+
+		int choix = 1;
+		try {
+			choix = scanner.nextInt();
+			scanner.nextLine();
+		} catch (InputMismatchException e) {
+			scanner.nextLine();
+		}
+
+		switch (choix) {
+			case 2:
+				this.regleJeu = new VarianteRapide();
+				System.out.println("✓ Variante Rapide sélectionnée");
+				break;
+			case 3:
+				this.regleJeu = new VarianteStrategique();
+				System.out.println("✓ Variante Stratégique sélectionnée");
+				break;
+			default:
+				this.regleJeu = new RegleStandard();
+				System.out.println("✓ Règles Standard sélectionnées");
+		}
+	}
+
+	private void choisirExtension() {
+		System.out.println("\n=== Extension ===");
+		System.out.print("Activer l'extension 'Cartes Magiques' ? (o/n): ");
+		String reponse = scanner.nextLine().trim().toLowerCase();
+
+		if (reponse.equals("o") || reponse.equals("oui")) {
+			this.extension = Extension.creerExtensionStandard();
+			this.extension.activer();
+			System.out.println("✓ Extension activée!");
+			System.out.println("  Cartes ajoutées: Doublement, Inversion, Miroir");
+		} else {
+			this.extension = null;
+			System.out.println("✓ Pas d'extension");
+		}
+	}
+
+	private void afficherRecapitulatif() {
+		System.out.println("\n╔════════════════════════════════════╗");
+		System.out.println("║        RÉCAPITULATIF               ║");
+		System.out.println("╠════════════════════════════════════╣");
+		System.out.println("  Joueurs:");
+		for (Joueur j : joueurs) {
+			String type = (j instanceof JoueurHumain) ? "Humain" : "Bot";
+			System.out.println("    • " + j.getNom() + " (" + type + ")");
+		}
+		System.out.println("  Règles: " + regleJeu.getClass().getSimpleName());
+		System.out.println("  Extension: " + (extension != null ? "Oui" : "Non"));
+		System.out.println("╚════════════════════════════════════╝\n");
+	}
+
+	public void ajouterJoueur(Joueur joueur) {
 		if (etat != EtatPartie.CONFIGURATION) { // verification si le jeu est en config
 			System.out.println("Impossible d'ajouter des joueurs : jeu déjà démarré.");
 			return;
 		}
-		this.joueurs.add(joueurs);
+		this.joueurs.add(joueur);
 	}
 
 	public void choisirRegle(RegleJeu regleJeu) {
@@ -85,34 +163,67 @@ public class Jeu implements Serializable {
 
 	public void demarrer() {
 		this.etat = EtatPartie.EN_COURS;
-		this.partieCourante = new Partie();
-		partieCourante.initialiser(joueurs, regleJeu, extension);
-		List<Carte> trophees = partieCourante.getTrophees();
-		System.out.println("Les trophées sont : ");
-		for (Carte c : trophees) {
-			if (!(c instanceof Joker)) {
-				System.out.println(c.getValeur() + c.getCouleur().getSymbole());
-			} else {
-				System.out.println("Joker");
-			}
 
-		}
-		// debug
-		// System.out.println(partieCourante.verifierFinJeu());
+		// Utiliser le Singleton Partie
+		Partie.reinitialiser();
+		this.partieCourante = Partie.getInstance();
+		partieCourante.setJeuReference(this);
+		partieCourante.initialiser(joueurs, regleJeu, extension);
+
+		afficherTrophees();
+
+		// Boucle principale du jeu
 		while (!partieCourante.verifierFinJeu()) {
-			System.out.println("\n     Début de la manche " + partieCourante.getNumeroManche());
+			System.out.println("\n╔════════════════════════════════════╗");
+			System.out.println("║   MANCHE " + partieCourante.getNumeroManche() + "                          ║");
+			System.out.println("╚════════════════════════════════════╝");
+
 			partieCourante.jouerManche();
 
+			if (etat == EtatPartie.SUSPENDUE) {
+				return;
+			}
 		}
+
+		// Fin de partie
+		partieCourante.terminerPartie();
+		this.etat = EtatPartie.TERMINEE;
+	}
+
+	private void afficherTrophees() {
+		System.out.println("\n🏆 === TROPHÉES DE LA PARTIE ===");
+		List<Carte> trophees = partieCourante.getTrophees();
+		for (Carte c : trophees) {
+			System.out.println("  • " + c);
+		}
+		System.out.println();
+	}
+
+	public boolean proposerSauvegardeOuQuitter() {
+		System.out.print("\n💾 Sauvegarder la partie ? (o/n): ");
+		String rep = scanner.nextLine().trim().toLowerCase();
+
+		if (rep.equals("o") || rep.equals("oui")) {
+			sauvegarder();
+
+			System.out.print("Quitter la partie ? (o/n): ");
+			String quitter = scanner.nextLine().trim().toLowerCase();
+
+			if (quitter.equals("o") || quitter.equals("oui")) {
+				etat = EtatPartie.SUSPENDUE;
+				System.out.println("✓ Partie sauvegardée et arrêtée");
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public void sauvegarder() {
-		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("sauvegarde_jeu.dat"))) {
-
+		try (ObjectOutputStream oos = new ObjectOutputStream(
+				new FileOutputStream("sauvegarde_jeu.dat"))) {
 			oos.writeObject(this);
-
-			System.out.println("✔ Partie sauvegardée dans sauvegarde_jeu.dat");
-
+			System.out.println("✓ Partie sauvegardée dans 'sauvegarde_jeu.dat'");
 		} catch (IOException e) {
 			System.err.println("❌ Erreur lors de la sauvegarde");
 			e.printStackTrace();
@@ -120,12 +231,14 @@ public class Jeu implements Serializable {
 	}
 
 	public static Jeu charger(String fichier) {
-		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fichier))) {
-
+		try (ObjectInputStream ois = new ObjectInputStream(
+				new FileInputStream(fichier))) {
 			Jeu jeu = (Jeu) ois.readObject();
-			System.out.println("✔ Partie chargée depuis " + fichier);
+			Partie.reinitialiser();
+			jeu.partieCourante = Partie.getInstance();
+			jeu.partieCourante.setJeuReference(jeu);
+			System.out.println("✓ Partie chargée depuis '" + fichier + "'");
 			return jeu;
-
 		} catch (IOException | ClassNotFoundException e) {
 			System.err.println("❌ Erreur lors du chargement");
 			e.printStackTrace();
@@ -134,8 +247,35 @@ public class Jeu implements Serializable {
 	}
 
 	public static void main(String[] args) {
-		Jeu jeu = new Jeu();
-		jeu.configurerJeu();
+		System.out.println("\n╔════════════════════════════════════╗");
+		System.out.println("║          JEU DE JEST               ║");
+		System.out.println("╚════════════════════════════════════╝\n");
+
+		System.out.println("1. Nouvelle partie");
+		System.out.println("2. Charger une partie");
+		System.out.print("Votre choix: ");
+
+		int choix = 1;
+		try {
+			choix = scanner.nextInt();
+			scanner.nextLine();
+		} catch (InputMismatchException e) {
+			scanner.nextLine();
+		}
+
+		Jeu jeu;
+		if (choix == 2) {
+			jeu = Jeu.charger("sauvegarde_jeu.dat");
+			if (jeu == null) {
+				System.out.println("Création d'une nouvelle partie...");
+				jeu = new Jeu();
+				jeu.configurerJeu();
+			}
+		} else {
+			jeu = new Jeu();
+			jeu.configurerJeu();
+		}
+
 		jeu.demarrer();
 	}
 }

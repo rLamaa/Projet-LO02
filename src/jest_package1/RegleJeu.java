@@ -10,5 +10,7 @@ public interface RegleJeu extends Serializable {
 
     List<Joueur> determinerOrdreJeu(List<Offre> offres);
 
+    Joueur determinerGagnantTrophee(List<Joueur> joueurs, Carte trophee);
+
     void appliquerReglesSpeciales(Jeu jeu);
 }

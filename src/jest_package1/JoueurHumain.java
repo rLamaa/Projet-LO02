@@ -11,8 +11,68 @@ public class JoueurHumain extends Joueur implements Serializable {
 	}
 
 	public ChoixCarte choisirCarte(List<Offre> offres) {
+		// Filtrer les offres disponibles (complètes et pas du joueur lui-même)
+		List<Offre> offresDisponibles = new ArrayList<>();
+		for (Offre o : offres) {
+			if (o.estComplete() && o.getProprietaire() != this) {
+				offresDisponibles.add(o);
+			}
+		}
 
-		return null;
+		if (offresDisponibles.isEmpty()) {
+			return null;
+		}
+
+		// Afficher les offres disponibles
+		System.out.println("\n[" + this.nom + "] Offres disponibles:");
+		for (int i = 0; i < offresDisponibles.size(); i++) {
+			Offre o = offresDisponibles.get(i);
+			System.out.println("  " + (i + 1) + ". [" + o.getProprietaire().getNom() +
+					"] Visible: " + o.getCarteVisible() + " | Cachée: [?]");
+		}
+
+		// Demander le choix de l'offre
+		int choixOffre = 0;
+		System.out.print("\n[" + this.nom + "] Choisissez l'offre (1-" + offresDisponibles.size() + "): ");
+		try {
+			String input = Jeu.scanner.nextLine().trim();
+			if (!input.isEmpty()) {
+				choixOffre = Integer.parseInt(input);
+			} else {
+				choixOffre = 1;
+			}
+		} catch (NumberFormatException e) {
+			choixOffre = 1;
+		}
+
+		// Valider le choix
+		if (choixOffre < 1 || choixOffre > offresDisponibles.size()) {
+			choixOffre = 1;
+		}
+
+		Offre offreChoisie = offresDisponibles.get(choixOffre - 1);
+
+		// Demander le choix de la carte (visible ou cachée)
+		System.out.println("\n[" + this.nom + "] Quelle carte voulez-vous ?");
+		System.out.println("  1. Visible: " + offreChoisie.getCarteVisible());
+		System.out.println("  2. Cachée: [?]");
+		System.out.print("[" + this.nom + "] Votre choix (1 ou 2): ");
+
+		String choixCarte = "";
+		try {
+			choixCarte = Jeu.scanner.nextLine().trim();
+		} catch (NoSuchElementException e) {
+			choixCarte = "1";
+		}
+
+		Carte carteChoisie;
+		if (choixCarte.equals("2")) {
+			carteChoisie = offreChoisie.getCarteCachee();
+		} else {
+			carteChoisie = offreChoisie.getCarteVisible();
+		}
+
+		return new ChoixCarte(offreChoisie, carteChoisie);
 	}
 
 	@Override
