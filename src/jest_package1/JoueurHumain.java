@@ -1,9 +1,8 @@
 package jest_package1;
 
-import java.io.Serializable;
 import java.util.*;
 
-public class JoueurHumain extends Joueur implements Serializable {
+public class JoueurHumain extends Joueur {
 	private static final long serialVersionUID = 1L;
 
 	public JoueurHumain(String nom) {
@@ -19,7 +18,36 @@ public class JoueurHumain extends Joueur implements Serializable {
 			}
 		}
 
+		// CAS SPÉCIAL : Si aucune offre disponible SAUF la sienne
 		if (offresDisponibles.isEmpty()) {
+			// Vérifier si sa propre offre est complète
+			for (Offre o : offres) {
+				if (o.getProprietaire() == this && o.estComplete()) {
+					System.out.println("\n[" + this.nom + "] Vous êtes le dernier joueur.");
+					System.out.println("Vous devez choisir dans votre propre offre.");
+
+					System.out.println("  1. Visible: " + o.getCarteVisible());
+					System.out.println("  2. Cachée: [?]");
+					System.out.print("[" + this.nom + "] Votre choix (1 ou 2): ");
+
+					String choixCarte = "";
+					try {
+						choixCarte = Jeu.scanner.nextLine().trim();
+					} catch (NoSuchElementException e) {
+						choixCarte = "1";
+					}
+
+					Carte carteChoisie;
+					if (choixCarte.equals("2")) {
+						carteChoisie = o.getCarteCachee();
+					} else {
+						carteChoisie = o.getCarteVisible();
+					}
+
+					return new ChoixCarte(o, carteChoisie);
+				}
+			}
+			// Vraiment aucune offre disponible
 			return null;
 		}
 
@@ -79,7 +107,10 @@ public class JoueurHumain extends Joueur implements Serializable {
 	public Offre faireOffre() {
 		String choix = "0";
 		System.out.println("\n[" + this.nom + "] Quelle carte doit être cachée?");
-		List<Carte> cartes = this.getJest().getCartes();
+
+		// CORRECTION IMPORTANTE : Utiliser jest (temporaire), PAS getJest() (définitif)
+		List<Carte> cartes = this.jest.getCartes(); // <-- CHANGÉ ICI
+
 		for (int i = 0; i < cartes.size(); i++) {
 			if (!(cartes.get(i) instanceof Joker)) {
 				System.out.println(
@@ -91,7 +122,7 @@ public class JoueurHumain extends Joueur implements Serializable {
 		}
 
 		System.out.print("[" + this.nom + "] La 1 ou la 2? ");
-		choix = Jeu.scanner.nextLine().trim(); // Read user input and trim whitespace
+		choix = Jeu.scanner.nextLine().trim();
 		Carte c1;
 		Carte c2;
 		if (choix.equals("1")) {
@@ -100,18 +131,16 @@ public class JoueurHumain extends Joueur implements Serializable {
 		} else if (choix.equals("2")) {
 			c2 = cartes.get(0);
 			c1 = cartes.get(1);
-		}
-
-		else {
+		} else {
 			System.out.println("Mauvais choix, première carte mise par défaut");
 			c1 = cartes.get(0);
 			c2 = cartes.get(1);
 		}
-		// On enlève les cartes du Jest du joueur pour qu'au prochain tour, le jest soit vide et une fois les cartes distribuées, 
-		// le jest ne contienne que 2 cartes, comme il se doit
+
+		// On enlève les cartes du Jest TEMPORAIRE
 		this.jest.enleverCarte(c1);
 		this.jest.enleverCarte(c2);
-		
+
 		this.offreCourante = new Offre(c1, c2, this);
 		return this.offreCourante;
 	}

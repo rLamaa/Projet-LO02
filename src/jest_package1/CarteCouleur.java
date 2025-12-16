@@ -1,8 +1,6 @@
 package jest_package1;
 
-import java.io.Serializable;
-
-public class CarteCouleur extends Carte implements Serializable {
+public class CarteCouleur extends Carte {
     private static final long serialVersionUID = 1L;
 
     public CarteCouleur(Couleur couleur, Valeur valeur) {

@@ -1,6 +1,5 @@
 package jest_package1;
 
-import java.io.Serializable;
 import java.util.List;
 
 public class VarianteRapide implements RegleJeu {

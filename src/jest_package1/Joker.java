@@ -1,8 +1,6 @@
 package jest_package1;
 
-import java.io.Serializable;
-
-public class Joker extends Carte implements Serializable {
+public class Joker extends Carte {
     private static final long serialVersionUID = 1L;
 
     public Joker() {

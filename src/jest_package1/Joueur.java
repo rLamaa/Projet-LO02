@@ -24,11 +24,11 @@ public abstract class Joueur implements Serializable {
     public void ajouterCarteJest(Carte carte) {
         jest.ajouterCarte(carte);
     }
-    
+
     public void ajouterCarteJestPerso(Carte carte) {
         jestPerso.ajouterCarte(carte);
     }
-    
+
     public Jest getJest() {
         return jest;
     }
@@ -40,4 +40,9 @@ public abstract class Joueur implements Serializable {
     public Offre getOffreCourante() {
         return offreCourante;
     }
+
+    public Jest getJestPerso() {
+        return jestPerso;
+    }
+
 }

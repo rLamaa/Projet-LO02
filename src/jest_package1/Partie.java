@@ -17,7 +17,6 @@ public class Partie implements Serializable {
 	private RegleJeu regleJeu;
 	private int numeroManche;
 	private List<Offre> offresActuelles;
-	private Joueur joueurActif;
 	private transient Jeu jeuReference;
 
 	/**
@@ -95,15 +94,23 @@ public class Partie implements Serializable {
 
 		creerOffres();
 
-		while (!verifierFinManche() && !verifierFinJeu()) {
+		while (!verifierFinManche()) {
 			resoudreTour();
 		}
 
 		numeroManche++;
 	}
 
+	/**
+	 * Distribue 2 cartes à chaque joueur.
+	 * Première manche: cartes piochées directement
+	 * Autres manches: récupère les cartes non choisies + nouvelles cartes de la
+	 * pioche
+	 */
 	public void distribuerCartes() {
+
 		if (numeroManche == 1) {
+			// Première manche
 			for (Joueur j : joueurs) {
 				List<Carte> cartesInitiales = pioche.piocher(2);
 				for (Carte c : cartesInitiales) {
@@ -122,69 +129,249 @@ public class Partie implements Serializable {
 				}
 			}
 
-			// Ajouter des cartes de la pioche
 			int nbCartesAPiocher = joueurs.size();
 			cartesRestantes.addAll(pioche.piocher(nbCartesAPiocher));
 
 			Collections.shuffle(cartesRestantes);
 
-			// Distribuer 2 cartes à chaque joueur
 			for (int i = 0; i < joueurs.size(); i++) {
 				joueurs.get(i).ajouterCarteJest(cartesRestantes.get(i * 2));
 				joueurs.get(i).ajouterCarteJest(cartesRestantes.get(i * 2 + 1));
 			}
 		}
+
 		System.out.println("Les cartes sont distribuées");
+
+		// DEBUG: Afficher clairement les deux Jest de chaque joueur
+		System.out.println("\n=== DEBUG - Distribution des cartes ===");
+		for (Joueur j : joueurs) {
+			System.out.println("[DEBUG] " + j.getNom() + ":");
+			System.out.println("  ├─ jest (temporaire)     : " + j.getJest().getCartes());
+			System.out.println("  └─ jestPerso (définitif) : " + j.getJestPerso().getCartes()); // TODO: remplacer par
+			// jestPerso
+		}
 	}
 
+	/**
+	 * Crée les offres de chaque joueur (1 carte visible + 1 carte cachée)
+	 * Chaque joueur choisit 2 cartes de sa main pour faire une offre
+	 */
 	public void creerOffres() {
 		offresActuelles = new ArrayList<>();
 		System.out.println("\n=== Création des offres ===");
 
+		// Boucle: chaque joueur propose ses 2 cartes (1 visible, 1 cachée)
 		for (Joueur j : joueurs) {
 			Offre offre = j.faireOffre();
 			offresActuelles.add(offre);
 
 			System.out.println("[" + j.getNom() + "] Offre créée - Visible: " +
 					offre.getCarteVisible() + " | Cachée: [?]");
+
+			// DEBUG: Afficher l'état des deux Jest après création offre
+			System.out.println("[DEBUG] " + j.getNom() + " APRÈS offre:");
+			System.out.println("  ├─ jest (temporaire)     : " + j.getJest().getCartes() + " (cartes pour l'offre)");
+			System.out.println("  ├─ Carte visible : " + offre.getCarteVisible());
+			System.out.println("  ├─ Carte cachée  : " + offre.getCarteCachee());
+			System.out.println("  └─ jestPerso (définitif) : " + j.getJestPerso().getCartes());
+
 		}
 	}
 
+	/**
+	 * Gère un tour complet: chaque joueur choisit une carte jusqu'à fin de la
+	 * manche
+	 * L'ordre des joueurs dépend de la valeur de leurs cartes visibles
+	 * NOUVELLE VERSION : Gère correctement l'ordre des joueurs selon les règles
+	 */
 	public void resoudreTour() {
-		// Trier les joueurs par ordre décroissant de leur carte visible
-		List<Joueur> ordreJoueurs = new ArrayList<>(joueurs);
-		ordreJoueurs.sort((j1, j2) -> {
-			int val1 = 0, val2 = 0;
-			if (!(j1.getOffreCourante().getCarteVisible() instanceof Joker)) {
-				val1 = j1.getOffreCourante().getCarteVisible().getValeurNumerique();
-			}
-			if (!(j2.getOffreCourante().getCarteVisible() instanceof Joker)) {
-				val2 = j2.getOffreCourante().getCarteVisible().getValeurNumerique();
-			}
-			return Integer.compare(val2, val1); // Ordre décroissant
-		});
+		Set<Joueur> joueursAyantJoue = new HashSet<>();
+		Joueur joueurActif = determinerPremierJoueur();
 
-		// Chaque joueur prend son tour une fois
-		for (Joueur actif : ordreJoueurs) {
-			if (verifierFinManche()) {
-				break; // La manche est finie
-			}
+		// Boucle: tant que tous les joueurs n'ont pas joué et la manche n'est pas finie
+		while (joueursAyantJoue.size() < joueurs.size() && !verifierFinManche()) {
+			System.out.println("\n--- Tour de " + joueurActif.getNom() + " ---");
 
-			System.out.println("\n--- Tour de " + actif.getNom() + " ---");
-
-			ChoixCarte choix = actif.choisirCarte(offresActuelles);
+			// Le joueur actif choisit une carte parmi les offres disponibles
+			ChoixCarte choix = joueurActif.choisirCarte(offresActuelles);
 
 			if (choix != null) {
 				Carte carteChoisie = choix.getCarte();
 				Offre offreChoisie = choix.getOffre();
 
-				actif.ajouterCarteJestPerso(carteChoisie);
+				joueurActif.ajouterCarteJestPerso(carteChoisie);
 				offreChoisie.retirerCarte(carteChoisie);
-				
 
-				System.out.println("[" + actif.getNom() + "] a pris: " + carteChoisie);
+				System.out.println("[" + joueurActif.getNom() + "] a pris: " + carteChoisie);
+				// DEBUG: Afficher l'état des deux Jest après prise de carte
+				System.out.println("[DEBUG] " + joueurActif.getNom() + " APRÈS avoir pris la carte:");
+				System.out.println("  ├─ jest (temporaire)     : " + joueurActif.getJest().getCartes());
+				System.out.println("  └─ jestPerso (définitif) : " + joueurActif.getJestPerso().getCartes()); // TODO:
+																												// remplacer
+																												// par
+																												// jestPerso
+				// Marquer ce joueur comme ayant joué
+				joueursAyantJoue.add(joueurActif);
+
+				// Déterminer le prochain joueur
+				joueurActif = determinerProchainJoueur(offreChoisie.getProprietaire(), joueursAyantJoue);
+			} else {
+				// Cas spécial : dernier joueur, doit prendre de sa propre offre
+				Offre offreJoueur = trouverOffreDeJoueur(joueurActif);
+				if (offreJoueur != null && offreJoueur.estComplete()) {
+					System.out.println(
+							"[" + joueurActif.getNom() + "] est le dernier, doit choisir dans sa propre offre");
+
+					// Demander quelle carte prendre de sa propre offre
+					Carte carteChoisie;
+					if (joueurActif instanceof JoueurHumain) {
+						System.out.println("  1. Visible: " + offreJoueur.getCarteVisible());
+						System.out.println("  2. Cachée: [?]");
+						System.out.print("[" + joueurActif.getNom() + "] Votre choix (1 ou 2): ");
+						String choixCarte = Jeu.scanner.nextLine().trim();
+						carteChoisie = choixCarte.equals("2") ? offreJoueur.getCarteCachee()
+								: offreJoueur.getCarteVisible();
+					} else {
+						// Bot prend la visible par défaut
+						carteChoisie = offreJoueur.getCarteVisible();
+					}
+
+					joueurActif.ajouterCarteJestPerso(carteChoisie);
+					offreJoueur.retirerCarte(carteChoisie);
+					System.out.println("[" + joueurActif.getNom() + "] a pris: " + carteChoisie);
+				}
+
+				joueursAyantJoue.add(joueurActif);
+				break; // Fin du tour
 			}
 		}
+	}
+
+	/**
+	 * Détermine le premier joueur selon les règles :
+	 * - Celui avec la carte visible de plus grande valeur
+	 * - En cas d'égalité, celui avec la couleur la plus forte
+	 * - Joker = valeur 0
+	 * Boucle: compare chaque joueur pour trouver celui avec la meilleure carte
+	 */
+	private Joueur determinerPremierJoueur() {
+		Joueur premier = joueurs.get(0);
+		int valeurMax = getValeurCarteVisible(premier);
+		Couleur couleurMax = getCouleurCarteVisible(premier);
+
+		// Boucle: parcourt tous les joueurs pour trouver celui avec la carte la plus
+		// forte
+		for (int i = 1; i < joueurs.size(); i++) {
+			Joueur joueur = joueurs.get(i);
+			int valeur = getValeurCarteVisible(joueur);
+			Couleur couleur = getCouleurCarteVisible(joueur);
+
+			// Condition: si la valeur est supérieure, ce joueur devient le premier
+			if (valeur > valeurMax) {
+				valeurMax = valeur;
+				couleurMax = couleur;
+				premier = joueur;
+			} else if (valeur == valeurMax && couleur != null && couleurMax != null) {
+				// En cas d'égalité, comparer les couleurs (Pique > Trèfle > Carreau > Coeur)
+				if (couleur.getForce() > couleurMax.getForce()) {
+					couleurMax = couleur;
+					premier = joueur;
+				}
+			}
+		}
+
+		System.out.println("[DEBUG] Premier joueur: " + premier.getNom());
+		return premier;
+	}
+
+	/**
+	 * Détermine le prochain joueur selon les règles :
+	 * - C'est le propriétaire de l'offre choisie (s'il n'a pas encore joué)
+	 * - Sinon, c'est le joueur restant avec la plus grande carte visible
+	 * Boucle: parcourt les joueurs restants pour trouver celui avec la meilleure
+	 * carte
+	 */
+	private Joueur determinerProchainJoueur(Joueur proprietaireOffre, Set<Joueur> joueursAyantJoue) {
+		// Si le propriétaire n'a pas encore joué, c'est à lui
+		if (!joueursAyantJoue.contains(proprietaireOffre)) {
+			return proprietaireOffre;
+		}
+
+		// Sinon, trouver parmi les joueurs restants celui avec la plus grande carte
+		// visible
+		Joueur prochain = null;
+		int valeurMax = -1;
+		Couleur couleurMax = null;
+
+		// Boucle: parcourt tous les joueurs qui n'ont pas encore joué
+		for (Joueur joueur : joueurs) {
+			if (!joueursAyantJoue.contains(joueur)) {
+				int valeur = getValeurCarteVisible(joueur);
+				Couleur couleur = getCouleurCarteVisible(joueur);
+
+				// Condition: si c'est le premier ou si la valeur est supérieure
+				if (prochain == null || valeur > valeurMax) {
+					valeurMax = valeur;
+					couleurMax = couleur;
+					prochain = joueur;
+				} else if (valeur == valeurMax && couleur != null && couleurMax != null) {
+					if (couleur.getForce() > couleurMax.getForce()) {
+						couleurMax = couleur;
+						prochain = joueur;
+					}
+				}
+			}
+		}
+
+		return prochain;
+	}
+
+	/**
+	 * Retourne la valeur de la carte visible d'un joueur (Joker = 0)
+	 * Condition: si c'est un Joker, retourne 0; sinon retourne sa valeur numérique
+	 */
+	private int getValeurCarteVisible(Joueur joueur) {
+		Offre offre = trouverOffreDeJoueur(joueur);
+		if (offre == null || offre.getCarteVisible() == null) {
+			return 0;
+		}
+
+		Carte carte = offre.getCarteVisible();
+		if (carte instanceof Joker) {
+			return 0;
+		}
+		return carte.getValeurNumerique();
+	}
+
+	/**
+	 * Retourne la couleur de la carte visible d'un joueur (null si Joker)
+	 * Condition: si c'est un Joker, retourne null; sinon retourne sa couleur
+	 */
+	private Couleur getCouleurCarteVisible(Joueur joueur) {
+		Offre offre = trouverOffreDeJoueur(joueur);
+		if (offre == null || offre.getCarteVisible() == null) {
+			return null;
+		}
+
+		Carte carte = offre.getCarteVisible();
+		if (carte instanceof Joker) {
+			return null;
+		}
+		return carte.getCouleur();
+	}
+
+	/**
+	 * Trouve l'offre d'un joueur donné
+	 * Boucle: parcourt toutes les offres pour trouver celle appartenant au joueur
+	 */
+	private Offre trouverOffreDeJoueur(Joueur joueur) {
+		// Boucle: parcourt les offres jusqu'à trouver celle du joueur
+		for (Offre offre : offresActuelles) {
+			if (offre.getProprietaire() == joueur) {
+				return offre;
+			}
+		}
+		return null;
 	}
 
 	public boolean verifierFinManche() {
@@ -200,32 +387,55 @@ public class Partie implements Serializable {
 		return pioche.estVide();
 	}
 
+	/**
+	 * Termine la partie: récupère les dernières cartes, attribue trophées et
+	 * calcule le gagnant
+	 */
 	public void terminerPartie() {
 		System.out.println("\n=== FIN DE LA PARTIE ===");
 
-		// Chaque joueur prend sa dernière carte
+		// Boucle: chaque joueur prend sa dernière carte restante
 		for (int i = 0; i < joueurs.size(); i++) {
 			Offre offre = offresActuelles.get(i);
 			Carte derniereCarte = offre.getCarteVisible() != null ? offre.getCarteVisible() : offre.getCarteCachee();
 			joueurs.get(i).ajouterCarteJestPerso(derniereCarte);
 		}
 
+		// DEBUG: Afficher le jest final de chaque joueur
+		System.out.println("\n=== DEBUG - Jest final de chaque joueur ===");
+		for (Joueur j : joueurs) {
+			System.out.println("[DEBUG] " + j.getNom() + " - Jest: " + j.getJestPerso().getCartes());
+		}
+
 		attribuerTrophees();
 		calculerGagnant();
 	}
 
+	/**
+	 * Attribue les trophées aux joueurs selon les règles de jeu
+	 * Boucle: pour chaque trophée, détermine le gagnant et l'ajoute à son jest
+	 */
 	public void attribuerTrophees() {
 		System.out.println("\n=== Attribution des trophées ===");
 
+		// Boucle: parcourt chaque trophée et le donne au gagnant
 		for (Carte trophee : trophees) {
 			Joueur gagnant = regleJeu.determinerGagnantTrophee(joueurs, trophee);
 			if (gagnant != null) {
-				gagnant.getJest().ajouterTrophee(trophee);
+				gagnant.getJestPerso().ajouterTrophee(trophee);
 				System.out.println("Trophée " + trophee + " attribué à " + gagnant.getNom());
+				// DEBUG: Afficher le jest du gagnant après l'attribution
+				System.out.println(
+						"[DEBUG] Jest de " + gagnant.getNom() + " après trophée: " + gagnant.getJest().getCartes());
 			}
 		}
 	}
 
+	/**
+	 * Calcule le score final de chaque joueur et détermine le gagnant
+	 * Boucle: parcourt chaque joueur et calcule son score, puis détermine le
+	 * meilleur
+	 */
 	public Joueur calculerGagnant() {
 		System.out.println("\n=== Calcul des scores ===");
 
@@ -233,10 +443,14 @@ public class Partie implements Serializable {
 		int scoreMax = Integer.MIN_VALUE;
 		Joueur gagnant = null;
 
+		// Boucle: calcule le score de chaque joueur
 		for (Joueur j : joueurs) {
-			int score = calculateur.calculerScore(j.getJest());
+			int score = calculateur.calculerScore(j.getJestPerso());
 			System.out.println("[" + j.getNom() + "] Score: " + score);
+			// DEBUG: Afficher le jest du joueur avant calcul final
+			System.out.println("[DEBUG] Jest final de " + j.getNom() + ": " + j.getJest().getCartes());
 
+			// Condition: si le score est meilleur, ce joueur devient le gagnant
 			if (score > scoreMax) {
 				scoreMax = score;
 				gagnant = j;

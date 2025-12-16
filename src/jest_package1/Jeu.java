@@ -183,6 +183,10 @@ public class Jeu implements Serializable {
 			if (etat == EtatPartie.SUSPENDUE) {
 				return;
 			}
+
+			if (partieCourante.verifierFinJeu()) {
+				break;
+			}
 		}
 
 		// Fin de partie
