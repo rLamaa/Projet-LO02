@@ -8,43 +8,79 @@ import java.util.*;
  * Système d'extension avec nouvelles cartes
  */
 public class Extension implements Serializable {
+    /**
+     * Identifiant de version pour la sérialisation.
+     */
     private static final long serialVersionUID = 1L;
     private String nom;
     private List<CarteExtension> nouvellesCartes;
     private boolean active;
 
+    /**
+     * Constructeur de la classe Extension
+     * 
+     * @param nom
+     */
     public Extension(String nom) {
         this.nom = nom;
         this.nouvellesCartes = new ArrayList<>();
         this.active = false;
     }
 
+    /**
+     * Fonction permettant d'ajouter une carte Extension
+     * 
+     * @param c
+     */
     public void ajouterCarte(CarteExtension c) {
         nouvellesCartes.add(c);
     }
 
+    /**
+     * Getter de la liste de carte d'extension
+     * 
+     * @return
+     */
     public List<CarteExtension> getCartes() {
         return nouvellesCartes;
     }
 
+    /**
+     * Fonction permettant de voir si les extensions sont activées
+     * 
+     * @return
+     */
     public boolean estActive() {
         return active;
     }
 
+    /**
+     * Fonction permettant d'activer les extensions
+     */
     public void activer() {
         this.active = true;
     }
 
+    /**
+     * Fonction permettant desactiver les extensions
+     */
     public void desactiver() {
         this.active = false;
     }
 
+    /**
+     * Getter du nom de l'Extension
+     * 
+     * @return
+     */
     public String getNom() {
         return nom;
     }
 
     /**
-     * Crée une extension avec des cartes prédéfinies
+     * Crée une extension avec des effets prédéfinies
+     * 
+     * @return
      */
     public static Extension creerExtensionStandard() {
         Extension ext = new Extension("Extension Magique");

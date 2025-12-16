@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.List;
 
 public abstract class Joueur implements Serializable {
+    /**
+     * Identifiant de version pour la sérialisation.
+     */
     private static final long serialVersionUID = 1L;
 
     public Joueur(String nom) {

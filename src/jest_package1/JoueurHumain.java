@@ -3,6 +3,9 @@ package jest_package1;
 import java.util.*;
 
 public class JoueurHumain extends Joueur {
+	/**
+	 * Identifiant de version pour la sérialisation.
+	 */
 	private static final long serialVersionUID = 1L;
 
 	public JoueurHumain(String nom) {

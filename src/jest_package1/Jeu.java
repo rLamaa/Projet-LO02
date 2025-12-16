@@ -4,15 +4,25 @@ import java.io.*;
 import java.util.*;
 
 public class Jeu implements Serializable {
-
+	/**
+	 * Identifiant de version pour la sérialisation.
+	 */
 	private static final long serialVersionUID = 1L;
-	private List<Joueur> joueurs;
-	private RegleJeu regleJeu;
-	private Extension extension;
-	private Partie partieCourante;
-	private EtatPartie etat;
-	public static Scanner scanner = new Scanner(System.in);
+	private List<Joueur> joueurs; // liste des joueurs de la partie
+	private RegleJeu regleJeu; // regle du jeu de Jest
+	private Extension extension; // carte d'extension
+	private Partie partieCourante; // variable qui fait reference à l'unique instance partie (permet d'avoir une
+									// seule partie par jeu)
+	private EtatPartie etat; // etat de la partie, utile pour la sauvegarde/configuration pour éviter les
+								// bugs
+	public static Scanner scanner = new Scanner(System.in); // NE PAS TOUCHER, buffer commun pour lire les input de
+															// l'utilisateur
 
+	/**
+	 * Constructeur de la classe Jeu
+	 * 
+	 * 
+	 */
 	public Jeu() {
 		this.joueurs = new ArrayList<>();
 		this.etat = EtatPartie.CONFIGURATION;
@@ -38,8 +48,11 @@ public class Jeu implements Serializable {
 
 	private void configurerJoueurs() {
 		int nbJoueurs = 0;
-		while (nbJoueurs < 1 || nbJoueurs > 4) {
+		while (nbJoueurs < 1 || nbJoueurs > 4) { // condition qui permet de ne pas avoir aucun joueur ou plus de
+													// 4 joueurs
 			System.out.print("Nombre de joueurs humains (1-4): ");
+			// les try/catch sont indispensable pour verifier les inputs et permettre à
+			// l'utilisateur de recommencer
 			try {
 				nbJoueurs = scanner.nextInt();
 				scanner.nextLine();
@@ -53,20 +66,21 @@ public class Jeu implements Serializable {
 		for (int i = 1; i <= nbJoueurs; i++) {
 			System.out.print("Nom du joueur " + i + ": ");
 			String nom = scanner.nextLine().trim();
-			if (nom.isEmpty())
+			if (nom.isEmpty()) // condition pour ne pas avoir des noms vide
 				nom = "Joueur" + i;
 			ajouterJoueur(new JoueurHumain(nom));
 		}
 
 		// Compléter avec des bots jusqu'à 3 joueurs minimum
 		int nbBots = Math.max(0, 3 - nbJoueurs);
-		String[] nomsBots = { "Alpha", "Beta", "Gamma", "Delta" };
+		String[] nomsBots = { "Alpha", "Beta", "Gamma", "Delta" }; // noms des bots qui sont appender
 		Strategie[] strategies = {
-				new StrategieOffensive(),
-				new StrategieDefensive(),
-				new StrategieAleatoire()
+				new StrategieOffensive(), // 1
+				new StrategieDefensive(), // 2
+				new StrategieAleatoire() // 3
 		};
-
+		// la boucle attribue aux bots la strategie dans l'ordre, càd le bot 1 aura la
+		// strat 1, le 2 la 2, le 3 la 3, (le 4 la 1)
 		for (int i = 0; i < nbBots; i++) {
 			String nomBot = "Bot_" + nomsBots[i];
 			JoueurVirtuel bot = new JoueurVirtuel(nomBot);
@@ -123,6 +137,8 @@ public class Jeu implements Serializable {
 		}
 	}
 
+	// utile pour que le joueur verifie qu'il a bien tout fait commeil voulait et
+	// pour nous debug
 	private void afficherRecapitulatif() {
 		System.out.println("\n╔════════════════════════════════════╗");
 		System.out.println("║        RÉCAPITULATIF               ║");
