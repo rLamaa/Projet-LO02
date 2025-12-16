@@ -107,6 +107,11 @@ public class JoueurHumain extends Joueur implements Serializable {
 			c1 = cartes.get(0);
 			c2 = cartes.get(1);
 		}
+		// On enlève les cartes du Jest du joueur pour qu'au prochain tour, le jest soit vide et une fois les cartes distribuées, 
+		// le jest ne contienne que 2 cartes, comme il se doit
+		this.jest.enleverCarte(c1);
+		this.jest.enleverCarte(c2);
+		
 		this.offreCourante = new Offre(c1, c2, this);
 		return this.offreCourante;
 	}

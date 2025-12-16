@@ -16,6 +16,10 @@ public class Jest implements Serializable {
     public void ajouterCarte(Carte carte) {
         cartes.add(carte);
     }
+    
+    public void enleverCarte(Carte carte) {
+        cartes.remove(carte);
+    }    
 
     public void ajouterTrophee(Carte carte) {
         trophees.add(carte);

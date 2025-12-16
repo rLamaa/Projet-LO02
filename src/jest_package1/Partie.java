@@ -178,8 +178,9 @@ public class Partie implements Serializable {
 				Carte carteChoisie = choix.getCarte();
 				Offre offreChoisie = choix.getOffre();
 
-				actif.ajouterCarteJest(carteChoisie);
+				actif.ajouterCarteJestPerso(carteChoisie);
 				offreChoisie.retirerCarte(carteChoisie);
+				
 
 				System.out.println("[" + actif.getNom() + "] a pris: " + carteChoisie);
 			}
@@ -206,7 +207,7 @@ public class Partie implements Serializable {
 		for (int i = 0; i < joueurs.size(); i++) {
 			Offre offre = offresActuelles.get(i);
 			Carte derniereCarte = offre.getCarteVisible() != null ? offre.getCarteVisible() : offre.getCarteCachee();
-			joueurs.get(i).ajouterCarteJest(derniereCarte);
+			joueurs.get(i).ajouterCarteJestPerso(derniereCarte);
 		}
 
 		attribuerTrophees();
