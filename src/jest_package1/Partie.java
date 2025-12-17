@@ -66,11 +66,12 @@ public class Partie implements Serializable {
 		pioche.melanger();
 		System.out.println("Pioche mélangée.");
 
-		initialiserTrophees();
-
 		this.joueurs = joueursInitialises;
 		this.regleJeu = regleJeu;
 		this.numeroManche = 1;
+
+		initialiserTrophees();
+
 	}
 
 	private void initialiserTrophees() {
@@ -415,20 +416,124 @@ public class Partie implements Serializable {
 	 * Attribue les trophées aux joueurs selon les règles de jeu
 	 * Boucle: pour chaque trophée, détermine le gagnant et l'ajoute à son jest
 	 */
+	/**
+	 * Attribue les trophées aux joueurs selon les règles de jeu
+	 * Boucle: pour chaque trophée, détermine le gagnant et l'ajoute à son jest
+	 */
 	public void attribuerTrophees() {
-		System.out.println("\n=== Attribution des trophées ===");
+		System.out.println("\n╔════════════════════════════════════════╗");
+		System.out.println("║  🏆 ATTRIBUTION DES TROPHÉES 🏆       ║");
+		System.out.println("╚════════════════════════════════════════╝\n");
 
 		// Boucle: parcourt chaque trophée et le donne au gagnant
 		for (Carte trophee : trophees) {
+			String description = RegleStandard.getDescriptionTrophee(trophee);
+
+			System.out.println("┌────────────────────────────────────────");
+			System.out.println("│ Trophée: " + trophee);
+			System.out.println("│ Condition: " + description);
+
 			Joueur gagnant = regleJeu.determinerGagnantTrophee(joueurs, trophee);
+
 			if (gagnant != null) {
 				gagnant.getJestPerso().ajouterTrophee(trophee);
-				System.out.println("Trophée " + trophee + " attribué à " + gagnant.getNom());
-				// DEBUG: Afficher le jest du gagnant après l'attribution
-				System.out.println(
-						"[DEBUG] Jest de " + gagnant.getNom() + " après trophée: " + gagnant.getJest().getCartes());
+				System.out.println("│ ✅ Attribué à: " + gagnant.getNom());
+
+				// Afficher pourquoi ce joueur a gagné (debug utile)
+				afficherRaisonAttribution(gagnant, trophee);
+			} else {
+				System.out.println("│ ⚠️  Aucun gagnant trouvé");
+			}
+			System.out.println("└────────────────────────────────────────\n");
+		}
+	}
+
+	/**
+	 * Affiche la raison pour laquelle un joueur a gagné un trophée
+	 */
+	private void afficherRaisonAttribution(Joueur gagnant, Carte trophee) {
+		Jest jest = gagnant.getJestPerso();
+
+		if (trophee instanceof Joker) {
+			CalculateurScoreStandard calc = new CalculateurScoreStandard();
+			int score = calc.calculerScore(jest);
+			System.out.println("│   → Score: " + score + " points");
+		} else if (trophee instanceof CarteCouleur) {
+			CarteCouleur ct = (CarteCouleur) trophee;
+			Couleur couleur = ct.getCouleur();
+			Valeur valeur = ct.getValeur();
+
+			// Compter selon la condition
+			if (couleur == Couleur.COEUR) {
+				System.out.println("│   → Possède le Joker");
+			} else if (couleur == Couleur.CARREAU && valeur == Valeur.QUATRE) {
+				CalculateurScoreStandard calc = new CalculateurScoreStandard();
+				int score = calc.calculerScore(jest);
+				System.out.println("│   → Meilleur Jest sans Joker: " + score + " points");
+			} else {
+				// Afficher les cartes pertinentes
+				int count = compterCartesRelevantes(jest, trophee);
+				System.out.println("│   → Nombre trouvé: " + count);
 			}
 		}
+	}
+
+	/**
+	 * Compte les cartes relevantes pour un trophée donné
+	 */
+	private int compterCartesRelevantes(Jest jest, Carte trophee) {
+		if (!(trophee instanceof CarteCouleur))
+			return 0;
+
+		CarteCouleur ct = (CarteCouleur) trophee;
+		Couleur couleur = ct.getCouleur();
+		Valeur valeur = ct.getValeur();
+		int count = 0;
+
+		// Déterminer ce qu'on compte selon le trophée
+		Couleur couleurAChercher = null;
+		Valeur valeurAChercher = null;
+
+		// CARREAUX
+		if (couleur == Couleur.CARREAU) {
+			if (valeur == Valeur.AS) {
+				valeurAChercher = Valeur.QUATRE;
+			} else if (valeur == Valeur.DEUX || valeur == Valeur.TROIS) {
+				couleurAChercher = Couleur.CARREAU;
+			}
+		}
+		// PIQUES
+		else if (couleur == Couleur.PIQUE) {
+			if (valeur == Valeur.TROIS) {
+				valeurAChercher = Valeur.DEUX;
+			} else if (valeur == Valeur.DEUX) {
+				valeurAChercher = Valeur.TROIS;
+			} else if (valeur == Valeur.QUATRE || valeur == Valeur.AS) {
+				couleurAChercher = Couleur.TREFLE;
+			}
+		}
+		// TRÈFLES
+		else if (couleur == Couleur.TREFLE) {
+			if (valeur == Valeur.QUATRE || valeur == Valeur.AS) {
+				couleurAChercher = Couleur.PIQUE;
+			} else if (valeur == Valeur.DEUX || valeur == Valeur.TROIS) {
+				couleurAChercher = Couleur.COEUR;
+			}
+		}
+
+		// Compter les cartes correspondantes
+		for (Carte c : jest.getCartes()) {
+			if (c instanceof CarteCouleur) {
+				CarteCouleur cc = (CarteCouleur) c;
+				if (couleurAChercher != null && cc.getCouleur() == couleurAChercher) {
+					count++;
+				} else if (valeurAChercher != null && cc.getValeur() == valeurAChercher) {
+					count++;
+				}
+			}
+		}
+
+		return count;
 	}
 
 	/**

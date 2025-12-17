@@ -153,6 +153,11 @@ public class Jeu implements Serializable {
 		System.out.println("╚════════════════════════════════════╝\n");
 	}
 
+	/**
+	 * Ajoute un joueur à la partie
+	 * 
+	 * @param joueur le joueur que l'on souhaite ajouter à la partie
+	 */
 	public void ajouterJoueur(Joueur joueur) {
 		if (etat != EtatPartie.CONFIGURATION) { // verification si le jeu est en config
 			System.out.println("Impossible d'ajouter des joueurs : jeu déjà démarré.");
@@ -161,6 +166,11 @@ public class Jeu implements Serializable {
 		this.joueurs.add(joueur);
 	}
 
+	/**
+	 * Choisit la regle du jeu
+	 * 
+	 * @param regleJeu les règles du jeu choisit
+	 */
 	public void choisirRegle(RegleJeu regleJeu) {
 		if (etat != EtatPartie.CONFIGURATION) {
 			System.out.println("Impossible de changer les règles : jeu déjà démarré.");
@@ -169,6 +179,11 @@ public class Jeu implements Serializable {
 		this.regleJeu = regleJeu;
 	}
 
+	/**
+	 * Activte les extensions
+	 * 
+	 * @param extension l'extension choisit
+	 */
 	public void activerExtension(Extension extension) {
 		if (etat != EtatPartie.CONFIGURATION) {
 			System.out.println("Impossible d'activer une extension : jeu déjà démarré.");
@@ -177,6 +192,10 @@ public class Jeu implements Serializable {
 		this.extension = extension;
 	}
 
+	/**
+	 * Demarre la partie, en créant l'instance de la classe et permet alors de
+	 * configurer comme que le joueur souhaite
+	 */
 	public void demarrer() {
 		this.etat = EtatPartie.EN_COURS;
 
@@ -210,15 +229,45 @@ public class Jeu implements Serializable {
 		this.etat = EtatPartie.TERMINEE;
 	}
 
+	/**
+	 * Permet d'afficher les throphées de maniere clair
+	 */
+	/**
+	 * Permet d'afficher les trophées de manière claire avec leurs conditions
+	 */
 	private void afficherTrophees() {
-		System.out.println("\n🏆 === TROPHÉES DE LA PARTIE ===");
+		System.out.println("\n╔════════════════════════════════════════╗");
+		System.out.println("║  🏆 TROPHÉES DE LA PARTIE 🏆         ║");
+		System.out.println("╚════════════════════════════════════════╝");
+
 		List<Carte> trophees = partieCourante.getTrophees();
-		for (Carte c : trophees) {
-			System.out.println("  • " + c);
+
+		for (int i = 0; i < trophees.size(); i++) {
+			Carte c = trophees.get(i);
+			String description = RegleStandard.getDescriptionTrophee(c);
+
+			System.out.println("\n  Trophée " + (i + 1) + ": " + c);
+			System.out.println("  ┗━━ " + description);
 		}
-		System.out.println();
+
+		System.out.println("\n╔════════════════════════════════════════╗");
+		System.out.println("║  ℹ️  RAPPEL DES RÈGLES                ║");
+		System.out.println("╠════════════════════════════════════════╣");
+		System.out.println("║  Piques ♠ & Trèfles ♣ : +points       ║");
+		System.out.println("║  Carreaux ♦ : -points                  ║");
+		System.out.println("║  Cœurs ♥ : 0 pts (sauf avec Joker)    ║");
+		System.out.println("║  Joker seul : +4 pts                   ║");
+		System.out.println("║  Joker + 4 Cœurs : Cœurs positifs!    ║");
+		System.out.println("║  Paire noire (♠+♣ même valeur): +2    ║");
+		System.out.println("║  As seul de sa couleur : vaut 5        ║");
+		System.out.println("╚════════════════════════════════════════╝\n");
 	}
 
+	/**
+	 * La fonction demande à l'utilisateur si il souahite sauvegarder puis quitter
+	 * 
+	 * @return
+	 */
 	public boolean proposerSauvegardeOuQuitter() {
 		System.out.print("\n💾 Sauvegarder la partie ? (o/n): ");
 		String rep = scanner.nextLine().trim().toLowerCase();
@@ -239,6 +288,9 @@ public class Jeu implements Serializable {
 		return false;
 	}
 
+	/**
+	 * Sauvegarde la partie en cours
+	 */
 	public void sauvegarder() {
 		try (ObjectOutputStream oos = new ObjectOutputStream(
 				new FileOutputStream("sauvegarde_jeu.dat"))) {
@@ -250,6 +302,13 @@ public class Jeu implements Serializable {
 		}
 	}
 
+	/**
+	 * Charge une partie depuis
+	 * 
+	 * @param fichier correspond au fichier de sauvegarde du jeu, pour l'instant on
+	 *                ne donne pas le choix à l'utilisateur de choisir du nom
+	 * @return le jeu chargé à travers le fichier
+	 */
 	public static Jeu charger(String fichier) {
 		try (ObjectInputStream ois = new ObjectInputStream(
 				new FileInputStream(fichier))) {
@@ -266,6 +325,11 @@ public class Jeu implements Serializable {
 		}
 	}
 
+	/**
+	 * Fonction principale du jeu, point d'accés
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		System.out.println("\n╔════════════════════════════════════╗");
 		System.out.println("║          JEU DE JEST               ║");

@@ -198,9 +198,7 @@ public abstract class Carte implements Serializable {
 }
 package jest_package1;
 
-import java.io.Serializable;
-
-public class CarteCouleur extends Carte implements Serializable {
+public class CarteCouleur extends Carte {
     private static final long serialVersionUID = 1L;
 
     public CarteCouleur(Couleur couleur, Valeur valeur) {
@@ -316,19 +314,39 @@ package jest_package1;
 import java.io.Serializable;
 
 public class ChoixCarte implements Serializable {
+	/**
+	 * Identifiant de version pour la sérialisation.
+	 */
 	private static final long serialVersionUID = 1L;
 	private Offre offreChoisie;
 	private Carte carteChoisie;
 
+	/**
+	 * Constructeur de la classe ChoixCarte
+	 * 
+	 * @param offreChoisie
+	 * @param carteChoisie
+	 * 
+	 */
 	public ChoixCarte(Offre offreChoisie, Carte carteChoisie) {
 		this.offreChoisie = offreChoisie;
 		this.carteChoisie = carteChoisie;
 	}
 
+	/**
+	 * Getter de l'offre choisie
+	 * 
+	 * @return
+	 */
 	public Offre getOffre() {
 		return offreChoisie;
 	}
 
+	/**
+	 * Getter de la carte choisie
+	 * 
+	 * @return
+	 */
 	public Carte getCarte() {
 		return carteChoisie;
 	}
@@ -337,27 +355,49 @@ public class ChoixCarte implements Serializable {
 public enum Couleur {
     PIQUE, TREFLE, CARREAU, COEUR;
 
+    /**
+     * Getter de la force de la couleur
+     * 
+     * @return
+     */
     public int getForce() {
-    	switch(this) {
-    	case PIQUE: return 4;
-    	case TREFLE: return 3;
-    	case CARREAU: return 2;
-    	case COEUR: return 1;
-    	}
-    	return 0;
-    	}
-    public String getSymbole() { 
         switch (this) {
-        case PIQUE: return "♠";
-        case TREFLE: return "♣";
-        case CARREAU: return "♦";
-        case COEUR: return "♥";
+            case PIQUE:
+                return 4;
+            case TREFLE:
+                return 3;
+            case CARREAU:
+                return 2;
+            case COEUR:
+                return 1;
+        }
+        return 0;
     }
-    return "";
+
+    /**
+     * Getter du symbole de la couleur
+     * 
+     * @return
+     */
+    public String getSymbole() {
+        switch (this) {
+            case PIQUE:
+                return "♠";
+            case TREFLE:
+                return "♣";
+            case CARREAU:
+                return "♦";
+            case COEUR:
+                return "♥";
+        }
+        return "";
     }
 }
 package jest_package1;
 
+/**
+ * Types d'effets possibles des extensions
+ */
 public enum EffetExtension {
     DOUBLEMENT,
     INVERSION,
@@ -365,8 +405,11 @@ public enum EffetExtension {
 }
 package jest_package1;
 
+/**
+ * États possibles d'une partie de Jest
+ */
 
-public enum EtatPartie{
+public enum EtatPartie {
 	CONFIGURATION,
 	EN_COURS,
 	TERMINEE,
@@ -381,43 +424,79 @@ import java.util.*;
  * Système d'extension avec nouvelles cartes
  */
 public class Extension implements Serializable {
+    /**
+     * Identifiant de version pour la sérialisation.
+     */
     private static final long serialVersionUID = 1L;
     private String nom;
     private List<CarteExtension> nouvellesCartes;
     private boolean active;
 
+    /**
+     * Constructeur de la classe Extension
+     * 
+     * @param nom
+     */
     public Extension(String nom) {
         this.nom = nom;
         this.nouvellesCartes = new ArrayList<>();
         this.active = false;
     }
 
+    /**
+     * Fonction permettant d'ajouter une carte Extension
+     * 
+     * @param c
+     */
     public void ajouterCarte(CarteExtension c) {
         nouvellesCartes.add(c);
     }
 
+    /**
+     * Getter de la liste de carte d'extension
+     * 
+     * @return
+     */
     public List<CarteExtension> getCartes() {
         return nouvellesCartes;
     }
 
+    /**
+     * Fonction permettant de voir si les extensions sont activées
+     * 
+     * @return
+     */
     public boolean estActive() {
         return active;
     }
 
+    /**
+     * Fonction permettant d'activer les extensions
+     */
     public void activer() {
         this.active = true;
     }
 
+    /**
+     * Fonction permettant desactiver les extensions
+     */
     public void desactiver() {
         this.active = false;
     }
 
+    /**
+     * Getter du nom de l'Extension
+     * 
+     * @return
+     */
     public String getNom() {
         return nom;
     }
 
     /**
-     * Crée une extension avec des cartes prédéfinies
+     * Crée une extension avec des effets prédéfinies
+     * 
+     * @return
      */
     public static Extension creerExtensionStandard() {
         Extension ext = new Extension("Extension Magique");
@@ -446,27 +525,48 @@ public class Jest implements Serializable {
     private List<Carte> cartes;
     private List<Carte> trophees;
 
+    /**
+     * Constructeur de la fonction
+     */
     public Jest() {
         this.cartes = new ArrayList<>();
         this.trophees = new ArrayList<>();
     }
 
     public void ajouterCarte(Carte carte) {
-        cartes.add(carte);
+        cartes.add(carte); // permet d'ajouter une carte au jest
     }
-    
+
+    /**
+     * Fonction permettant de vider la liste de cartes
+     * NON UTILISE
+     */
+    public void vider() {
+        cartes.clear();
+    }
+
     public void enleverCarte(Carte carte) {
-        cartes.remove(carte);
-    }    
+        cartes.remove(carte);// permet d'enlever une carte au jest
+    }
 
     public void ajouterTrophee(Carte carte) {
-        trophees.add(carte);
+        trophees.add(carte); // permet d'ajouter un trophée au jest
     }
 
+    /**
+     * Getter de la liste de cartes du jest
+     * 
+     * @return
+     */
     public List<Carte> getCartes() {
         return cartes;
     }
 
+    /**
+     * Getter de la liste de trophées du jest
+     * 
+     * @return
+     */
     public List<Carte> getTrophees() {
         return trophees;
     }
@@ -477,15 +577,25 @@ import java.io.*;
 import java.util.*;
 
 public class Jeu implements Serializable {
-
+	/**
+	 * Identifiant de version pour la sérialisation.
+	 */
 	private static final long serialVersionUID = 1L;
-	private List<Joueur> joueurs;
-	private RegleJeu regleJeu;
-	private Extension extension;
-	private Partie partieCourante;
-	private EtatPartie etat;
-	public static Scanner scanner = new Scanner(System.in);
+	private List<Joueur> joueurs; // liste des joueurs de la partie
+	private RegleJeu regleJeu; // regle du jeu de Jest
+	private Extension extension; // carte d'extension
+	private Partie partieCourante; // variable qui fait reference à l'unique instance partie (permet d'avoir une
+									// seule partie par jeu)
+	private EtatPartie etat; // etat de la partie, utile pour la sauvegarde/configuration pour éviter les
+								// bugs
+	public static Scanner scanner = new Scanner(System.in); // NE PAS TOUCHER, buffer commun pour lire les input de
+															// l'utilisateur
 
+	/**
+	 * Constructeur de la classe Jeu
+	 * 
+	 * 
+	 */
 	public Jeu() {
 		this.joueurs = new ArrayList<>();
 		this.etat = EtatPartie.CONFIGURATION;
@@ -511,8 +621,11 @@ public class Jeu implements Serializable {
 
 	private void configurerJoueurs() {
 		int nbJoueurs = 0;
-		while (nbJoueurs < 1 || nbJoueurs > 4) {
+		while (nbJoueurs < 1 || nbJoueurs > 4) { // condition qui permet de ne pas avoir aucun joueur ou plus de
+													// 4 joueurs
 			System.out.print("Nombre de joueurs humains (1-4): ");
+			// les try/catch sont indispensable pour verifier les inputs et permettre à
+			// l'utilisateur de recommencer
 			try {
 				nbJoueurs = scanner.nextInt();
 				scanner.nextLine();
@@ -526,20 +639,21 @@ public class Jeu implements Serializable {
 		for (int i = 1; i <= nbJoueurs; i++) {
 			System.out.print("Nom du joueur " + i + ": ");
 			String nom = scanner.nextLine().trim();
-			if (nom.isEmpty())
+			if (nom.isEmpty()) // condition pour ne pas avoir des noms vide
 				nom = "Joueur" + i;
 			ajouterJoueur(new JoueurHumain(nom));
 		}
 
 		// Compléter avec des bots jusqu'à 3 joueurs minimum
 		int nbBots = Math.max(0, 3 - nbJoueurs);
-		String[] nomsBots = { "Alpha", "Beta", "Gamma", "Delta" };
+		String[] nomsBots = { "Alpha", "Beta", "Gamma", "Delta" }; // noms des bots qui sont appender
 		Strategie[] strategies = {
-				new StrategieOffensive(),
-				new StrategieDefensive(),
-				new StrategieAleatoire()
+				new StrategieOffensive(), // 1
+				new StrategieDefensive(), // 2
+				new StrategieAleatoire() // 3
 		};
-
+		// la boucle attribue aux bots la strategie dans l'ordre, càd le bot 1 aura la
+		// strat 1, le 2 la 2, le 3 la 3, (le 4 la 1)
 		for (int i = 0; i < nbBots; i++) {
 			String nomBot = "Bot_" + nomsBots[i];
 			JoueurVirtuel bot = new JoueurVirtuel(nomBot);
@@ -596,6 +710,8 @@ public class Jeu implements Serializable {
 		}
 	}
 
+	// utile pour que le joueur verifie qu'il a bien tout fait commeil voulait et
+	// pour nous debug
 	private void afficherRecapitulatif() {
 		System.out.println("\n╔════════════════════════════════════╗");
 		System.out.println("║        RÉCAPITULATIF               ║");
@@ -610,6 +726,11 @@ public class Jeu implements Serializable {
 		System.out.println("╚════════════════════════════════════╝\n");
 	}
 
+	/**
+	 * Ajoute un joueur à la partie
+	 * 
+	 * @param joueur le joueur que l'on souhaite ajouter à la partie
+	 */
 	public void ajouterJoueur(Joueur joueur) {
 		if (etat != EtatPartie.CONFIGURATION) { // verification si le jeu est en config
 			System.out.println("Impossible d'ajouter des joueurs : jeu déjà démarré.");
@@ -618,6 +739,11 @@ public class Jeu implements Serializable {
 		this.joueurs.add(joueur);
 	}
 
+	/**
+	 * Choisit la regle du jeu
+	 * 
+	 * @param regleJeu les règles du jeu choisit
+	 */
 	public void choisirRegle(RegleJeu regleJeu) {
 		if (etat != EtatPartie.CONFIGURATION) {
 			System.out.println("Impossible de changer les règles : jeu déjà démarré.");
@@ -626,6 +752,11 @@ public class Jeu implements Serializable {
 		this.regleJeu = regleJeu;
 	}
 
+	/**
+	 * Activte les extensions
+	 * 
+	 * @param extension l'extension choisit
+	 */
 	public void activerExtension(Extension extension) {
 		if (etat != EtatPartie.CONFIGURATION) {
 			System.out.println("Impossible d'activer une extension : jeu déjà démarré.");
@@ -634,6 +765,10 @@ public class Jeu implements Serializable {
 		this.extension = extension;
 	}
 
+	/**
+	 * Demarre la partie, en créant l'instance de la classe et permet alors de
+	 * configurer comme que le joueur souhaite
+	 */
 	public void demarrer() {
 		this.etat = EtatPartie.EN_COURS;
 
@@ -656,6 +791,10 @@ public class Jeu implements Serializable {
 			if (etat == EtatPartie.SUSPENDUE) {
 				return;
 			}
+
+			if (partieCourante.verifierFinJeu()) {
+				break;
+			}
 		}
 
 		// Fin de partie
@@ -663,6 +802,9 @@ public class Jeu implements Serializable {
 		this.etat = EtatPartie.TERMINEE;
 	}
 
+	/**
+	 * Permet d'afficher les throphées de maniere clair
+	 */
 	private void afficherTrophees() {
 		System.out.println("\n🏆 === TROPHÉES DE LA PARTIE ===");
 		List<Carte> trophees = partieCourante.getTrophees();
@@ -672,6 +814,11 @@ public class Jeu implements Serializable {
 		System.out.println();
 	}
 
+	/**
+	 * La fonction demande à l'utilisateur si il souahite sauvegarder puis quitter
+	 * 
+	 * @return
+	 */
 	public boolean proposerSauvegardeOuQuitter() {
 		System.out.print("\n💾 Sauvegarder la partie ? (o/n): ");
 		String rep = scanner.nextLine().trim().toLowerCase();
@@ -692,6 +839,9 @@ public class Jeu implements Serializable {
 		return false;
 	}
 
+	/**
+	 * Sauvegarde la partie en cours
+	 */
 	public void sauvegarder() {
 		try (ObjectOutputStream oos = new ObjectOutputStream(
 				new FileOutputStream("sauvegarde_jeu.dat"))) {
@@ -703,6 +853,13 @@ public class Jeu implements Serializable {
 		}
 	}
 
+	/**
+	 * Charge une partie depuis
+	 * 
+	 * @param fichier correspond au fichier de sauvegarde du jeu, pour l'instant on
+	 *                ne donne pas le choix à l'utilisateur de choisir du nom
+	 * @return le jeu chargé à travers le fichier
+	 */
 	public static Jeu charger(String fichier) {
 		try (ObjectInputStream ois = new ObjectInputStream(
 				new FileInputStream(fichier))) {
@@ -719,6 +876,11 @@ public class Jeu implements Serializable {
 		}
 	}
 
+	/**
+	 * Fonction principale du jeu, point d'accés
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		System.out.println("\n╔════════════════════════════════════╗");
 		System.out.println("║          JEU DE JEST               ║");
@@ -753,74 +915,162 @@ public class Jeu implements Serializable {
 	}
 }package jest_package1;
 
-import java.io.Serializable;
-
-public class Joker extends Carte implements Serializable {
+public class Joker extends Carte {
+    /**
+     * Identifiant de version pour la sérialisation.
+     */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Constructeur par défaut du Joker.
+     * Initialise la couleur à {@code null} car le Joker
+     * n’a pas de couleur spécifique.
+     */
     public Joker() {
         this.couleur = null; // Joker n’a pas de couleur
     }
 
+    /**
+     * Retourne la représentation textuelle de la carte.
+     *
+     * @return la chaîne {@code "Joker"}
+     */
     @Override
     public String toString() {
         return "Joker";
     }
 
+    /**
+     * Accepte un visiteur de score pour calculer la valeur
+     * du Joker dans une partie donnée de Jest.
+     *
+     * @param visiteur le visiteur de score qui calcule le score
+     * @param jest     la partie de Jest dans laquelle la carte est jouée
+     * @return le score calculé par le visiteur pour cette carte
+     */
     @Override
     public int accepter(VisiteurScore visiteur, Jest jest) {
         return visiteur.visiterJoker(this, jest);
     }
-}
-package jest_package1;
+}package jest_package1;
 
 import java.io.Serializable;
 import java.util.List;
 
 public abstract class Joueur implements Serializable {
+
+    /**
+     * Identifiant de version pour la sérialisation.
+     */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Nom du joueur.
+     */
+    protected String nom;
+
+    /**
+     * Jest courant du joueur (cartes remportées pendant la manche).
+     */
+    protected Jest jest;
+
+    /**
+     * Jest personnel du joueur (cartes conservées sur plusieurs manches).
+     */
+    protected Jest jestPerso;
+
+    /**
+     * Offre actuellement proposée par le joueur.
+     */
+    protected Offre offreCourante;
+
+    /**
+     * Constructeur d'un joueur.
+     *
+     * @param nom le nom du joueur
+     */
     public Joueur(String nom) {
         this.nom = nom;
         this.jest = new Jest();
         this.jestPerso = new Jest();
     }
 
-    protected String nom;
-    protected Jest jest;
-    protected Jest jestPerso;
-    protected Offre offreCourante;
-
+    /**
+     * Demande au joueur de créer une offre à partir de sa main.
+     *
+     * @return l'offre créée par le joueur
+     */
     public abstract Offre faireOffre();
 
+    /**
+     * Demande au joueur de choisir une carte parmi les offres disponibles.
+     *
+     * @param offres la liste des offres proposées par les joueurs
+     * @return le choix de carte effectué par le joueur
+     */
     public abstract ChoixCarte choisirCarte(List<Offre> offres);
 
+    /**
+     * Ajoute une carte au Jest courant du joueur.
+     *
+     * @param carte la carte à ajouter
+     */
     public void ajouterCarteJest(Carte carte) {
         jest.ajouterCarte(carte);
     }
-    
+
+    /**
+     * Ajoute une carte au Jest personnel du joueur.
+     *
+     * @param carte la carte à ajouter
+     */
     public void ajouterCarteJestPerso(Carte carte) {
         jestPerso.ajouterCarte(carte);
     }
-    
+
+    /**
+     * Retourne le Jest courant du joueur.
+     *
+     * @return le Jest courant
+     */
     public Jest getJest() {
         return jest;
     }
 
+    /**
+     * Retourne le nom du joueur.
+     *
+     * @return le nom du joueur
+     */
     public String getNom() {
         return nom;
     }
 
+    /**
+     * Retourne l'offre courante du joueur.
+     *
+     * @return l'offre courante
+     */
     public Offre getOffreCourante() {
         return offreCourante;
     }
-}
-package jest_package1;
 
-import java.io.Serializable;
+    /**
+     * Retourne le Jest personnel du joueur.
+     *
+     * @return le Jest personnel
+     */
+    public Jest getJestPerso() {
+        return jestPerso;
+    }
+}package jest_package1;
+
 import java.util.*;
 
-public class JoueurHumain extends Joueur implements Serializable {
+public class JoueurHumain extends Joueur {
+	/**
+	 * Identifiant de version pour la sérialisation.
+	 */
 	private static final long serialVersionUID = 1L;
 
 	public JoueurHumain(String nom) {
@@ -836,7 +1086,36 @@ public class JoueurHumain extends Joueur implements Serializable {
 			}
 		}
 
+		// CAS SPÉCIAL : Si aucune offre disponible SAUF la sienne
 		if (offresDisponibles.isEmpty()) {
+			// Vérifier si sa propre offre est complète
+			for (Offre o : offres) {
+				if (o.getProprietaire() == this && o.estComplete()) {
+					System.out.println("\n[" + this.nom + "] Vous êtes le dernier joueur.");
+					System.out.println("Vous devez choisir dans votre propre offre.");
+
+					System.out.println("  1. Visible: " + o.getCarteVisible());
+					System.out.println("  2. Cachée: [?]");
+					System.out.print("[" + this.nom + "] Votre choix (1 ou 2): ");
+
+					String choixCarte = "";
+					try {
+						choixCarte = Jeu.scanner.nextLine().trim();
+					} catch (NoSuchElementException e) {
+						choixCarte = "1";
+					}
+
+					Carte carteChoisie;
+					if (choixCarte.equals("2")) {
+						carteChoisie = o.getCarteCachee();
+					} else {
+						carteChoisie = o.getCarteVisible();
+					}
+
+					return new ChoixCarte(o, carteChoisie);
+				}
+			}
+			// Vraiment aucune offre disponible
 			return null;
 		}
 
@@ -896,7 +1175,10 @@ public class JoueurHumain extends Joueur implements Serializable {
 	public Offre faireOffre() {
 		String choix = "0";
 		System.out.println("\n[" + this.nom + "] Quelle carte doit être cachée?");
-		List<Carte> cartes = this.getJest().getCartes();
+
+		// CORRECTION IMPORTANTE : Utiliser jest (temporaire), PAS getJest() (définitif)
+		List<Carte> cartes = this.jest.getCartes(); // <-- CHANGÉ ICI
+
 		for (int i = 0; i < cartes.size(); i++) {
 			if (!(cartes.get(i) instanceof Joker)) {
 				System.out.println(
@@ -908,7 +1190,7 @@ public class JoueurHumain extends Joueur implements Serializable {
 		}
 
 		System.out.print("[" + this.nom + "] La 1 ou la 2? ");
-		choix = Jeu.scanner.nextLine().trim(); // Read user input and trim whitespace
+		choix = Jeu.scanner.nextLine().trim();
 		Carte c1;
 		Carte c2;
 		if (choix.equals("1")) {
@@ -917,18 +1199,16 @@ public class JoueurHumain extends Joueur implements Serializable {
 		} else if (choix.equals("2")) {
 			c2 = cartes.get(0);
 			c1 = cartes.get(1);
-		}
-
-		else {
+		} else {
 			System.out.println("Mauvais choix, première carte mise par défaut");
 			c1 = cartes.get(0);
 			c2 = cartes.get(1);
 		}
-		// On enlève les cartes du Jest du joueur pour qu'au prochain tour, le jest soit vide et une fois les cartes distribuées, 
-		// le jest ne contienne que 2 cartes, comme il se doit
+
+		// On enlève les cartes du Jest TEMPORAIRE
 		this.jest.enleverCarte(c1);
 		this.jest.enleverCarte(c2);
-		
+
 		this.offreCourante = new Offre(c1, c2, this);
 		return this.offreCourante;
 	}
@@ -1112,7 +1392,6 @@ public class Partie implements Serializable {
 	private RegleJeu regleJeu;
 	private int numeroManche;
 	private List<Offre> offresActuelles;
-	private Joueur joueurActif;
 	private transient Jeu jeuReference;
 
 	/**
@@ -1162,11 +1441,12 @@ public class Partie implements Serializable {
 		pioche.melanger();
 		System.out.println("Pioche mélangée.");
 
-		initialiserTrophees();
-
 		this.joueurs = joueursInitialises;
 		this.regleJeu = regleJeu;
 		this.numeroManche = 1;
+
+		initialiserTrophees();
+
 	}
 
 	private void initialiserTrophees() {
@@ -1190,15 +1470,23 @@ public class Partie implements Serializable {
 
 		creerOffres();
 
-		while (!verifierFinManche() && !verifierFinJeu()) {
+		while (!verifierFinManche()) {
 			resoudreTour();
 		}
 
 		numeroManche++;
 	}
 
+	/**
+	 * Distribue 2 cartes à chaque joueur.
+	 * Première manche: cartes piochées directement
+	 * Autres manches: récupère les cartes non choisies + nouvelles cartes de la
+	 * pioche
+	 */
 	public void distribuerCartes() {
+
 		if (numeroManche == 1) {
+			// Première manche
 			for (Joueur j : joueurs) {
 				List<Carte> cartesInitiales = pioche.piocher(2);
 				for (Carte c : cartesInitiales) {
@@ -1217,69 +1505,249 @@ public class Partie implements Serializable {
 				}
 			}
 
-			// Ajouter des cartes de la pioche
 			int nbCartesAPiocher = joueurs.size();
 			cartesRestantes.addAll(pioche.piocher(nbCartesAPiocher));
 
 			Collections.shuffle(cartesRestantes);
 
-			// Distribuer 2 cartes à chaque joueur
 			for (int i = 0; i < joueurs.size(); i++) {
 				joueurs.get(i).ajouterCarteJest(cartesRestantes.get(i * 2));
 				joueurs.get(i).ajouterCarteJest(cartesRestantes.get(i * 2 + 1));
 			}
 		}
+
 		System.out.println("Les cartes sont distribuées");
+
+		// DEBUG: Afficher clairement les deux Jest de chaque joueur
+		System.out.println("\n=== DEBUG - Distribution des cartes ===");
+		for (Joueur j : joueurs) {
+			System.out.println("[DEBUG] " + j.getNom() + ":");
+			System.out.println("  ├─ jest (temporaire)     : " + j.getJest().getCartes());
+			System.out.println("  └─ jestPerso (définitif) : " + j.getJestPerso().getCartes()); // TODO: remplacer par
+			// jestPerso
+		}
 	}
 
+	/**
+	 * Crée les offres de chaque joueur (1 carte visible + 1 carte cachée)
+	 * Chaque joueur choisit 2 cartes de sa main pour faire une offre
+	 */
 	public void creerOffres() {
 		offresActuelles = new ArrayList<>();
 		System.out.println("\n=== Création des offres ===");
 
+		// Boucle: chaque joueur propose ses 2 cartes (1 visible, 1 cachée)
 		for (Joueur j : joueurs) {
 			Offre offre = j.faireOffre();
 			offresActuelles.add(offre);
 
 			System.out.println("[" + j.getNom() + "] Offre créée - Visible: " +
 					offre.getCarteVisible() + " | Cachée: [?]");
+
+			// DEBUG: Afficher l'état des deux Jest après création offre
+			System.out.println("[DEBUG] " + j.getNom() + " APRÈS offre:");
+			System.out.println("  ├─ jest (temporaire)     : " + j.getJest().getCartes() + " (cartes pour l'offre)");
+			System.out.println("  ├─ Carte visible : " + offre.getCarteVisible());
+			System.out.println("  ├─ Carte cachée  : " + offre.getCarteCachee());
+			System.out.println("  └─ jestPerso (définitif) : " + j.getJestPerso().getCartes());
+
 		}
 	}
 
+	/**
+	 * Gère un tour complet: chaque joueur choisit une carte jusqu'à fin de la
+	 * manche
+	 * L'ordre des joueurs dépend de la valeur de leurs cartes visibles
+	 * NOUVELLE VERSION : Gère correctement l'ordre des joueurs selon les règles
+	 */
 	public void resoudreTour() {
-		// Trier les joueurs par ordre décroissant de leur carte visible
-		List<Joueur> ordreJoueurs = new ArrayList<>(joueurs);
-		ordreJoueurs.sort((j1, j2) -> {
-			int val1 = 0, val2 = 0;
-			if (!(j1.getOffreCourante().getCarteVisible() instanceof Joker)) {
-				val1 = j1.getOffreCourante().getCarteVisible().getValeurNumerique();
-			}
-			if (!(j2.getOffreCourante().getCarteVisible() instanceof Joker)) {
-				val2 = j2.getOffreCourante().getCarteVisible().getValeurNumerique();
-			}
-			return Integer.compare(val2, val1); // Ordre décroissant
-		});
+		Set<Joueur> joueursAyantJoue = new HashSet<>();
+		Joueur joueurActif = determinerPremierJoueur();
 
-		// Chaque joueur prend son tour une fois
-		for (Joueur actif : ordreJoueurs) {
-			if (verifierFinManche()) {
-				break; // La manche est finie
-			}
+		// Boucle: tant que tous les joueurs n'ont pas joué et la manche n'est pas finie
+		while (joueursAyantJoue.size() < joueurs.size() && !verifierFinManche()) {
+			System.out.println("\n--- Tour de " + joueurActif.getNom() + " ---");
 
-			System.out.println("\n--- Tour de " + actif.getNom() + " ---");
-
-			ChoixCarte choix = actif.choisirCarte(offresActuelles);
+			// Le joueur actif choisit une carte parmi les offres disponibles
+			ChoixCarte choix = joueurActif.choisirCarte(offresActuelles);
 
 			if (choix != null) {
 				Carte carteChoisie = choix.getCarte();
 				Offre offreChoisie = choix.getOffre();
 
-				actif.ajouterCarteJestPerso(carteChoisie);
+				joueurActif.ajouterCarteJestPerso(carteChoisie);
 				offreChoisie.retirerCarte(carteChoisie);
-				
 
-				System.out.println("[" + actif.getNom() + "] a pris: " + carteChoisie);
+				System.out.println("[" + joueurActif.getNom() + "] a pris: " + carteChoisie);
+				// DEBUG: Afficher l'état des deux Jest après prise de carte
+				System.out.println("[DEBUG] " + joueurActif.getNom() + " APRÈS avoir pris la carte:");
+				System.out.println("  ├─ jest (temporaire)     : " + joueurActif.getJest().getCartes());
+				System.out.println("  └─ jestPerso (définitif) : " + joueurActif.getJestPerso().getCartes()); // TODO:
+																												// remplacer
+																												// par
+																												// jestPerso
+				// Marquer ce joueur comme ayant joué
+				joueursAyantJoue.add(joueurActif);
+
+				// Déterminer le prochain joueur
+				joueurActif = determinerProchainJoueur(offreChoisie.getProprietaire(), joueursAyantJoue);
+			} else {
+				// Cas spécial : dernier joueur, doit prendre de sa propre offre
+				Offre offreJoueur = trouverOffreDeJoueur(joueurActif);
+				if (offreJoueur != null && offreJoueur.estComplete()) {
+					System.out.println(
+							"[" + joueurActif.getNom() + "] est le dernier, doit choisir dans sa propre offre");
+
+					// Demander quelle carte prendre de sa propre offre
+					Carte carteChoisie;
+					if (joueurActif instanceof JoueurHumain) {
+						System.out.println("  1. Visible: " + offreJoueur.getCarteVisible());
+						System.out.println("  2. Cachée: [?]");
+						System.out.print("[" + joueurActif.getNom() + "] Votre choix (1 ou 2): ");
+						String choixCarte = Jeu.scanner.nextLine().trim();
+						carteChoisie = choixCarte.equals("2") ? offreJoueur.getCarteCachee()
+								: offreJoueur.getCarteVisible();
+					} else {
+						// Bot prend la visible par défaut
+						carteChoisie = offreJoueur.getCarteVisible();
+					}
+
+					joueurActif.ajouterCarteJestPerso(carteChoisie);
+					offreJoueur.retirerCarte(carteChoisie);
+					System.out.println("[" + joueurActif.getNom() + "] a pris: " + carteChoisie);
+				}
+
+				joueursAyantJoue.add(joueurActif);
+				break; // Fin du tour
 			}
 		}
+	}
+
+	/**
+	 * Détermine le premier joueur selon les règles :
+	 * - Celui avec la carte visible de plus grande valeur
+	 * - En cas d'égalité, celui avec la couleur la plus forte
+	 * - Joker = valeur 0
+	 * Boucle: compare chaque joueur pour trouver celui avec la meilleure carte
+	 */
+	private Joueur determinerPremierJoueur() {
+		Joueur premier = joueurs.get(0);
+		int valeurMax = getValeurCarteVisible(premier);
+		Couleur couleurMax = getCouleurCarteVisible(premier);
+
+		// Boucle: parcourt tous les joueurs pour trouver celui avec la carte la plus
+		// forte
+		for (int i = 1; i < joueurs.size(); i++) {
+			Joueur joueur = joueurs.get(i);
+			int valeur = getValeurCarteVisible(joueur);
+			Couleur couleur = getCouleurCarteVisible(joueur);
+
+			// Condition: si la valeur est supérieure, ce joueur devient le premier
+			if (valeur > valeurMax) {
+				valeurMax = valeur;
+				couleurMax = couleur;
+				premier = joueur;
+			} else if (valeur == valeurMax && couleur != null && couleurMax != null) {
+				// En cas d'égalité, comparer les couleurs (Pique > Trèfle > Carreau > Coeur)
+				if (couleur.getForce() > couleurMax.getForce()) {
+					couleurMax = couleur;
+					premier = joueur;
+				}
+			}
+		}
+
+		System.out.println("[DEBUG] Premier joueur: " + premier.getNom());
+		return premier;
+	}
+
+	/**
+	 * Détermine le prochain joueur selon les règles :
+	 * - C'est le propriétaire de l'offre choisie (s'il n'a pas encore joué)
+	 * - Sinon, c'est le joueur restant avec la plus grande carte visible
+	 * Boucle: parcourt les joueurs restants pour trouver celui avec la meilleure
+	 * carte
+	 */
+	private Joueur determinerProchainJoueur(Joueur proprietaireOffre, Set<Joueur> joueursAyantJoue) {
+		// Si le propriétaire n'a pas encore joué, c'est à lui
+		if (!joueursAyantJoue.contains(proprietaireOffre)) {
+			return proprietaireOffre;
+		}
+
+		// Sinon, trouver parmi les joueurs restants celui avec la plus grande carte
+		// visible
+		Joueur prochain = null;
+		int valeurMax = -1;
+		Couleur couleurMax = null;
+
+		// Boucle: parcourt tous les joueurs qui n'ont pas encore joué
+		for (Joueur joueur : joueurs) {
+			if (!joueursAyantJoue.contains(joueur)) {
+				int valeur = getValeurCarteVisible(joueur);
+				Couleur couleur = getCouleurCarteVisible(joueur);
+
+				// Condition: si c'est le premier ou si la valeur est supérieure
+				if (prochain == null || valeur > valeurMax) {
+					valeurMax = valeur;
+					couleurMax = couleur;
+					prochain = joueur;
+				} else if (valeur == valeurMax && couleur != null && couleurMax != null) {
+					if (couleur.getForce() > couleurMax.getForce()) {
+						couleurMax = couleur;
+						prochain = joueur;
+					}
+				}
+			}
+		}
+
+		return prochain;
+	}
+
+	/**
+	 * Retourne la valeur de la carte visible d'un joueur (Joker = 0)
+	 * Condition: si c'est un Joker, retourne 0; sinon retourne sa valeur numérique
+	 */
+	private int getValeurCarteVisible(Joueur joueur) {
+		Offre offre = trouverOffreDeJoueur(joueur);
+		if (offre == null || offre.getCarteVisible() == null) {
+			return 0;
+		}
+
+		Carte carte = offre.getCarteVisible();
+		if (carte instanceof Joker) {
+			return 0;
+		}
+		return carte.getValeurNumerique();
+	}
+
+	/**
+	 * Retourne la couleur de la carte visible d'un joueur (null si Joker)
+	 * Condition: si c'est un Joker, retourne null; sinon retourne sa couleur
+	 */
+	private Couleur getCouleurCarteVisible(Joueur joueur) {
+		Offre offre = trouverOffreDeJoueur(joueur);
+		if (offre == null || offre.getCarteVisible() == null) {
+			return null;
+		}
+
+		Carte carte = offre.getCarteVisible();
+		if (carte instanceof Joker) {
+			return null;
+		}
+		return carte.getCouleur();
+	}
+
+	/**
+	 * Trouve l'offre d'un joueur donné
+	 * Boucle: parcourt toutes les offres pour trouver celle appartenant au joueur
+	 */
+	private Offre trouverOffreDeJoueur(Joueur joueur) {
+		// Boucle: parcourt les offres jusqu'à trouver celle du joueur
+		for (Offre offre : offresActuelles) {
+			if (offre.getProprietaire() == joueur) {
+				return offre;
+			}
+		}
+		return null;
 	}
 
 	public boolean verifierFinManche() {
@@ -1295,32 +1763,55 @@ public class Partie implements Serializable {
 		return pioche.estVide();
 	}
 
+	/**
+	 * Termine la partie: récupère les dernières cartes, attribue trophées et
+	 * calcule le gagnant
+	 */
 	public void terminerPartie() {
 		System.out.println("\n=== FIN DE LA PARTIE ===");
 
-		// Chaque joueur prend sa dernière carte
+		// Boucle: chaque joueur prend sa dernière carte restante
 		for (int i = 0; i < joueurs.size(); i++) {
 			Offre offre = offresActuelles.get(i);
 			Carte derniereCarte = offre.getCarteVisible() != null ? offre.getCarteVisible() : offre.getCarteCachee();
 			joueurs.get(i).ajouterCarteJestPerso(derniereCarte);
 		}
 
+		// DEBUG: Afficher le jest final de chaque joueur
+		System.out.println("\n=== DEBUG - Jest final de chaque joueur ===");
+		for (Joueur j : joueurs) {
+			System.out.println("[DEBUG] " + j.getNom() + " - Jest: " + j.getJestPerso().getCartes());
+		}
+
 		attribuerTrophees();
 		calculerGagnant();
 	}
 
+	/**
+	 * Attribue les trophées aux joueurs selon les règles de jeu
+	 * Boucle: pour chaque trophée, détermine le gagnant et l'ajoute à son jest
+	 */
 	public void attribuerTrophees() {
 		System.out.println("\n=== Attribution des trophées ===");
 
+		// Boucle: parcourt chaque trophée et le donne au gagnant
 		for (Carte trophee : trophees) {
 			Joueur gagnant = regleJeu.determinerGagnantTrophee(joueurs, trophee);
 			if (gagnant != null) {
-				gagnant.getJest().ajouterTrophee(trophee);
+				gagnant.getJestPerso().ajouterTrophee(trophee);
 				System.out.println("Trophée " + trophee + " attribué à " + gagnant.getNom());
+				// DEBUG: Afficher le jest du gagnant après l'attribution
+				System.out.println(
+						"[DEBUG] Jest de " + gagnant.getNom() + " après trophée: " + gagnant.getJest().getCartes());
 			}
 		}
 	}
 
+	/**
+	 * Calcule le score final de chaque joueur et détermine le gagnant
+	 * Boucle: parcourt chaque joueur et calcule son score, puis détermine le
+	 * meilleur
+	 */
 	public Joueur calculerGagnant() {
 		System.out.println("\n=== Calcul des scores ===");
 
@@ -1328,10 +1819,14 @@ public class Partie implements Serializable {
 		int scoreMax = Integer.MIN_VALUE;
 		Joueur gagnant = null;
 
+		// Boucle: calcule le score de chaque joueur
 		for (Joueur j : joueurs) {
-			int score = calculateur.calculerScore(j.getJest());
+			int score = calculateur.calculerScore(j.getJestPerso());
 			System.out.println("[" + j.getNom() + "] Score: " + score);
+			// DEBUG: Afficher le jest du joueur avant calcul final
+			System.out.println("[DEBUG] Jest final de " + j.getNom() + ": " + j.getJest().getCartes());
 
+			// Condition: si le score est meilleur, ce joueur devient le gagnant
 			if (score > scoreMax) {
 				scoreMax = score;
 				gagnant = j;
@@ -1582,125 +2077,249 @@ public interface Strategie extends Serializable {
 }
 package jest_package1;
 
-import java.io.Serializable;
+import java.util.List;
+import java.util.Random;
+
+public class StrategieAleatoire implements Strategie {
+    private static final long serialVersionUID = 1L;
+    private Random random = new Random();
+
+    @Override
+    public ChoixCarte choisirCarte(List<Offre> offres, Jest jest) {
+        if (offres.isEmpty())
+            return null;
+
+        // Choisir une offre au hasard
+        Offre offreChoisie = offres.get(random.nextInt(offres.size()));
+
+        // Choisir visible ou cachée au hasard
+        Carte carteChoisie = random.nextBoolean() ? offreChoisie.getCarteVisible() : offreChoisie.getCarteCachee();
+
+        return new ChoixCarte(offreChoisie, carteChoisie);
+    }
+
+    @Override
+    public Offre choisirCartesOffre(Carte c1, Carte c2) {
+        // Choisir aléatoirement quelle carte montrer
+        if (random.nextBoolean()) {
+            return new Offre(c2, c1, null); // Montrer c1
+        } else {
+            return new Offre(c1, c2, null); // Montrer c2
+        }
+    }
+
+    @Override
+    public int evaluerOffre(Offre offre, Jest jest) {
+        return random.nextInt(10); // Évaluation aléatoire
+    }
+}package jest_package1;
+
 import java.util.List;
 
-public class StrategieAleatoire implements Strategie, Serializable {
+public class StrategieDefensive implements Strategie {
     private static final long serialVersionUID = 1L;
 
+    @Override
     public ChoixCarte choisirCarte(List<Offre> offres, Jest jest) {
-        return null;
+        if (offres.isEmpty())
+            return null;
+
+        // Choisir l'offre avec la carte visible la moins dangereuse
+        Offre meilleureOffre = offres.get(0);
+        int dangerMin = evaluerDanger(meilleureOffre.getCarteVisible());
+
+        for (Offre o : offres) {
+            int danger = evaluerDanger(o.getCarteVisible());
+            if (danger < dangerMin) {
+                dangerMin = danger;
+                meilleureOffre = o;
+            }
+        }
+
+        // Stratégie défensive : prendre la cachée (éviter les pièges)
+        return new ChoixCarte(meilleureOffre, meilleureOffre.getCarteCachee());
     }
 
+    @Override
     public Offre choisirCartesOffre(Carte c1, Carte c2) {
-        return null;
+        // Montrer la carte la moins dangereuse, cacher la plus dangereuse
+        int danger1 = evaluerDanger(c1);
+        int danger2 = evaluerDanger(c2);
+
+        if (danger1 < danger2) {
+            // c1 est moins dangereuse, on la montre
+            return new Offre(c2, c1, null);
+        } else {
+            // c2 est moins dangereuse, on la montre
+            return new Offre(c1, c2, null);
+        }
     }
 
+    @Override
     public int evaluerOffre(Offre offre, Jest jest) {
+        return evaluerDanger(offre.getCarteVisible());
+    }
+
+    /**
+     * Évalue le "danger" d'une carte (Carreau = danger, Pique/Trèfle = sûr)
+     */
+    private int evaluerDanger(Carte c) {
+        if (c instanceof Joker) {
+            return 2; // Danger moyen
+        }
+        if (c instanceof CarteCouleur) {
+            CarteCouleur cc = (CarteCouleur) c;
+            int valeur = cc.getValeurNumerique();
+
+            switch (cc.getCouleur()) {
+                case CARREAU:
+                    return valeur * 2; // Très dangereux (points négatifs)
+                case COEUR:
+                    return valeur; // Danger moyen (dépend du Joker)
+                case PIQUE:
+                case TREFLE:
+                    return -valeur; // Pas dangereux (valeur négative = bon)
+            }
+        }
         return 0;
     }
 }package jest_package1;
 
-import java.io.Serializable;
 import java.util.List;
 
-public class StrategieDefensive implements Strategie, Serializable {
+public class StrategieOffensive implements Strategie {
     private static final long serialVersionUID = 1L;
 
+    @Override
     public ChoixCarte choisirCarte(List<Offre> offres, Jest jest) {
-        return null;
+        if (offres.isEmpty())
+            return null;
+
+        // Choisir l'offre avec la carte visible la plus forte
+        Offre meilleureOffre = offres.get(0);
+        int valeurMax = evaluerCarte(meilleureOffre.getCarteVisible());
+
+        for (Offre o : offres) {
+            int valeur = evaluerCarte(o.getCarteVisible());
+            if (valeur > valeurMax) {
+                valeurMax = valeur;
+                meilleureOffre = o;
+            }
+        }
+
+        // Prendre la carte visible (stratégie offensive = prendre ce qu'on voit de
+        // bien)
+        return new ChoixCarte(meilleureOffre, meilleureOffre.getCarteVisible());
     }
 
+    @Override
     public Offre choisirCartesOffre(Carte c1, Carte c2) {
-        return null;
+        // Cacher la carte la plus faible, montrer la plus forte
+        int val1 = evaluerCarte(c1);
+        int val2 = evaluerCarte(c2);
+
+        if (val1 > val2) {
+            // c1 est meilleure, on la montre
+            return new Offre(c2, c1, null);
+        } else {
+            // c2 est meilleure, on la montre
+            return new Offre(c1, c2, null);
+        }
     }
 
+    @Override
     public int evaluerOffre(Offre offre, Jest jest) {
+        return evaluerCarte(offre.getCarteVisible());
+    }
+
+    /**
+     * Évalue la valeur d'une carte (positive pour Pique/Trèfle, négative pour
+     * Carreau)
+     */
+    private int evaluerCarte(Carte c) {
+        if (c instanceof Joker) {
+            return 4; // Le Joker vaut 4 points sans cœur
+        }
+        if (c instanceof CarteCouleur) {
+            CarteCouleur cc = (CarteCouleur) c;
+            int valeur = cc.getValeurNumerique();
+
+            switch (cc.getCouleur()) {
+                case PIQUE:
+                case TREFLE:
+                    return valeur; // Positif
+                case CARREAU:
+                    return -valeur; // Négatif
+                case COEUR:
+                    return 0; // Neutre (dépend du Joker)
+            }
+        }
         return 0;
     }
-}package jest_package1;
-
-import java.io.Serializable;
-import java.util.List;
-
-public class StrategieOffensive implements Strategie, Serializable {
-    private static final long serialVersionUID = 1L;
-
-    public ChoixCarte choisirCarte(List<Offre> offres, Jest jest) {
-        return null;
-    }
-
-    public Offre choisirCartesOffre(Carte c1, Carte c2) {
-        return null;
-    }
-
-    public int evaluerOffre(Offre offre, Jest jest) {
-        return 0;
-    }
-}package jest_package1;
-
-import java.util.*;
+}
+package jest_package1;
 
 public class TestDesFonctions {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		 	Carte c1 = new CarteCouleur(Couleur.PIQUE, Valeur.TROIS);
-	        Carte c2 = new CarteCouleur(Couleur.COEUR, Valeur.AS);
-	        Carte j = new Joker();
-	        
-	        System.out.println(c1); // 3♠
-	        System.out.println(c2); // 1♥
-	        System.out.println(j);  // Joker
-	        Pioche p = new Pioche();
-	        p.initialiser(false);
-	        //while (!p.estVide()) System.out.println(p.piocher());
-	        JoueurHumain j1 = new JoueurHumain("Léna");
-	        System.out.println(j1.getNom());
-	        System.out.println(j1.getJest().getCartes());
-	        j1.getJest().getCartes().add(c1);
-	        j1.getJest().getCartes().add(c2);
+		Carte c1 = new CarteCouleur(Couleur.PIQUE, Valeur.TROIS);
+		Carte c2 = new CarteCouleur(Couleur.COEUR, Valeur.AS);
+		Carte j = new Joker();
 
-	        System.out.println("");
-	        j1.faireOffre();
-	        
-	        System.out.println("Cachée "+j1.getOffreCourante().getCarteCachee());
-	        System.out.println("Visible "+j1.getOffreCourante().getCarteVisible());
+		System.out.println(c1); // 3♠
+		System.out.println(c2); // 1♥
+		System.out.println(j); // Joker
+		Pioche p = new Pioche();
+		p.initialiser(false);
+		// while (!p.estVide()) System.out.println(p.piocher());
+		JoueurHumain j1 = new JoueurHumain("Léna");
+		System.out.println(j1.getNom());
+		System.out.println(j1.getJest().getCartes());
+		j1.getJest().getCartes().add(c1);
+		j1.getJest().getCartes().add(c2);
 
-	        
-	        
-	        
-	        
+		System.out.println("");
+		j1.faireOffre();
+
+		System.out.println("Cachée " + j1.getOffreCourante().getCarteCachee());
+		System.out.println("Visible " + j1.getOffreCourante().getCarteVisible());
+
 	}
 
 }
 package jest_package1;
 
-public class Trophee {
+public class Trophee extends Carte {
 	private TypeCondition typeCondition;
 	private Couleur couleurCible;
 	private int valeurCible;
 	private int modificateurScore;
-	
+
+	public Trophee(Valeur chiffre, Couleur c) {
+		super();
+	}
+
 	public boolean verifierCondition(Jest jest) {
 		return false;
-		
+
 	}
-	
+
 	public int appliquerEffet(Jest jest) {
 		return modificateurScore;
-		
-	}
-	
-}
 
+	}
+
+}
 package jest_package1;
 
-public enum TypeCondition{
-	MAJORITE_COULEUR,
+public enum TypeCondition {
+	JOKER,
 	MEILLEUR_JEST,
-	PIRE_JEST,
-	PLUS_DE_PAIRES
+	MEILLEUR_JEST_SANS_JOKER,
+	LE_MOINS_DE_TYPE,
+	LE_PLUS_DE_TYPE,
+	LE_PLUS_DE_NUMERO
 }package jest_package1;
 
 public enum Valeur {
@@ -1721,7 +2340,6 @@ public enum Valeur {
     }
 }package jest_package1;
 
-import java.io.Serializable;
 import java.util.List;
 
 public class VarianteRapide implements RegleJeu {
@@ -1766,10 +2384,9 @@ public class VarianteRapide implements RegleJeu {
 }
 package jest_package1;
 
-import java.io.Serializable;
 import java.util.List;
 
-public class VarianteStrategique implements RegleJeu, Serializable {
+public class VarianteStrategique implements RegleJeu {
     private static final long serialVersionUID = 1L;
     private boolean offresVisibles;
 
