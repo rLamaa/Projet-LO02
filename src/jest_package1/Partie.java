@@ -18,6 +18,7 @@ public class Partie implements Serializable {
 	private int numeroManche;
 	private List<Offre> offresActuelles;
 	private transient Jeu jeuReference;
+	private boolean mancheEnCours;
 
 	/**
 	 * Constructeur privé pour le pattern Singleton
@@ -87,7 +88,10 @@ public class Partie implements Serializable {
 	}
 
 	public void jouerManche() {
-		distribuerCartes();
+		if (!mancheEnCours) {
+			distribuerCartes();
+			mancheEnCours = true;
+		}
 
 		if (jeuReference != null && jeuReference.proposerSauvegardeOuQuitter()) {
 			return;
@@ -99,6 +103,7 @@ public class Partie implements Serializable {
 			resoudreTour();
 		}
 
+		mancheEnCours = false;
 		numeroManche++;
 	}
 

@@ -197,14 +197,18 @@ public class Jeu implements Serializable {
 	 * configurer comme que le joueur souhaite
 	 */
 	public void demarrer() {
+
+		if (partieCourante == null) {
+			// NOUVELLE PARTIE UNIQUEMENT
+			Partie.reinitialiser();
+			partieCourante = Partie.getInstance();
+			partieCourante.setJeuReference(this);
+			partieCourante.initialiser(joueurs, regleJeu, extension);
+		} else {
+			// PARTIE CHARGÉE
+			partieCourante.setJeuReference(this);
+		}
 		this.etat = EtatPartie.EN_COURS;
-
-		// Utiliser le Singleton Partie
-		Partie.reinitialiser();
-		this.partieCourante = Partie.getInstance();
-		partieCourante.setJeuReference(this);
-		partieCourante.initialiser(joueurs, regleJeu, extension);
-
 		afficherTrophees();
 
 		// Boucle principale du jeu
@@ -273,15 +277,21 @@ public class Jeu implements Serializable {
 		String rep = scanner.nextLine().trim().toLowerCase();
 
 		if (rep.equals("o") || rep.equals("oui")) {
+			this.etat = EtatPartie.SUSPENDUE;
+
 			sauvegarder();
 
 			System.out.print("Quitter la partie ? (o/n): ");
 			String quitter = scanner.nextLine().trim().toLowerCase();
 
 			if (quitter.equals("o") || quitter.equals("oui")) {
-				etat = EtatPartie.SUSPENDUE;
+				this.etat = EtatPartie.SUSPENDUE;
+				// System.out.println(this.etat);
 				System.out.println("✓ Partie sauvegardée et arrêtée");
 				return true;
+			} else {
+				this.etat = EtatPartie.EN_COURS;
+				// System.out.println(this.etat);
 			}
 		}
 
@@ -310,14 +320,15 @@ public class Jeu implements Serializable {
 	 * @return le jeu chargé à travers le fichier
 	 */
 	public static Jeu charger(String fichier) {
-		try (ObjectInputStream ois = new ObjectInputStream(
-				new FileInputStream(fichier))) {
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fichier))) {
+
 			Jeu jeu = (Jeu) ois.readObject();
-			Partie.reinitialiser();
-			jeu.partieCourante = Partie.getInstance();
+
 			jeu.partieCourante.setJeuReference(jeu);
+
 			System.out.println("✓ Partie chargée depuis '" + fichier + "'");
 			return jeu;
+
 		} catch (IOException | ClassNotFoundException e) {
 			System.err.println("❌ Erreur lors du chargement");
 			e.printStackTrace();
