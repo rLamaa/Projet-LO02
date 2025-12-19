@@ -104,6 +104,13 @@ public class Partie implements Serializable {
 		}
 
 		mancheEnCours = false;
+
+		// Appliquer les règles spéciales (ex: incrémenter le compteur de manches pour
+		// VarianteRapide)
+		if (jeuReference != null) {
+			regleJeu.appliquerReglesSpeciales(jeuReference);
+		}
+
 		numeroManche++;
 	}
 
@@ -390,6 +397,14 @@ public class Partie implements Serializable {
 	}
 
 	public boolean verifierFinJeu() {
+		// Vérifier d'abord si la règle de jeu spécifique dit que la partie est terminée
+		if (regleJeu instanceof VarianteRapide) {
+			VarianteRapide variante = (VarianteRapide) regleJeu;
+			if (variante.partiTerminee()) {
+				return true;
+			}
+		}
+		// Sinon, vérifier si la pioche est vide (comportement standard)
 		return pioche.estVide();
 	}
 
