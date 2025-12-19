@@ -11,7 +11,7 @@ public class CalculateurScoreStandard implements VisiteurScore {
 	@Override
 	public int calculerScore(Jest j) {
 		int scoreTotal = 0;
-		
+
 		// Calculer le score de toutes les cartes = Jest final avec les trophées
 		for (Carte c : j.getCartes()) {
 			scoreTotal += c.accepter(this, j);
@@ -20,11 +20,9 @@ public class CalculateurScoreStandard implements VisiteurScore {
 		// Ajouter les bonus des paires noires
 		scoreTotal += calculerBonusPairesNoires(j);
 
-
 		return scoreTotal;
 	}
 
-	
 	@Override
 	public int visiterPique(CarteCouleur c, Jest j) {
 		// Les Piques augmentent toujours le score
@@ -67,30 +65,9 @@ public class CalculateurScoreStandard implements VisiteurScore {
 		}
 	}
 
-<<<<<<< HEAD
-        // Vérifier si le joueur a le Joker
-        for (Carte carte : j.getCartes()) {
-            if (carte instanceof Joker) {
-                aJoker = true;
-                break;
-            }
-        }
-        if (!aJoker) {
-            // Sans Joker, les Cœurs valent 0
-            return 0;
-        } else if (nbCoeurs == 4) {
-            // Avec Joker et 4 Cœurs, les Cœurs ajoutent leur valeur
-            return calculerValeurAs(c, j);
-        } else {
-            // Avec Joker et 1-3 Cœurs, les Cœurs diminuent le score
-            return -calculerValeurAs(c, j);
-        }
-    }
-=======
 	@Override
 	public int visiterJoker(Joker c, Jest j) {
 		int nbCoeurs = compterCoeurs(j);
->>>>>>> 9ee239861a56bfad9ca74d1933a18f4116ee9855
 
 		if (nbCoeurs == 0) {
 			// Joker sans Cœur = +4 points
