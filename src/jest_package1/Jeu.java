@@ -321,7 +321,7 @@ public class Jeu implements Serializable {
 	 */
 	public static Jeu charger(String fichier) {
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fichier))) {
-
+			// fait tout en fait pas besoin de partie.init....
 			Jeu jeu = (Jeu) ois.readObject();
 
 			jeu.partieCourante.setJeuReference(jeu);

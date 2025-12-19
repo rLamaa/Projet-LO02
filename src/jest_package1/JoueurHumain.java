@@ -110,9 +110,7 @@ public class JoueurHumain extends Joueur {
 	public Offre faireOffre() {
 		String choix = "0";
 		System.out.println("\n[" + this.nom + "] Quelle carte doit être cachée?");
-
-		// CORRECTION IMPORTANTE : Utiliser jest (temporaire), PAS getJest() (définitif)
-		List<Carte> cartes = this.jest.getCartes(); // <-- CHANGÉ ICI
+		List<Carte> cartes = this.jest.getCartes();
 
 		for (int i = 0; i < cartes.size(); i++) {
 			if (!(cartes.get(i) instanceof Joker)) {

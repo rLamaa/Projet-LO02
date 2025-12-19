@@ -59,7 +59,7 @@ public class CalculateurScoreStandard implements VisiteurScore {
                 break;
             }
         }
-
+        System.out.println(aJoker);
         if (!aJoker) {
             // Sans Joker, les Cœurs valent 0
             return 0;

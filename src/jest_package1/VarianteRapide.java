@@ -4,7 +4,7 @@ import java.util.List;
 
 public class VarianteRapide implements RegleJeu {
     private static final long serialVersionUID = 1L;
-    private int nombreManchesMax = 5;
+    private int nombreManchesMax = 3;
     private int manchesJouees = 0;
 
     @Override

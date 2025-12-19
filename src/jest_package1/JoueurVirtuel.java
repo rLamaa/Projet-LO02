@@ -66,10 +66,20 @@ public class JoueurVirtuel extends Joueur {
         return choix;
     }
 
+    /**
+     * Setter de la stratégie du robot
+     * 
+     * @param strategie la stratégie que l'on souhaite qu'il adopte
+     */
     public void setStrategie(Strategie strategie) {
         this.strategie = strategie;
     }
 
+    /**
+     * Getter de la stratégie du robot
+     * 
+     * @return
+     */
     public Strategie getStrategie() {
         return strategie;
     }

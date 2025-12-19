@@ -64,6 +64,8 @@ public class Offre implements Serializable {
 
 	/**
 	 * Vérifie si l'offre contient encore 2 cartes
+	 * 
+	 * @return
 	 */
 	public boolean estComplete() {
 		return this.carteCachee != null && this.carteVisible != null;
@@ -71,6 +73,8 @@ public class Offre implements Serializable {
 
 	/**
 	 * Compte le nombre de cartes restantes dans l'offre
+	 * 
+	 * @return
 	 */
 	public int compterCartes() {
 		int count = 0;
@@ -81,6 +85,11 @@ public class Offre implements Serializable {
 		return count;
 	}
 
+	/**
+	 * Getter du propriètaire de l'offre
+	 * 
+	 * @return
+	 */
 	public Joueur getProprietaire() {
 		return proprietaire;
 	}

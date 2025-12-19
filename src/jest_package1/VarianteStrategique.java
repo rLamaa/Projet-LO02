@@ -4,7 +4,8 @@ import java.util.List;
 
 public class VarianteStrategique implements RegleJeu {
     private static final long serialVersionUID = 1L;
-    private boolean offresVisibles;
+    @SuppressWarnings("unused")
+    private boolean offresVisibles = true;
 
     public int calculerValeurJest(Jest jest) {
         return 0;
