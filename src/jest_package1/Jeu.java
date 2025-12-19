@@ -74,6 +74,24 @@ public class Jeu implements Serializable {
 		// Compléter avec des bots jusqu'à 3 joueurs minimum
 		int nbBots = Math.max(0, 3 - nbJoueurs);
 		String[] nomsBots = { "Alpha", "Beta", "Gamma", "Delta" }; // noms des bots qui sont appender
+		/*String info;
+		Random va = new Random();
+		int nombre;
+		nombre=va.nextInt(3);
+		//	System.out.println(nombre);
+		switch(nombre) {
+			case 0:
+				info="SPORT";
+				break;
+			case 1:
+				info="POLITQUE";
+				break;
+			case 2:
+				info="ECONOMIE";
+				break;
+	        default:
+	        	info="SPORT"; //cas par défaut mit à sport pour eviter les erreurs
+		}*/
 		Strategie[] strategies = {
 				new StrategieOffensive(), // 1
 				new StrategieDefensive(), // 2
