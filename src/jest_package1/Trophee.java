@@ -1,6 +1,6 @@
 package jest_package1;
 
-public class Trophee extends Carte {
+public class Trophee {
 	@SuppressWarnings("unused")
 	private TypeCondition typeCondition;
 	@SuppressWarnings("unused")

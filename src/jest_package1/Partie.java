@@ -162,6 +162,7 @@ public class Partie implements Serializable {
 			System.out.println("  ├─ jest (temporaire)     : " + j.getJest().getCartes());
 			System.out.println("  └─ jestPerso (définitif) : " + j.getJestPerso().getCartes()); // TODO: remplacer par
 			// jestPerso
+			
 		}
 	}
 
@@ -456,7 +457,7 @@ public class Partie implements Serializable {
 			Joueur gagnant = regleJeu.determinerGagnantTrophee(joueurs, trophee);
 
 			if (gagnant != null) {
-				gagnant.getJestPerso().ajouterTrophee(trophee);
+				gagnant.getJestPerso().ajouterCarte(trophee);
 				System.out.println("│ ✅ Attribué à: " + gagnant.getNom());
 
 				// Afficher pourquoi ce joueur a gagné (debug utile)
@@ -466,6 +467,11 @@ public class Partie implements Serializable {
 			}
 			System.out.println("└────────────────────────────────────────\n");
 		}
+		for (Joueur j : joueurs) {
+			System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+			System.out.println(j.getJestPerso().getCartes());
+		}
+
 	}
 
 	/**
@@ -573,7 +579,7 @@ public class Partie implements Serializable {
 			int score = calculateur.calculerScore(j.getJestPerso());
 			System.out.println("[" + j.getNom() + "] Score: " + score);
 			// DEBUG: Afficher le jest du joueur avant calcul final
-			System.out.println("[DEBUG] Jest final de " + j.getNom() + ": " + j.getJest().getCartes());
+			System.out.println("[DEBUG] Jest final de " + j.getNom() + ": " + j.getJestPerso().getCartes());
 
 			// Condition: si le score est meilleur, ce joueur devient le gagnant
 			if (score > scoreMax) {

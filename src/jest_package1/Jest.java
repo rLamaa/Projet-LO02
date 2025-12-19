@@ -6,14 +6,13 @@ import java.util.*;
 public class Jest implements Serializable {
     private static final long serialVersionUID = 1L;
     private List<Carte> cartes;
-    private List<Carte> trophees;
+
 
     /**
      * Constructeur de la fonction
      */
     public Jest() {
         this.cartes = new ArrayList<>();
-        this.trophees = new ArrayList<>();
     }
 
     public void ajouterCarte(Carte carte) {
@@ -32,10 +31,7 @@ public class Jest implements Serializable {
         cartes.remove(carte);// permet d'enlever une carte au jest
     }
 
-    public void ajouterTrophee(Carte carte) {
-        trophees.add(carte); // permet d'ajouter un trophée au jest
-    }
-
+  
     /**
      * Getter de la liste de cartes du jest
      * 
@@ -50,7 +46,13 @@ public class Jest implements Serializable {
      * 
      * @return
      */
-    public List<Carte> getTrophees() {
-        return trophees;
-    }
+ 
+    
+    // Permet de faire un seul jest final : en ajoutant les trophées au jestPerso pour pouvoir compter le score final
+    public List<Carte> getToutesLesCartes() {
+		List<Carte> toutes = new ArrayList<>();
+		toutes.addAll(this.cartes);
+		
+		return toutes;
+	}
 }
