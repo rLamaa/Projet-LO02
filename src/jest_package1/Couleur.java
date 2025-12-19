@@ -1,7 +1,7 @@
 package jest_package1;
 
 public enum Couleur {
-    PIQUE, TREFLE, CARREAU, COEUR;
+    PIQUE, TREFLE, CARREAU, COEUR, ETOILE;
 
     /**
      * Getter de la force de la couleur
@@ -37,6 +37,8 @@ public enum Couleur {
                 return "♦";
             case COEUR:
                 return "♥";
+            case ETOILE:
+            	return "☆";
         }
         return "";
     }

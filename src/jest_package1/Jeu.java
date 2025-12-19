@@ -111,9 +111,9 @@ public class Jeu implements Serializable {
 
 	private void choisirVariante() {
 		System.out.println("\n=== Choix de la variante ===");
-		System.out.println("1. Règles Standard");
-		System.out.println("2. Variante Rapide (5 manches max)");
-		System.out.println("3. Variante Stratégique (offres visibles, scores modifiés)");
+		System.out.println("1. Règles Standards");
+		System.out.println("2. Variante Rapide (3 manches max)");
+		System.out.println("3. Variante Stratégique (offres visibles)");
 		System.out.print("Votre choix (1-3): ");
 
 		int choix = 1;
@@ -145,7 +145,7 @@ public class Jeu implements Serializable {
 		String reponse = scanner.nextLine().trim().toLowerCase();
 
 		if (reponse.equals("o") || reponse.equals("oui")) {
-			this.extension = Extension.creerExtensionStandard();
+			//this.extension = Extension.creerExtensionStandard();
 			this.extension.activer();
 			System.out.println("✓ Extension activée!");
 			System.out.println("  Cartes ajoutées: Doublement, Inversion, Miroir");

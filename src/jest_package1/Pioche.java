@@ -8,10 +8,22 @@ public class Pioche implements Serializable {
     private static final long serialVersionUID = 1L;
     // création de la pioche
     private Stack<Carte> pioche = new Stack<>();
-
+    
+        
     // ajouter les nouvelles cartes si on ajoute une extension
     public void initialiser(boolean avecExtension) {
-        for (Couleur c : Couleur.values()) {
+    	//Cartes pour le jeu standard
+        List<Couleur> couleurs = new ArrayList<>();
+        couleurs.add(Couleur.PIQUE);
+        couleurs.add(Couleur.TREFLE);
+        couleurs.add(Couleur.CARREAU);
+        couleurs.add(Couleur.COEUR);
+        
+        if(avecExtension) {
+            couleurs.add(Couleur.ETOILE);
+        }
+        
+        for (Couleur c : couleurs) {
             for (Valeur v : Valeur.values()) {
                 pioche.add(new CarteCouleur(c, v));
             }

@@ -467,11 +467,6 @@ public class Partie implements Serializable {
 			}
 			System.out.println("└────────────────────────────────────────\n");
 		}
-		for (Joueur j : joueurs) {
-			System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-			System.out.println(j.getJestPerso().getCartes());
-		}
-
 	}
 
 	/**

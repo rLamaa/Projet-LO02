@@ -84,6 +84,7 @@ public class RegleStandard implements RegleJeu {
 				} else if (valeur == Valeur.TROIS) {
 					return "📊 Le MOINS de Carreaux ♦";
 				}
+					
 			}
 
 			// PIQUES
@@ -109,7 +110,19 @@ public class RegleStandard implements RegleJeu {
 					return "📊 Le MOINS de Cœurs ♥";
 				} else if (valeur == Valeur.TROIS) {
 					return "📊 Le plus de Cœurs ♥";
-				}
+				} 
+			}
+			// ETOILES
+			if (couleur == Couleur.ETOILE) {
+				if (valeur == Valeur.QUATRE) {
+					return "📊 Le plus de cartes 4";
+				} else if (valeur == Valeur.AS) {
+					return "📊 Le plus de Cœurs ♥";
+				} else if (valeur == Valeur.DEUX) {
+					return "📊 Le MOINS de Piques ♠";
+				} else if (valeur == Valeur.TROIS) {
+					return "📊 Le plus de Trèfles ♣";
+				} 
 			}
 		}
 
@@ -187,6 +200,22 @@ public class RegleStandard implements RegleJeu {
 					return determinerMajoriteCouleur(joueurs, Couleur.COEUR);
 				}
 			}
+			// ETOILES
+			if (couleur == Couleur.ETOILE) {
+				if (valeur == Valeur.QUATRE) {
+					// 4☆ → Le plus de cartes 4
+					return determinerMajoriteValeur(joueurs, Valeur.QUATRE);
+				} else if (valeur == Valeur.AS) {
+					// A☆ → Le plus de Cœurs ♥
+					return determinerMajoriteCouleur(joueurs, Couleur.COEUR);
+				} else if (valeur == Valeur.DEUX) {
+					// 2☆ → Le MOINS de Piques ♠
+					return determinerMinoriteCouleur(joueurs, Couleur.PIQUE);
+				} else if (valeur == Valeur.TROIS) {
+					// 3☆ → Le plus de Trèfles ♣
+					return determinerMajoriteCouleur(joueurs, Couleur.TREFLE);
+				}
+			}			
 		}
 
 		return null;
