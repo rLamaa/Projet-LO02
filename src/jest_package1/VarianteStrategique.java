@@ -39,4 +39,10 @@ public class VarianteStrategique implements RegleJeu {
     public boolean sontOffresVisibles() {
         return offresVisibles;
     }
+
+	@Override
+	public Offre creerOffre(Joueur joueur, Carte c1, Carte c2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

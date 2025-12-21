@@ -44,7 +44,7 @@ public class Partie implements Serializable {
 		instance = new Partie();
 	}
 
-	public void initialiser(List<Joueur> joueurs, RegleJeu regleJeu, Extension extension) {
+	public void initialiser(List<Joueur> joueurs, RegleJeu regleJeu, boolean avecExtension) {
 		List<Joueur> joueursInitialises = new ArrayList<>();
 
 		for (Joueur p : joueurs) {
@@ -58,11 +58,7 @@ public class Partie implements Serializable {
 		}
 
 		// Initialisation de la pioche avec extension si présente
-		pioche.initialiser(extension != null);
-		if (extension != null && extension.estActive()) {
-			pioche.ajouterCartes(new ArrayList<>(extension.getCartes()));
-		}
-
+		pioche.initialiser(avecExtension);
 		System.out.println("Pioche initialisée avec " + pioche.getTaille() + " cartes.");
 		pioche.melanger();
 		System.out.println("Pioche mélangée.");
@@ -176,11 +172,11 @@ public class Partie implements Serializable {
 
 		// Boucle: chaque joueur propose ses 2 cartes (1 visible, 1 cachée)
 		for (Joueur j : joueurs) {
-			Offre offre = j.faireOffre();
+			Offre offre = j.faireOffre();				
 			offresActuelles.add(offre);
 
-			System.out.println("[" + j.getNom() + "] Offre créée - Visible: " +
-					offre.getCarteVisible() + " | Cachée: [?]");
+			System.out.println("[" + j.getNom() + "] Offre créée - Visible : " +
+					offre.getCarteVisible() + " | Cachée : [?]");
 
 			// DEBUG: Afficher l'état des deux Jest après création offre
 			System.out.println("[DEBUG] " + j.getNom() + " APRÈS offre:");

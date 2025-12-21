@@ -12,6 +12,7 @@ public class Pioche implements Serializable {
         
     // ajouter les nouvelles cartes si on ajoute une extension
     public void initialiser(boolean avecExtension) {
+    	pioche.clear();
     	//Cartes pour le jeu standard
         List<Couleur> couleurs = new ArrayList<>();
         couleurs.add(Couleur.PIQUE);
@@ -21,6 +22,8 @@ public class Pioche implements Serializable {
         
         if(avecExtension) {
             couleurs.add(Couleur.ETOILE);
+            couleurs.add(Couleur.TRIANGLE);
+            couleurs.add(Couleur.SOLEIL);
         }
         
         for (Couleur c : couleurs) {

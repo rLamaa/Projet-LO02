@@ -18,6 +18,12 @@ public class RegleStandard implements RegleJeu {
 	public boolean verifierConditionTrophee(Jest jest, Carte trophee) {
 		return true;
 	}
+	
+	public Offre creerOffre(Joueur joueur, Carte carteCachee, Carte carteVisible) {
+		carteVisible.setVisible(true);
+		carteCachee.setVisible(false);
+		return new Offre(carteCachee, carteVisible, joueur);
+	}
 
 	@Override
 	public List<Joueur> determinerOrdreJeu(List<Offre> offres) {
@@ -124,6 +130,30 @@ public class RegleStandard implements RegleJeu {
 					return "📊 Le plus de Trèfles ♣";
 				} 
 			}
+			// TRIANGLES
+			if (couleur == Couleur.TRIANGLE) {
+				if (valeur == Valeur.QUATRE) {
+					return "📊 Le MOINS de Trèfles ♣";
+				} else if (valeur == Valeur.AS) {
+					return "⭐ Meilleur Jest SANS Joker";
+				} else if (valeur == Valeur.DEUX) {
+					return "📊 Le plus de cartes 2";
+				} else if (valeur == Valeur.TROIS) {
+					return "⭐ Meilleur Jest SANS Joker";
+				} 
+			}
+			// SOLEILS
+			if (couleur == Couleur.SOLEIL) {
+				if (valeur == Valeur.QUATRE) {
+					return "📊 Le plus de cartes As";
+				} else if (valeur == Valeur.AS) {
+					return "📊 Le MOINS de Cœurs ♥";
+				} else if (valeur == Valeur.DEUX) {
+					return "⭐ Meilleur Jest SANS Joker";
+				} else if (valeur == Valeur.TROIS) {
+					return "📊 Le plus de Piques ♠";
+				} 
+			}
 		}
 
 		return "❓ Condition inconnue";
@@ -214,6 +244,38 @@ public class RegleStandard implements RegleJeu {
 				} else if (valeur == Valeur.TROIS) {
 					// 3☆ → Le plus de Trèfles ♣
 					return determinerMajoriteCouleur(joueurs, Couleur.TREFLE);
+				}
+			}
+			// SOLEIL
+			if (couleur == Couleur.SOLEIL) {
+				if (valeur == Valeur.QUATRE) {
+					// 4☼ → Le plus de cartes As
+					return determinerMajoriteValeur(joueurs, Valeur.AS);
+				} else if (valeur == Valeur.AS) {
+					// A☼ → Le MOINS de Cœurs ♥
+					return determinerMinoriteCouleur(joueurs, Couleur.COEUR);
+				} else if (valeur == Valeur.DEUX) {
+					// 2☼ → Meilleur Jest SANS Joker
+					return determinerMeilleurJest(joueurs, true);
+				} else if (valeur == Valeur.TROIS) {
+					// 3☼ → Le plus de Piques ♠
+					return determinerMajoriteCouleur(joueurs, Couleur.PIQUE);
+				}
+			}	
+			// TRIANGLES
+			if (couleur == Couleur.TRIANGLE) {
+				if (valeur == Valeur.QUATRE) {
+					// 4▲ → Le moins de Trèfles ♣
+					return determinerMinoriteCouleur(joueurs, Couleur.TREFLE);
+				} else if (valeur == Valeur.AS) {
+					// A▲ → Meilleur Jest SANS Joker
+					return determinerMeilleurJest(joueurs, true);
+				} else if (valeur == Valeur.DEUX) {
+					// 2▲ → Le plus de 2
+					return determinerMajoriteValeur(joueurs, Valeur.DEUX);
+				} else if (valeur == Valeur.TROIS) {
+					// 3▲ → Meilleur Jest SANS Joker
+					return determinerMeilleurJest(joueurs, true);
 				}
 			}			
 		}

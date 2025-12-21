@@ -41,4 +41,10 @@ public class VarianteRapide implements RegleJeu {
     public boolean partiTerminee() {
         return manchesJouees >= nombreManchesMax;
     }
+
+	@Override
+	public Offre creerOffre(Joueur joueur, Carte c1, Carte c2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

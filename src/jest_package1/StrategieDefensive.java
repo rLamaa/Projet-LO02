@@ -61,10 +61,14 @@ public class StrategieDefensive implements Strategie {
                 case CARREAU:
                     return valeur * 2; // Très dangereux (points négatifs)
                 case COEUR:
-                    return valeur; // Danger moyen (dépend du Joker)
+                case SOLEIL:
+                    return valeur; // Danger moyen (dépend du Joker ou dépend de pair ou impair)
                 case PIQUE:
                 case TREFLE:
+                case TRIANGLE:
                     return -valeur; // Pas dangereux (valeur négative = bon)
+                case ETOILE:
+                	return -valeur * 2; // Pas dangereux du tout
             }
         }
         return 0;

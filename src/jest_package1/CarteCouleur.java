@@ -24,6 +24,12 @@ public class CarteCouleur extends Carte {
                 return visiteur.visiterCarreau(this, jest);
             case COEUR:
                 return visiteur.visiterCoeur(this, jest);
+            case ETOILE:
+                return visiteur.visiterEtoile(this, jest);
+            case TRIANGLE:
+                return visiteur.visiterTriangle(this, jest);
+            case SOLEIL:
+                return visiteur.visiterSoleil(this, jest);
         }
         return 0;
     }

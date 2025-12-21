@@ -10,7 +10,7 @@ public class Jeu implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private List<Joueur> joueurs; // liste des joueurs de la partie
 	private RegleJeu regleJeu; // regle du jeu de Jest
-	private Extension extension; // carte d'extension
+	private boolean avecExtension = false; // boolean qui permet de savoir si le jeu se joue avec ou sans extension
 	private Partie partieCourante; // variable qui fait reference à l'unique instance partie (permet d'avoir une
 									// seule partie par jeu)
 	private EtatPartie etat; // etat de la partie, utile pour la sauvegarde/configuration pour éviter les
@@ -113,7 +113,7 @@ public class Jeu implements Serializable {
 		System.out.println("\n=== Choix de la variante ===");
 		System.out.println("1. Règles Standards");
 		System.out.println("2. Variante Rapide (3 manches max)");
-		System.out.println("3. Variante Stratégique (offres visibles)");
+		System.out.println("(3. Variante Stratégique (offres visibles) -> Fabrication en cours...)");
 		System.out.print("Votre choix (1-3): ");
 
 		int choix = 1;
@@ -141,16 +141,16 @@ public class Jeu implements Serializable {
 
 	private void choisirExtension() {
 		System.out.println("\n=== Extension ===");
-		System.out.print("Activer l'extension 'Cartes Magiques' ? (o/n): ");
+		System.out.print("Activer l'extension 'Nouvelles Cartes' ? (o/n): ");
 		String reponse = scanner.nextLine().trim().toLowerCase();
 
 		if (reponse.equals("o") || reponse.equals("oui")) {
 			//this.extension = Extension.creerExtensionStandard();
-			this.extension.activer();
+			avecExtension = true;
 			System.out.println("✓ Extension activée!");
-			System.out.println("  Cartes ajoutées: Doublement, Inversion, Miroir");
+			System.out.println("  Cartes ajoutées: Etoiles, Triangles, Soleils");
 		} else {
-			this.extension = null;
+			avecExtension = false;
 			System.out.println("✓ Pas d'extension");
 		}
 	}
@@ -167,7 +167,11 @@ public class Jeu implements Serializable {
 			System.out.println("    • " + j.getNom() + " (" + type + ")");
 		}
 		System.out.println("  Règles: " + regleJeu.getClass().getSimpleName());
-		System.out.println("  Extension: " + (extension != null ? "Oui" : "Non"));
+		if(avecExtension==true) {
+			System.out.println("  Extension: Oui");
+		} else {
+			System.out.println("  Extension: Non");
+		}
 		System.out.println("╚════════════════════════════════════╝\n");
 	}
 
@@ -198,19 +202,6 @@ public class Jeu implements Serializable {
 	}
 
 	/**
-	 * Activte les extensions
-	 * 
-	 * @param extension l'extension choisit
-	 */
-	public void activerExtension(Extension extension) {
-		if (etat != EtatPartie.CONFIGURATION) {
-			System.out.println("Impossible d'activer une extension : jeu déjà démarré.");
-			return;
-		}
-		this.extension = extension;
-	}
-
-	/**
 	 * Demarre la partie, en créant l'instance de la classe et permet alors de
 	 * configurer comme que le joueur souhaite
 	 */
@@ -221,7 +212,7 @@ public class Jeu implements Serializable {
 			Partie.reinitialiser();
 			partieCourante = Partie.getInstance();
 			partieCourante.setJeuReference(this);
-			partieCourante.initialiser(joueurs, regleJeu, extension);
+			partieCourante.initialiser(joueurs, regleJeu, avecExtension);
 		} else {
 			// PARTIE CHARGÉE
 			partieCourante.setJeuReference(this);

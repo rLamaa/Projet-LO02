@@ -60,12 +60,16 @@ public class StrategieOffensive implements Strategie {
             int valeur = cc.getValeurNumerique();
 
             switch (cc.getCouleur()) {
-                case PIQUE:
+            	case ETOILE:
+            		return valeur*2;
+            	case PIQUE:
                 case TREFLE:
+                case TRIANGLE:
                     return valeur; // Positif
                 case CARREAU:
                     return -valeur; // Négatif
                 case COEUR:
+                case SOLEIL:
                     return 0; // Neutre (dépend du Joker)
             }
         }

@@ -41,6 +41,22 @@ public class CalculateurScoreStandard implements VisiteurScore {
 		return -calculerValeurAs(c, j);
 	}
 
+	public int visiterEtoile(CarteCouleur c, Jest j) {
+		// Les Etoiles doublent toujours le score
+		return 2 * (calculerValeurAs(c, j));
+	}
+
+	public int visiterSoleil(CarteCouleur c, Jest j) {
+		// Les Soleils augmentent le score quand ils sont impairs sinon, diminuent
+		int valeur = 0;
+		if (calculerValeurAs(c, j) % 2 != 0) {
+			valeur = calculerValeurAs(c, j);
+		} else if (calculerValeurAs(c, j) % 2 == 0) {
+			valeur = -calculerValeurAs(c, j);
+		}
+		return valeur;
+	}
+
 	@Override
 	public int visiterCoeur(CarteCouleur c, Jest j) {
 		boolean aJoker = false;
@@ -65,6 +81,29 @@ public class CalculateurScoreStandard implements VisiteurScore {
 		}
 	}
 
+	public int visiterTriangle(CarteCouleur c, Jest j) {
+		boolean aJoker = false;
+		int nbTriangles = compterTriangles(j);
+
+		// Vérifier si le joueur a le Joker
+		for (Carte carte : j.getToutesLesCartes()) {
+			if (carte instanceof Joker) {
+				aJoker = true;
+				break;
+			}
+		}
+		if (!aJoker) {
+			// Sans Joker, les Triangles valent 0
+			return 0;
+		} else if (nbTriangles == 4) {
+			// Avec Joker et 4 Triangles, les Triangles perdent leur valeur
+			return -calculerValeurAs(c, j);
+		} else {
+			// Avec Joker et 1-3 Triangles, les Triangles augmentent le score
+			return calculerValeurAs(c, j);
+		}
+	}
+
 	@Override
 	public int visiterJoker(Joker c, Jest j) {
 		int nbCoeurs = compterCoeurs(j);
@@ -78,11 +117,11 @@ public class CalculateurScoreStandard implements VisiteurScore {
 		}
 	}
 
-	@Override
+	/*@Override
 	public int visiterExtension(CarteExtension c, Jest j) {
 		// À implémenter selon les cartes d'extension
 		return 0;
-	}
+	}*/
 
 	/**
 	 * Calcule le bonus pour les paires noires (Pique + Trèfle de même valeur)
@@ -147,6 +186,19 @@ public class CalculateurScoreStandard implements VisiteurScore {
 			if (carte instanceof CarteCouleur) {
 				CarteCouleur cc = (CarteCouleur) carte;
 				if (cc.getCouleur() == Couleur.COEUR) {
+					compte++;
+				}
+			}
+		}
+		return compte;
+	}
+
+	private int compterTriangles(Jest j) {
+		int compte = 0;
+		for (Carte carte : j.getToutesLesCartes()) {
+			if (carte instanceof CarteCouleur) {
+				CarteCouleur cc = (CarteCouleur) carte;
+				if (cc.getCouleur() == Couleur.TRIANGLE) {
 					compte++;
 				}
 			}

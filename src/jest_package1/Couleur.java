@@ -1,7 +1,7 @@
 package jest_package1;
 
 public enum Couleur {
-    PIQUE, TREFLE, CARREAU, COEUR, ETOILE;
+    PIQUE, TREFLE, CARREAU, COEUR, ETOILE, TRIANGLE, SOLEIL;
 
     /**
      * Getter de la force de la couleur
@@ -11,13 +11,19 @@ public enum Couleur {
     public int getForce() {
         switch (this) {
             case PIQUE:
-                return 4;
+                return 7;
             case TREFLE:
-                return 3;
+                return 6;
+            case ETOILE:
+            	return 5;
             case CARREAU:
-                return 2;
+                return 4;
+            case SOLEIL:
+            	return 3;
             case COEUR:
-                return 1;
+                return 2;
+            case TRIANGLE:
+            	return 1;
         }
         return 0;
     }
@@ -39,6 +45,10 @@ public enum Couleur {
                 return "♥";
             case ETOILE:
             	return "☆";
+            case TRIANGLE:
+            	return "▲";
+            case SOLEIL:
+            	return "☼";
         }
         return "";
     }

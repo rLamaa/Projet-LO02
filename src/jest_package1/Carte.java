@@ -6,7 +6,16 @@ public abstract class Carte implements Serializable {
     private static final long serialVersionUID = 1L;
     protected Couleur couleur;
     protected Valeur valeur;
+    private boolean visible = false;
+    
+    public boolean estVisible() {
+    	return visible;
+    }
 
+    public void setVisible(boolean visible) {
+    	this.visible = visible;
+    }
+    
     public int accepter(VisiteurScore visiteur, Jest jest) {
         return 0;
     }
