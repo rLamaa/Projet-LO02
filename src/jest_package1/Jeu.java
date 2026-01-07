@@ -134,7 +134,7 @@ public class Jeu implements Serializable {
 				System.out.println("✓ Variante Rapide sélectionnée");
 				break;
 			case 3:
-				this.regleJeu = new VarianteStrategique();
+				this.regleJeu = new RegleStrategique();
 				System.out.println("✓ Variante Stratégique sélectionnée");
 				break;
 			default:

@@ -18,4 +18,7 @@ public interface RegleJeu extends Serializable {
 	void appliquerReglesSpeciales(Jeu jeu);
 	
 	Offre creerOffre(Joueur joueur, Carte carteCachee, Carte carteVisible);
+	
+	// va permettre de changer les règles du jeu si la variante stratégique est choisie
+	boolean sontOffresVisibles();
 }

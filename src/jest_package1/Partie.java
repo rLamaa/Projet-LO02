@@ -155,8 +155,7 @@ public class Partie implements Serializable {
 		for (Joueur j : joueurs) {
 			System.out.println("[DEBUG] " + j.getNom() + ":");
 			System.out.println("  ├─ jest (temporaire)     : " + j.getJest().getCartes());
-			System.out.println("  └─ jestPerso (définitif) : " + j.getJestPerso().getCartes()); // TODO: remplacer par
-			// jestPerso
+			System.out.println("  └─ jestPerso (définitif) : " + j.getJestPerso().getCartes());
 
 		}
 	}
@@ -169,15 +168,17 @@ public class Partie implements Serializable {
 		offresActuelles = new ArrayList<>();
 		System.out.println("\n=== Création des offres ===");
 
+		boolean offresVisibles = regleJeu.sontOffresVisibles();
+		
 		// Boucle: chaque joueur propose ses 2 cartes (1 visible, 1 cachée)
 		for (Joueur j : joueurs) {
-			Offre offre = j.faireOffre(jeuReference.getRegleJeu().);
+			Offre offre = j.faireOffre(offresVisibles);
 			// La visibilité change selon la variante
 			offre = regleJeu.creerOffre(j, offre.getCarteCachee(), offre.getCarteVisible());
 			offresActuelles.add(offre);
 
 			// Affichage différent suivant la variante
-			if (regleJeu instanceof VarianteStrategique) {
+			if (offresVisibles) {
 				System.out.println("[" + j.getNom() + "] Offre créée - Carte 1 : " + offre.getCarteVisible()
 						+ " | Carte 2 : " + offre.getCarteCachee());
 			} else {
@@ -223,10 +224,7 @@ public class Partie implements Serializable {
 				// DEBUG: Afficher l'état des deux Jest après prise de carte
 				System.out.println("[DEBUG] " + joueurActif.getNom() + " APRÈS avoir pris la carte:");
 				System.out.println("  ├─ jest (temporaire)     : " + joueurActif.getJest().getCartes());
-				System.out.println("  └─ jestPerso (définitif) : " + joueurActif.getJestPerso().getCartes()); // TODO:
-																												// remplacer
-																												// par
-																												// jestPerso
+				System.out.println("  └─ jestPerso (définitif) : " + joueurActif.getJestPerso().getCartes());
 				// Marquer ce joueur comme ayant joué
 				joueursAyantJoue.add(joueurActif);
 

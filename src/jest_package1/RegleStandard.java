@@ -7,6 +7,14 @@ import java.util.*;
  */
 public class RegleStandard implements RegleJeu {
 	private static final long serialVersionUID = 1L;
+	
+	
+
+	@Override
+	public boolean sontOffresVisibles() {
+		// TODO Auto-generated method stub
+		return false; // dans le jeu standard, une carte est cachée et l'autre visible
+	}
 
 	@Override
 	public int calculerValeurJest(Jest jest) {

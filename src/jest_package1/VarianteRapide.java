@@ -7,7 +7,15 @@ public class VarianteRapide implements RegleJeu {
     private int nombreManchesMax = 3;
     private int manchesJouees = 0;
 
+    
+    
     @Override
+	public boolean sontOffresVisibles() {
+		// TODO Auto-generated method stub
+		return false; // dans la variante rapide, pareil que le jeu standard, une carte est cachée et l'autre visible
+	}
+
+	@Override
     public int calculerValeurJest(Jest jest) {
         // Utilise le même calcul que les règles standard
         CalculateurScoreStandard calc = new CalculateurScoreStandard();

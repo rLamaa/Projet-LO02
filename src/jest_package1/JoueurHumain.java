@@ -28,10 +28,23 @@ public class JoueurHumain extends Joueur {
 				if (o.getProprietaire() == this && o.estComplete()) {
 					System.out.println("\n[" + this.nom + "] Vous êtes le dernier joueur.");
 					System.out.println("Vous devez choisir dans votre propre offre.");
+					boolean offresVisibles = false;
+					if(o.getCarteCachee().estVisible()) {
+						//Variante stratégique, toutes les cartes sont visibles
+						offresVisibles = true;
+					}
 
-					System.out.println("  1. Visible: " + o.getCarteVisible());
-					System.out.println("  2. Cachée: [?]");
+					if(offresVisibles) {
+						System.out.println("\n[" + this.nom + "] Quelle carte voulez-vous ?");
+						System.out.println("  1. Carte 1 : " + o.getCarteVisible());
+						System.out.println("  2. Carte 2 : " + o.getCarteCachee());
+					} else {
+						System.out.println("\n[" + this.nom + "] Quelle carte voulez-vous ?");
+						System.out.println("  1. Visible : " + o.getCarteVisible());
+						System.out.println("  2. Cachée : [?] ");
+					}
 					System.out.print("[" + this.nom + "] Votre choix (1 ou 2): ");
+					
 
 					String choixCarte = "";
 					try {
@@ -56,12 +69,20 @@ public class JoueurHumain extends Joueur {
 
 		// Afficher les offres disponibles
 		System.out.println("\n[" + this.nom + "] Offres disponibles:");
+		boolean offresVisibles = false;
+		
 		for (int i = 0; i < offresDisponibles.size(); i++) {
 			Offre o = offresDisponibles.get(i);
 			// Afficher la carte cachée si elle est visible (variante stratégique)
-			String carteCacheeStr = o.getCarteCachee().estVisible() ? o.getCarteCachee().toString() : "[?]";
-			System.out.println("  " + (i + 1) + ". [" + o.getProprietaire().getNom() + "] Visible: "
-					+ o.getCarteVisible() + " | Cachée: " + carteCacheeStr);
+			if(o.getCarteCachee().estVisible()) {
+				//Variante stratégique, toutes les cartes sont visibles
+				offresVisibles = true;
+				System.out.println("  " + (i + 1) + ". [" + o.getProprietaire().getNom() + "] Carte 1 : " + o.getCarteVisible() + " | Carte 2 : " + o.getCarteCachee());
+			} else {
+				//Jeu standard donc une carte cachée, une carte visible
+				System.out.println("  " + (i + 1) + ". [" + o.getProprietaire().getNom() + "] Visible : " + o.getCarteVisible() + " | Cachée : [?]");
+
+			}
 		}
 
 		// Demander le choix de l'offre
@@ -85,12 +106,16 @@ public class JoueurHumain extends Joueur {
 
 		Offre offreChoisie = offresDisponibles.get(choixOffre - 1);
 
-		// Demander le choix de la carte (visible ou cachée)
-		System.out.println("\n[" + this.nom + "] Quelle carte voulez-vous ?");
-		System.out.println("  1. Visible: " + offreChoisie.getCarteVisible());
-		String carteCacheeStr = offreChoisie.getCarteCachee().estVisible() ? offreChoisie.getCarteCachee().toString()
-				: "[?]";
-		System.out.println("  2. Cachée: " + carteCacheeStr);
+		// Demander le choix de la carte (visible ou cachée (standard) ou 1 ou 2 (variante stratégique))
+		if(offresVisibles) {
+			System.out.println("\n[" + this.nom + "] Quelle carte voulez-vous ?");
+			System.out.println("  1. Carte 1 : " + offreChoisie.getCarteVisible());
+			System.out.println("  2. Carte 2 : " + offreChoisie.getCarteCachee());
+		} else {
+			System.out.println("\n[" + this.nom + "] Quelle carte voulez-vous ?");
+			System.out.println("  1. Visible : " + offreChoisie.getCarteVisible());
+			System.out.println("  2. Cachée : [?] ");
+		}
 		System.out.print("[" + this.nom + "] Votre choix (1 ou 2): ");
 
 		String choixCarte = "";
@@ -110,58 +135,57 @@ public class JoueurHumain extends Joueur {
 		return new ChoixCarte(offreChoisie, carteChoisie);
 	}
 
-	@Override
 	public Offre faireOffre(boolean offresVisibles) {
-
-		if (offresVisibles == true) {
-			System.out.println(
-					"Vous avez choisi la variante stratégique. Les cartes sont toutes visibles donc vous n'avez pas à créer d'offre");
-			List<Carte> cartes = this.jest.getCartes();
-
-			Carte c1;
-			Carte c2;
-			c2 = cartes.get(0);
-			c1 = cartes.get(1);
-			// On enlève les cartes du Jest TEMPORAIRE
-			this.jest.enleverCarte(c1);
-			this.jest.enleverCarte(c2);
-
+		List<Carte> cartes = this.jest.getCartes();
+		Carte c1;
+		Carte c2;
+		c1 = cartes.get(0);
+		c2 = cartes.get(1);
+		
+		// On enlève les cartes du Jest TEMPORAIRE
+		this.jest.enleverCarte(c1);
+		this.jest.enleverCarte(c2);
+					
+		if (offresVisibles) {
+			// Variante stratégique, pas besoin de choisir quelle carte est cachée et l'autre visible : les deux visibles
+			System.out.println("\\n[" + this.nom + "] Mode Stratégique : Les cartes sont toutes visibles donc vous n'avez pas à créer d'offre");
+			System.out.println("  Carte 1 : " + c1);
+			System.out.println("  Carte 2 : " + c2);
+			
 			this.offreCourante = new Offre(c1, c2, this);
 			return this.offreCourante;
 		} else {
+			// Jeu standard donc il faut choisir quelle carte est cachée
 			String choix = "0";
-			System.out.println("\n[" + this.nom + "] Quelle carte doit être cachée?");
-			List<Carte> cartes = this.jest.getCartes();
-
-			for (int i = 0; i < cartes.size(); i++) {
-				if (!(cartes.get(i) instanceof Joker)) {
-					System.out.println("  Choix " + (i + 1) + ": " + cartes.get(i).getValeur() + " de "
-							+ cartes.get(i).getCouleur().getSymbole());
-				} else {
-					System.out.println("  Choix " + (i + 1) + ": Joker");
-				}
+			System.out.println("\n[" + this.nom + "] Quelle carte doit être cachée ?");
+			if (!(c1 instanceof Joker)) {
+				System.out.println("  Choix 1 : " + c1);
+			} else {
+				System.out.println("  Choix 1 : Joker");
 			}
-
+			if (!(c2 instanceof Joker)) {
+				System.out.println("  Choix 2 : " + c2);
+			} else {
+				System.out.println("  Choix 2 : Joker");
+			}
+			
 			System.out.print("[" + this.nom + "] La 1 ou la 2? ");
 			choix = Jeu.scanner.nextLine().trim();
-			Carte c1;
-			Carte c2;
+			Carte carteCachee;
+			Carte carteVisible;
 			if (choix.equals("1")) {
-				c1 = cartes.get(0);
-				c2 = cartes.get(1);
+				carteCachee = c1;
+				carteVisible = c2;
 			} else if (choix.equals("2")) {
-				c2 = cartes.get(0);
-				c1 = cartes.get(1);
+				carteCachee = c2;
+				carteVisible = c1;
 			} else {
 				System.out.println("Mauvais choix, première carte mise par défaut");
-				c1 = cartes.get(0);
-				c2 = cartes.get(1);
+				carteCachee = c1;
+				carteVisible = c2;
 			}
-			// On enlève les cartes du Jest TEMPORAIRE
-			this.jest.enleverCarte(c1);
-			this.jest.enleverCarte(c2);
-
-			this.offreCourante = new Offre(c1, c2, this);
+			
+			this.offreCourante = new Offre(carteCachee, carteVisible, this);
 			return this.offreCourante;
 		}
 	}
