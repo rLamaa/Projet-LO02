@@ -58,8 +58,10 @@ public class JoueurHumain extends Joueur {
 		System.out.println("\n[" + this.nom + "] Offres disponibles:");
 		for (int i = 0; i < offresDisponibles.size(); i++) {
 			Offre o = offresDisponibles.get(i);
-			System.out.println("  " + (i + 1) + ". [" + o.getProprietaire().getNom() +
-					"] Visible: " + o.getCarteVisible() + " | Cachée: [?]");
+			// Afficher la carte cachée si elle est visible (variante stratégique)
+			String carteCacheeStr = o.getCarteCachee().estVisible() ? o.getCarteCachee().toString() : "[?]";
+			System.out.println("  " + (i + 1) + ". [" + o.getProprietaire().getNom() + "] Visible: "
+					+ o.getCarteVisible() + " | Cachée: " + carteCacheeStr);
 		}
 
 		// Demander le choix de l'offre
@@ -86,7 +88,9 @@ public class JoueurHumain extends Joueur {
 		// Demander le choix de la carte (visible ou cachée)
 		System.out.println("\n[" + this.nom + "] Quelle carte voulez-vous ?");
 		System.out.println("  1. Visible: " + offreChoisie.getCarteVisible());
-		System.out.println("  2. Cachée: [?]");
+		String carteCacheeStr = offreChoisie.getCarteCachee().estVisible() ? offreChoisie.getCarteCachee().toString()
+				: "[?]";
+		System.out.println("  2. Cachée: " + carteCacheeStr);
 		System.out.print("[" + this.nom + "] Votre choix (1 ou 2): ");
 
 		String choixCarte = "";
@@ -107,42 +111,58 @@ public class JoueurHumain extends Joueur {
 	}
 
 	@Override
-	public Offre faireOffre() {
-		String choix = "0";
-		System.out.println("\n[" + this.nom + "] Quelle carte doit être cachée?");
-		List<Carte> cartes = this.jest.getCartes();
+	public Offre faireOffre(boolean offresVisibles) {
 
-		for (int i = 0; i < cartes.size(); i++) {
-			if (!(cartes.get(i) instanceof Joker)) {
-				System.out.println(
-						"  Choix " + (i + 1) + ": " + cartes.get(i).getValeur() + " de "
-								+ cartes.get(i).getCouleur().getSymbole());
-			} else {
-				System.out.println("  Choix " + (i + 1) + ": Joker");
-			}
-		}
+		if (offresVisibles == true) {
+			System.out.println(
+					"Vous avez choisi la variante stratégique. Les cartes sont toutes visibles donc vous n'avez pas à créer d'offre");
+			List<Carte> cartes = this.jest.getCartes();
 
-		System.out.print("[" + this.nom + "] La 1 ou la 2? ");
-		choix = Jeu.scanner.nextLine().trim();
-		Carte c1;
-		Carte c2;
-		if (choix.equals("1")) {
-			c1 = cartes.get(0);
-			c2 = cartes.get(1);
-		} else if (choix.equals("2")) {
+			Carte c1;
+			Carte c2;
 			c2 = cartes.get(0);
 			c1 = cartes.get(1);
+			// On enlève les cartes du Jest TEMPORAIRE
+			this.jest.enleverCarte(c1);
+			this.jest.enleverCarte(c2);
+
+			this.offreCourante = new Offre(c1, c2, this);
+			return this.offreCourante;
 		} else {
-			System.out.println("Mauvais choix, première carte mise par défaut");
-			c1 = cartes.get(0);
-			c2 = cartes.get(1);
+			String choix = "0";
+			System.out.println("\n[" + this.nom + "] Quelle carte doit être cachée?");
+			List<Carte> cartes = this.jest.getCartes();
+
+			for (int i = 0; i < cartes.size(); i++) {
+				if (!(cartes.get(i) instanceof Joker)) {
+					System.out.println("  Choix " + (i + 1) + ": " + cartes.get(i).getValeur() + " de "
+							+ cartes.get(i).getCouleur().getSymbole());
+				} else {
+					System.out.println("  Choix " + (i + 1) + ": Joker");
+				}
+			}
+
+			System.out.print("[" + this.nom + "] La 1 ou la 2? ");
+			choix = Jeu.scanner.nextLine().trim();
+			Carte c1;
+			Carte c2;
+			if (choix.equals("1")) {
+				c1 = cartes.get(0);
+				c2 = cartes.get(1);
+			} else if (choix.equals("2")) {
+				c2 = cartes.get(0);
+				c1 = cartes.get(1);
+			} else {
+				System.out.println("Mauvais choix, première carte mise par défaut");
+				c1 = cartes.get(0);
+				c2 = cartes.get(1);
+			}
+			// On enlève les cartes du Jest TEMPORAIRE
+			this.jest.enleverCarte(c1);
+			this.jest.enleverCarte(c2);
+
+			this.offreCourante = new Offre(c1, c2, this);
+			return this.offreCourante;
 		}
-
-		// On enlève les cartes du Jest TEMPORAIRE
-		this.jest.enleverCarte(c1);
-		this.jest.enleverCarte(c2);
-
-		this.offreCourante = new Offre(c1, c2, this);
-		return this.offreCourante;
 	}
 }

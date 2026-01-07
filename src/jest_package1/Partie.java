@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Classe Partie implémentant le patron Singleton.
- * Gère le déroulement d'une partie de Jest.
+ * Classe Partie implémentant le patron Singleton. Gère le déroulement d'une
+ * partie de Jest.
  */
 public class Partie implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -111,10 +111,9 @@ public class Partie implements Serializable {
 	}
 
 	/**
-	 * Distribue 2 cartes à chaque joueur.
-	 * Première manche: cartes piochées directement
-	 * Autres manches: récupère les cartes non choisies + nouvelles cartes de la
-	 * pioche
+	 * Distribue 2 cartes à chaque joueur. Première manche: cartes piochées
+	 * directement Autres manches: récupère les cartes non choisies + nouvelles
+	 * cartes de la pioche
 	 */
 	public void distribuerCartes() {
 
@@ -158,13 +157,13 @@ public class Partie implements Serializable {
 			System.out.println("  ├─ jest (temporaire)     : " + j.getJest().getCartes());
 			System.out.println("  └─ jestPerso (définitif) : " + j.getJestPerso().getCartes()); // TODO: remplacer par
 			// jestPerso
-			
+
 		}
 	}
 
 	/**
-	 * Crée les offres de chaque joueur (1 carte visible + 1 carte cachée)
-	 * Chaque joueur choisit 2 cartes de sa main pour faire une offre
+	 * Crée les offres de chaque joueur (1 carte visible + 1 carte cachée) Chaque
+	 * joueur choisit 2 cartes de sa main pour faire une offre
 	 */
 	public void creerOffres() {
 		offresActuelles = new ArrayList<>();
@@ -172,26 +171,34 @@ public class Partie implements Serializable {
 
 		// Boucle: chaque joueur propose ses 2 cartes (1 visible, 1 cachée)
 		for (Joueur j : joueurs) {
-			Offre offre = j.faireOffre();				
+			Offre offre = j.faireOffre(jeuReference.getRegleJeu().);
+			// La visibilité change selon la variante
+			offre = regleJeu.creerOffre(j, offre.getCarteCachee(), offre.getCarteVisible());
 			offresActuelles.add(offre);
 
-			System.out.println("[" + j.getNom() + "] Offre créée - Visible : " +
-					offre.getCarteVisible() + " | Cachée : [?]");
+			// Affichage différent suivant la variante
+			if (regleJeu instanceof VarianteStrategique) {
+				System.out.println("[" + j.getNom() + "] Offre créée - Carte 1 : " + offre.getCarteVisible()
+						+ " | Carte 2 : " + offre.getCarteCachee());
+			} else {
+				System.out.println(
+						"[" + j.getNom() + "] Offre créée - Visible : " + offre.getCarteVisible() + " | Cachée : [?]");
+			}
 
 			// DEBUG: Afficher l'état des deux Jest après création offre
 			System.out.println("[DEBUG] " + j.getNom() + " APRÈS offre:");
 			System.out.println("  ├─ jest (temporaire)     : " + j.getJest().getCartes() + " (cartes pour l'offre)");
-			System.out.println("  ├─ Carte visible : " + offre.getCarteVisible());
-			System.out.println("  ├─ Carte cachée  : " + offre.getCarteCachee());
+			System.out.println("  ├─ Carte visible : " + offre.getCarteVisible() + " (visible="
+					+ offre.getCarteVisible().estVisible() + ")");
+			System.out.println("  ├─ Carte cachée  : " + offre.getCarteCachee() + " (visible="
+					+ offre.getCarteCachee().estVisible() + ")");
 			System.out.println("  └─ jestPerso (définitif) : " + j.getJestPerso().getCartes());
-
 		}
 	}
 
 	/**
 	 * Gère un tour complet: chaque joueur choisit une carte jusqu'à fin de la
-	 * manche
-	 * L'ordre des joueurs dépend de la valeur de leurs cartes visibles
+	 * manche L'ordre des joueurs dépend de la valeur de leurs cartes visibles
 	 * NOUVELLE VERSION : Gère correctement l'ordre des joueurs selon les règles
 	 */
 	public void resoudreTour() {
@@ -258,11 +265,10 @@ public class Partie implements Serializable {
 	}
 
 	/**
-	 * Détermine le premier joueur selon les règles :
-	 * - Celui avec la carte visible de plus grande valeur
-	 * - En cas d'égalité, celui avec la couleur la plus forte
-	 * - Joker = valeur 0
-	 * Boucle: compare chaque joueur pour trouver celui avec la meilleure carte
+	 * Détermine le premier joueur selon les règles : - Celui avec la carte visible
+	 * de plus grande valeur - En cas d'égalité, celui avec la couleur la plus forte
+	 * - Joker = valeur 0 Boucle: compare chaque joueur pour trouver celui avec la
+	 * meilleure carte
 	 */
 	private Joueur determinerPremierJoueur() {
 		Joueur premier = joueurs.get(0);
@@ -295,11 +301,10 @@ public class Partie implements Serializable {
 	}
 
 	/**
-	 * Détermine le prochain joueur selon les règles :
-	 * - C'est le propriétaire de l'offre choisie (s'il n'a pas encore joué)
-	 * - Sinon, c'est le joueur restant avec la plus grande carte visible
-	 * Boucle: parcourt les joueurs restants pour trouver celui avec la meilleure
-	 * carte
+	 * Détermine le prochain joueur selon les règles : - C'est le propriétaire de
+	 * l'offre choisie (s'il n'a pas encore joué) - Sinon, c'est le joueur restant
+	 * avec la plus grande carte visible Boucle: parcourt les joueurs restants pour
+	 * trouver celui avec la meilleure carte
 	 */
 	private Joueur determinerProchainJoueur(Joueur proprietaireOffre, Set<Joueur> joueursAyantJoue) {
 		// Si le propriétaire n'a pas encore joué, c'est à lui
@@ -337,8 +342,8 @@ public class Partie implements Serializable {
 	}
 
 	/**
-	 * Retourne la valeur de la carte visible d'un joueur (Joker = 0)
-	 * Condition: si c'est un Joker, retourne 0; sinon retourne sa valeur numérique
+	 * Retourne la valeur de la carte visible d'un joueur (Joker = 0) Condition: si
+	 * c'est un Joker, retourne 0; sinon retourne sa valeur numérique
 	 */
 	private int getValeurCarteVisible(Joueur joueur) {
 		Offre offre = trouverOffreDeJoueur(joueur);
@@ -371,8 +376,8 @@ public class Partie implements Serializable {
 	}
 
 	/**
-	 * Trouve l'offre d'un joueur donné
-	 * Boucle: parcourt toutes les offres pour trouver celle appartenant au joueur
+	 * Trouve l'offre d'un joueur donné Boucle: parcourt toutes les offres pour
+	 * trouver celle appartenant au joueur
 	 */
 	private Offre trouverOffreDeJoueur(Joueur joueur) {
 		// Boucle: parcourt les offres jusqu'à trouver celle du joueur
@@ -430,12 +435,12 @@ public class Partie implements Serializable {
 	}
 
 	/**
-	 * Attribue les trophées aux joueurs selon les règles de jeu
-	 * Boucle: pour chaque trophée, détermine le gagnant et l'ajoute à son jest
+	 * Attribue les trophées aux joueurs selon les règles de jeu Boucle: pour chaque
+	 * trophée, détermine le gagnant et l'ajoute à son jest
 	 */
 	/**
-	 * Attribue les trophées aux joueurs selon les règles de jeu
-	 * Boucle: pour chaque trophée, détermine le gagnant et l'ajoute à son jest
+	 * Attribue les trophées aux joueurs selon les règles de jeu Boucle: pour chaque
+	 * trophée, détermine le gagnant et l'ajoute à son jest
 	 */
 	public void attribuerTrophees() {
 		System.out.println("\n╔════════════════════════════════════════╗");
@@ -554,9 +559,8 @@ public class Partie implements Serializable {
 	}
 
 	/**
-	 * Calcule le score final de chaque joueur et détermine le gagnant
-	 * Boucle: parcourt chaque joueur et calcule son score, puis détermine le
-	 * meilleur
+	 * Calcule le score final de chaque joueur et détermine le gagnant Boucle:
+	 * parcourt chaque joueur et calcule son score, puis détermine le meilleur
 	 */
 	public Joueur calculerGagnant() {
 		System.out.println("\n=== Calcul des scores ===");

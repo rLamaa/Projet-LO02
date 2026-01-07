@@ -17,5 +17,5 @@ public interface RegleJeu extends Serializable {
 
 	void appliquerReglesSpeciales(Jeu jeu);
 	
-	Offre creerOffre(Joueur joueur, Carte c1, Carte c2);
+	Offre creerOffre(Joueur joueur, Carte carteCachee, Carte carteVisible);
 }

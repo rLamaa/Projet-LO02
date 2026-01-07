@@ -1,4 +1,4 @@
-package jest_package1;
+/*package jest_package1;
 
 import java.util.List;
 
@@ -42,7 +42,11 @@ public class VarianteStrategique implements RegleJeu {
 
 	@Override
 	public Offre creerOffre(Joueur joueur, Carte c1, Carte c2) {
-		// TODO Auto-generated method stub
-		return null;
+		// Variante Stratégique donc les deux cartes sont visibles
+		c1.setVisible(true);
+		c2.setVisible(true);
+		return new Offre(c1, c2, joueur);
 	}
-}
+	
+	
+}*/

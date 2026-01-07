@@ -46,7 +46,8 @@ public abstract class Joueur implements Serializable {
      *
      * @return l'offre créée par le joueur
      */
-    public abstract Offre faireOffre();
+    public abstract Offre faireOffre(boolean offresVisibles);
+    
 
     /**
      * Demande au joueur de choisir une carte parmi les offres disponibles.

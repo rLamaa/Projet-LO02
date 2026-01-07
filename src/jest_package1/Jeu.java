@@ -28,6 +28,10 @@ public class Jeu implements Serializable {
 		this.etat = EtatPartie.CONFIGURATION;
 	}
 
+	public RegleJeu getRegleJeu() {
+		return regleJeu;
+	}
+
 	public void configurerJeu() {
 		System.out.println("\n╔════════════════════════════════════╗");
 		System.out.println("║   Configuration du jeu JEST        ║");
@@ -113,7 +117,7 @@ public class Jeu implements Serializable {
 		System.out.println("\n=== Choix de la variante ===");
 		System.out.println("1. Règles Standards");
 		System.out.println("2. Variante Rapide (3 manches max)");
-		System.out.println("(3. Variante Stratégique (offres visibles) -> Fabrication en cours...)");
+		System.out.println("3. Variante Stratégique (offres visibles)");
 		System.out.print("Votre choix (1-3): ");
 
 		int choix = 1;
@@ -263,17 +267,22 @@ public class Jeu implements Serializable {
 			System.out.println("  ┗━━ " + description);
 		}
 
-		System.out.println("\n╔════════════════════════════════════════╗");
+		System.out.println("\n╔═══════════════════════════════════════╗");
 		System.out.println("║  ℹ️  RAPPEL DES RÈGLES                ║");
-		System.out.println("╠════════════════════════════════════════╣");
+		System.out.println("╠═══════════════════════════════════════╣");
 		System.out.println("║  Piques ♠ & Trèfles ♣ : +points       ║");
-		System.out.println("║  Carreaux ♦ : -points                  ║");
+		System.out.println("║  Carreaux ♦ : -points                 ║");
 		System.out.println("║  Cœurs ♥ : 0 pts (sauf avec Joker)    ║");
-		System.out.println("║  Joker seul : +4 pts                   ║");
+		System.out.println("║  Joker seul : +4 pts                  ║");
 		System.out.println("║  Joker + 4 Cœurs : Cœurs positifs!    ║");
 		System.out.println("║  Paire noire (♠+♣ même valeur): +2    ║");
-		System.out.println("║  As seul de sa couleur : vaut 5        ║");
-		System.out.println("╚════════════════════════════════════════╝\n");
+		System.out.println("║  As seul de sa couleur : vaut 5       ║");
+		if(avecExtension==true) {
+			System.out.println("║  Etoiles : vaut         ║");
+			System.out.println("║  Trangles : vaut         ║");
+			System.out.println("║  Soleils : vaut         ║");
+		}
+		System.out.println("╚═══════════════════════════════════════╝\n");
 	}
 
 	/**
