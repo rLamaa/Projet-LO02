@@ -21,7 +21,7 @@ public class TestDesFonctions {
 		j1.getJest().getCartes().add(c2);
 
 		System.out.println("");
-		j1.faireOffre();
+		// j1.faireOffre();
 
 		System.out.println("Cachée " + j1.getOffreCourante().getCarteCachee());
 		System.out.println("Visible " + j1.getOffreCourante().getCarteVisible());
