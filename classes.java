@@ -2,163 +2,209 @@ package jest_package1;
 
 import java.util.*;
 
-//A REVOIR IMPERATIVEMENT
 /**
  * Implémentation du patron Visitor pour calculer les scores selon les règles
- * standard.
+ * standards.
  */
 public class CalculateurScoreStandard implements VisiteurScore {
 
-    @Override
-    public int calculerScore(Jest j) {
-        int scoreTotal = 0;
+	@Override
+	public int calculerScore(Jest j) {
+		int scoreTotal = 0;
 
-        // Calculer le score de chaque carte
-        for (Carte c : j.getCartes()) {
-            scoreTotal += c.accepter(this, j);
-        }
+		// Calculer le score de toutes les cartes = Jest final avec les trophées
+		for (Carte c : j.getCartes()) {
+			scoreTotal += c.accepter(this, j);
+		}
 
-        // Ajouter les bonus des paires noires
-        scoreTotal += calculerBonusPairesNoires(j);
+		// Ajouter les bonus des paires noires
+		scoreTotal += calculerBonusPairesNoires(j);
 
-        // Ajouter les trophées
-        for (Carte trophee : j.getTrophees()) {
-            scoreTotal += trophee.accepter(this, j);
-        }
+		return scoreTotal;
+	}
 
-        return scoreTotal;
-    }
+	@Override
+	public int visiterPique(CarteCouleur c, Jest j) {
+		// Les Piques augmentent toujours le score
+		return calculerValeurAs(c, j);
+	}
 
-    @Override
-    public int visiterPique(CarteCouleur c, Jest j) {
-        // Les Piques augmentent toujours le score
-        return calculerValeurAs(c, j);
-    }
+	@Override
+	public int visiterTrefle(CarteCouleur c, Jest j) {
+		// Les Trèfles augmentent toujours le score
+		return calculerValeurAs(c, j);
+	}
 
-    @Override
-    public int visiterTrefle(CarteCouleur c, Jest j) {
-        // Les Trèfles augmentent toujours le score
-        return calculerValeurAs(c, j);
-    }
+	@Override
+	public int visiterCarreau(CarteCouleur c, Jest j) {
+		// Les Carreaux diminuent toujours le score
+		return -calculerValeurAs(c, j);
+	}
 
-    @Override
-    public int visiterCarreau(CarteCouleur c, Jest j) {
-        // Les Carreaux diminuent toujours le score
-        return -calculerValeurAs(c, j);
-    }
+	public int visiterEtoile(CarteCouleur c, Jest j) {
+		// Les Etoiles doublent toujours le score
+		return 2 * (calculerValeurAs(c, j));
+	}
 
-    @Override
-    public int visiterCoeur(CarteCouleur c, Jest j) {
-        boolean aJoker = false;
-        int nbCoeurs = compterCoeurs(j);
+	public int visiterSoleil(CarteCouleur c, Jest j) {
+		// Les Soleils augmentent le score quand ils sont impairs sinon, diminuent
+		int valeur = 0;
+		if (calculerValeurAs(c, j) % 2 != 0) {
+			valeur = calculerValeurAs(c, j);
+		} else if (calculerValeurAs(c, j) % 2 == 0) {
+			valeur = -calculerValeurAs(c, j);
+		}
+		return valeur;
+	}
 
-        // Vérifier si le joueur a le Joker
-        for (Carte carte : j.getCartes()) {
-            if (carte instanceof Joker) {
-                aJoker = true;
-                break;
-            }
-        }
-        if (!aJoker) {
-            // Sans Joker, les Cœurs valent 0
-            return 0;
-        } else if (nbCoeurs == 4) {
-            // Avec Joker et 4 Cœurs, les Cœurs ajoutent leur valeur
-            return calculerValeurAs(c, j);
-        } else {
-            // Avec Joker et 1-3 Cœurs, les Cœurs diminuent le score
-            return -calculerValeurAs(c, j);
-        }
-    }
+	@Override
+	public int visiterCoeur(CarteCouleur c, Jest j) {
+		boolean aJoker = false;
+		int nbCoeurs = compterCoeurs(j);
 
-    @Override
-    public int visiterJoker(Joker c, Jest j) {
-        int nbCoeurs = compterCoeurs(j);
+		// Vérifier si le joueur a le Joker
+		for (Carte carte : j.getToutesLesCartes()) {
+			if (carte instanceof Joker) {
+				aJoker = true;
+				break;
+			}
+		}
+		if (!aJoker) {
+			// Sans Joker, les Cœurs valent 0
+			return 0;
+		} else if (nbCoeurs == 4) {
+			// Avec Joker et 4 Cœurs, les Cœurs ajoutent leur valeur
+			return calculerValeurAs(c, j);
+		} else {
+			// Avec Joker et 1-3 Cœurs, les Cœurs diminuent le score
+			return -calculerValeurAs(c, j);
+		}
+	}
 
-        if (nbCoeurs == 0) {
-            // Joker sans Cœur = +4 points
-            return 4;
-        } else {
-            // Joker avec 1-4 Cœurs = 0 points
-            return 0;
-        }
-    }
+	public int visiterTriangle(CarteCouleur c, Jest j) {
+		boolean aJoker = false;
+		int nbTriangles = compterTriangles(j);
 
-    @Override
-    public int visiterExtension(CarteExtension c, Jest j) {
-        // À implémenter selon les cartes d'extension
-        return 0;
-    }
+		// Vérifier si le joueur a le Joker
+		for (Carte carte : j.getToutesLesCartes()) {
+			if (carte instanceof Joker) {
+				aJoker = true;
+				break;
+			}
+		}
+		if (!aJoker) {
+			// Sans Joker, les Triangles valent 0
+			return 0;
+		} else if (nbTriangles == 4) {
+			// Avec Joker et 4 Triangles, les Triangles perdent leur valeur
+			return -calculerValeurAs(c, j);
+		} else {
+			// Avec Joker et 1-3 Triangles, les Triangles augmentent le score
+			return calculerValeurAs(c, j);
+		}
+	}
 
-    /**
-     * Calcule le bonus pour les paires noires (Pique + Trèfle de même valeur)
-     */
-    private int calculerBonusPairesNoires(Jest j) {
-        int bonus = 0;
-        Map<Integer, Boolean> piques = new HashMap<>();
-        Map<Integer, Boolean> trefles = new HashMap<>();
+	@Override
+	public int visiterJoker(Joker c, Jest j) {
+		int nbCoeurs = compterCoeurs(j);
 
-        for (Carte carte : j.getCartes()) {
-            if (carte instanceof CarteCouleur) {
-                CarteCouleur cc = (CarteCouleur) carte;
-                int valeur = calculerValeurAs(cc, j);
+		if (nbCoeurs == 0) {
+			// Joker sans Cœur = +4 points
+			return 4;
+		} else {
+			// Joker avec 1-4 Cœurs = 0 points
+			return 0;
+		}
+	}
 
-                if (cc.getCouleur() == Couleur.PIQUE) {
-                    piques.put(valeur, true);
-                } else if (cc.getCouleur() == Couleur.TREFLE) {
-                    trefles.put(valeur, true);
-                }
-            }
-        }
+	/*@Override
+	public int visiterExtension(CarteExtension c, Jest j) {
+		// À implémenter selon les cartes d'extension
+		return 0;
+	}*/
 
-        // Vérifier les paires
-        for (Integer valeur : piques.keySet()) {
-            if (trefles.containsKey(valeur)) {
-                bonus += 2; // +2 points par paire noire
-            }
-        }
+	/**
+	 * Calcule le bonus pour les paires noires (Pique + Trèfle de même valeur)
+	 */
+	private int calculerBonusPairesNoires(Jest j) {
+		int bonus = 0;
+		Map<Integer, Boolean> piques = new HashMap<>();
+		Map<Integer, Boolean> trefles = new HashMap<>();
 
-        return bonus;
-    }
+		for (Carte carte : j.getToutesLesCartes()) {
+			if (carte instanceof CarteCouleur) {
+				CarteCouleur cc = (CarteCouleur) carte;
+				int valeur = cc.getValeurNumerique();
 
-    /**
-     * Calcule la valeur d'un As (5 si seul de sa couleur, sinon 1)
-     */
-    private int calculerValeurAs(CarteCouleur c, Jest j) {
-        if (c.getValeur() != Valeur.AS) {
-            return c.getValeurNumerique();
-        }
+				if (cc.getCouleur() == Couleur.PIQUE) {
+					piques.put(valeur, true);
+				} else if (cc.getCouleur() == Couleur.TREFLE) {
+					trefles.put(valeur, true);
+				}
+			}
+		}
 
-        // Compter les cartes de la même couleur
-        int compteur = 0;
-        for (Carte carte : j.getCartes()) {
-            if (carte instanceof CarteCouleur) {
-                CarteCouleur cc = (CarteCouleur) carte;
-                if (cc.getCouleur() == c.getCouleur()) {
-                    compteur++;
-                }
-            }
-        }
+		// Vérifier les paires
+		for (Integer valeur : piques.keySet()) {
+			if (trefles.containsKey(valeur)) {
+				bonus += 2; // +2 points par paire noire
+			}
+		}
 
-        // Si l'As est seul de sa couleur, il vaut 5
-        return (compteur == 1) ? 5 : 1;
-    }
+		return bonus;
+	}
 
-    /**
-     * Compte le nombre de Cœurs dans le Jest
-     */
-    private int compterCoeurs(Jest j) {
-        int compte = 0;
-        for (Carte carte : j.getCartes()) {
-            if (carte instanceof CarteCouleur) {
-                CarteCouleur cc = (CarteCouleur) carte;
-                if (cc.getCouleur() == Couleur.COEUR) {
-                    compte++;
-                }
-            }
-        }
-        return compte;
-    }
+	/**
+	 * Calcule la valeur d'un As (5 si seul de sa couleur, sinon 1)
+	 */
+	private int calculerValeurAs(CarteCouleur c, Jest j) {
+		if (c.getValeur() != Valeur.AS) {
+			return c.getValeurNumerique();
+		}
+
+		// Compter les cartes de la même couleur
+		int compteur = 0;
+		for (Carte carte : j.getToutesLesCartes()) {
+			if (carte instanceof CarteCouleur) {
+				CarteCouleur cc = (CarteCouleur) carte;
+				if (cc.getCouleur() == c.getCouleur()) {
+					compteur++;
+				}
+			}
+		}
+
+		// Si l'As est seul de sa couleur, il vaut 5
+		return (compteur == 1) ? 5 : 1;
+	}
+
+	/**
+	 * Compte le nombre de Cœurs dans le Jest
+	 */
+	private int compterCoeurs(Jest j) {
+		int compte = 0;
+		for (Carte carte : j.getToutesLesCartes()) {
+			if (carte instanceof CarteCouleur) {
+				CarteCouleur cc = (CarteCouleur) carte;
+				if (cc.getCouleur() == Couleur.COEUR) {
+					compte++;
+				}
+			}
+		}
+		return compte;
+	}
+
+	private int compterTriangles(Jest j) {
+		int compte = 0;
+		for (Carte carte : j.getToutesLesCartes()) {
+			if (carte instanceof CarteCouleur) {
+				CarteCouleur cc = (CarteCouleur) carte;
+				if (cc.getCouleur() == Couleur.TRIANGLE) {
+					compte++;
+				}
+			}
+		}
+		return compte;
+	}
 }package jest_package1;
 
 import java.io.Serializable;
@@ -167,7 +213,16 @@ public abstract class Carte implements Serializable {
     private static final long serialVersionUID = 1L;
     protected Couleur couleur;
     protected Valeur valeur;
+    private boolean visible = false;
+    
+    public boolean estVisible() {
+    	return visible;
+    }
 
+    public void setVisible(boolean visible) {
+    	this.visible = visible;
+    }
+    
     public int accepter(VisiteurScore visiteur, Jest jest) {
         return 0;
     }
@@ -221,91 +276,14 @@ public class CarteCouleur extends Carte {
                 return visiteur.visiterCarreau(this, jest);
             case COEUR:
                 return visiteur.visiterCoeur(this, jest);
+            case ETOILE:
+                return visiteur.visiterEtoile(this, jest);
+            case TRIANGLE:
+                return visiteur.visiterTriangle(this, jest);
+            case SOLEIL:
+                return visiteur.visiterSoleil(this, jest);
         }
         return 0;
-    }
-}
-package jest_package1;
-
-import java.util.HashSet;
-import java.util.Set;
-
-public class CarteExtension extends Carte {
-    private static final long serialVersionUID = 1L;
-
-    private EffetExtension effet;
-    private String description;
-
-    public CarteExtension(EffetExtension effet, String description) {
-        this.effet = effet;
-        this.description = description;
-    }
-
-    public EffetExtension getEffet() {
-        return effet;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public int accepter(VisiteurScore visiteur, Jest jest) {
-        switch (effet) {
-
-            case DOUBLEMENT:
-                return effetDoublement(jest);
-
-            case INVERSION:
-                return effetInversion(jest);
-
-            case MIROIR:
-                return effetMiroir(jest);
-
-            default:
-                return 0;
-        }
-    }
-
-    /* ================= EFFETS ================= */
-
-    private int effetDoublement(Jest jest) {
-        int bonus = 0;
-        for (Carte c : jest.getCartes()) {
-            if (c instanceof CarteCouleur cc &&
-                    cc.getCouleur() == Couleur.PIQUE) {
-                bonus += cc.getValeurNumerique();
-            }
-        }
-        return bonus;
-    }
-
-    private int effetInversion(Jest jest) {
-        int bonus = 0;
-        for (Carte c : jest.getCartes()) {
-            if (c instanceof CarteCouleur cc &&
-                    cc.getCouleur() == Couleur.CARREAU) {
-                bonus += 2 * cc.getValeurNumerique();
-            }
-        }
-        return bonus;
-    }
-
-    private int effetMiroir(Jest jest) {
-        Set<Couleur> couleurs = new HashSet<>();
-
-        for (Carte c : jest.getCartes()) {
-            if (c instanceof CarteCouleur cc) {
-                couleurs.add(cc.getCouleur());
-            }
-        }
-
-        return couleurs.size() == 4 ? 3 : 0;
-    }
-
-    @Override
-    public String toString() {
-        return "⭐ " + effet;
     }
 }
 package jest_package1;
@@ -352,7 +330,7 @@ public class ChoixCarte implements Serializable {
 }package jest_package1;
 
 public enum Couleur {
-    PIQUE, TREFLE, CARREAU, COEUR;
+    PIQUE, TREFLE, CARREAU, COEUR, ETOILE, TRIANGLE, SOLEIL;
 
     /**
      * Getter de la force de la couleur
@@ -362,13 +340,19 @@ public enum Couleur {
     public int getForce() {
         switch (this) {
             case PIQUE:
-                return 4;
+                return 7;
             case TREFLE:
-                return 3;
+                return 6;
+            case ETOILE:
+            	return 5;
             case CARREAU:
-                return 2;
+                return 4;
+            case SOLEIL:
+            	return 3;
             case COEUR:
-                return 1;
+                return 2;
+            case TRIANGLE:
+            	return 1;
         }
         return 0;
     }
@@ -388,6 +372,12 @@ public enum Couleur {
                 return "♦";
             case COEUR:
                 return "♥";
+            case ETOILE:
+            	return "☆";
+            case TRIANGLE:
+            	return "▲";
+            case SOLEIL:
+            	return "☼";
         }
         return "";
     }
@@ -415,106 +405,91 @@ public enum EtatPartie {
 	EN_COURS, // etat de marche du jeu
 	TERMINEE, // etat de fin de jeu
 	SUSPENDUE // etat de jen en suspens
-}
-package jest_package1;
+}package jest_package1;
 
-import java.io.Serializable;
-import java.util.*;
+import javax.swing.*;
+import java.awt.*;
 
-/**
- * Système d'extension avec nouvelles cartes
- */
-public class Extension implements Serializable {
-    /**
-     * Identifiant de version pour la sérialisation.
-     */
-    private static final long serialVersionUID = 1L;
-    private String nom;
-    private List<CarteExtension> nouvellesCartes;
-    private boolean active;
+class FinPanel extends JPanel {
+    private JeuGUI parent;
+    private JTextArea scoresArea;
+    private JLabel lblGagnant;
+    private JPanel cartesGagnantPanel;
 
-    /**
-     * Constructeur de la classe Extension
-     * 
-     * @param nom
-     */
-    public Extension(String nom) {
-        this.nom = nom;
-        this.nouvellesCartes = new ArrayList<>();
-        this.active = false;
+    public FinPanel(JeuGUI parent) {
+        this.parent = parent;
+        setBackground(new Color(34, 139, 34));
+        setLayout(null);
+
+        JLabel lblTitre = new JLabel("🏆 FIN DE LA PARTIE 🏆");
+        lblTitre.setFont(new Font("Arial", Font.BOLD, 36));
+        lblTitre.setForeground(Color.YELLOW);
+        lblTitre.setBounds(300, 30, 600, 50);
+        add(lblTitre);
+
+        scoresArea = new JTextArea();
+        scoresArea.setEditable(false);
+        scoresArea.setFont(new Font("Monospaced", Font.PLAIN, 16));
+        JScrollPane scrollPane = new JScrollPane(scoresArea);
+        scrollPane.setBounds(50, 120, 400, 300);
+        add(scrollPane);
+
+        lblGagnant = new JLabel("");
+        lblGagnant.setFont(new Font("Arial", Font.BOLD, 28));
+        lblGagnant.setForeground(Color.YELLOW);
+        lblGagnant.setBounds(50, 450, 600, 40);
+        add(lblGagnant);
+
+        cartesGagnantPanel = new JPanel();
+        cartesGagnantPanel.setBackground(new Color(34, 139, 34));
+        cartesGagnantPanel.setBounds(500, 120, 650, 350);
+        cartesGagnantPanel.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.YELLOW, 2),
+                "Cartes du Gagnant", 0, 0, new Font("Arial", Font.BOLD, 14), Color.YELLOW));
+        add(cartesGagnantPanel);
+
+        JButton btnMenu = new JButton("Retour au Menu");
+        btnMenu.setFont(new Font("Arial", Font.BOLD, 16));
+        btnMenu.setBounds(475, 650, 250, 50);
+        btnMenu.addActionListener(e -> parent.showPanel("MENU"));
+        add(btnMenu);
     }
 
-    /**
-     * Fonction permettant d'ajouter une carte Extension
-     * 
-     * @param c
-     */
-    public void ajouterCarte(CarteExtension c) {
-        nouvellesCartes.add(c);
-    }
+    public void afficherResultats(Partie partie) {
+        scoresArea.setText("");
+        VisiteurScore calc = new CalculateurScoreStandard();
 
-    /**
-     * Getter de la liste de carte d'extension
-     * 
-     * @return
-     */
-    public List<CarteExtension> getCartes() {
-        return nouvellesCartes;
-    }
+        Joueur gagnant = null;
+        int scoreMax = Integer.MIN_VALUE;
 
-    /**
-     * Fonction permettant de voir si les extensions sont activées
-     * 
-     * @return
-     */
-    public boolean estActive() {
-        return active;
-    }
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== SCORES FINAUX ===\n\n");
 
-    /**
-     * Fonction permettant d'activer les extensions
-     */
-    public void activer() {
-        this.active = true;
-    }
+        for (Joueur j : partie.getJoueurs()) {
+            int score = calc.calculerScore(j.getJestPerso());
+            sb.append(String.format("%-15s : %3d points\n", j.getNom(), score));
 
-    /**
-     * Fonction permettant desactiver les extensions
-     */
-    public void desactiver() {
-        this.active = false;
-    }
+            if (score > scoreMax) {
+                scoreMax = score;
+                gagnant = j;
+            }
+        }
 
-    /**
-     * Getter du nom de l'Extension
-     * 
-     * @return
-     */
-    public String getNom() {
-        return nom;
-    }
+        scoresArea.setText(sb.toString());
+        lblGagnant.setText("🏆 GAGNANT: " + gagnant.getNom() + " avec " + scoreMax + " points! 🏆");
 
-    /**
-     * Crée une extension avec des effets prédéfinies
-     * 
-     * @return
-     */
-    public static Extension creerExtensionStandard() {
-        Extension ext = new Extension("Extension Magique");
+        // Afficher les cartes du gagnant
+        cartesGagnantPanel.removeAll();
+        cartesGagnantPanel.setLayout(new FlowLayout());
 
-        ext.ajouterCarte(new CarteExtension(
-                EffetExtension.DOUBLEMENT,
-                "Double la valeur de tous vos Piques"));
+        for (Carte c : gagnant.getJestPerso().getCartes()) {
+            JLabel lblCarte = new JLabel(JeuGUI.getImageCarte(c));
+            lblCarte.setToolTipText(c.toString());
+            cartesGagnantPanel.add(lblCarte);
+        }
 
-        ext.ajouterCarte(new CarteExtension(
-                EffetExtension.INVERSION,
-                "Vos Carreaux deviennent positifs"));
-
-        ext.ajouterCarte(new CarteExtension(
-                EffetExtension.MIROIR,
-                "+3 points si vous avez les 4 couleurs"));
-
-        return ext;
+        cartesGagnantPanel.revalidate();
+        cartesGagnantPanel.repaint();
     }
 }package jest_package1;
 
@@ -524,14 +499,13 @@ import java.util.*;
 public class Jest implements Serializable {
     private static final long serialVersionUID = 1L;
     private List<Carte> cartes;
-    private List<Carte> trophees;
+
 
     /**
      * Constructeur de la fonction
      */
     public Jest() {
         this.cartes = new ArrayList<>();
-        this.trophees = new ArrayList<>();
     }
 
     public void ajouterCarte(Carte carte) {
@@ -550,10 +524,7 @@ public class Jest implements Serializable {
         cartes.remove(carte);// permet d'enlever une carte au jest
     }
 
-    public void ajouterTrophee(Carte carte) {
-        trophees.add(carte); // permet d'ajouter un trophée au jest
-    }
-
+  
     /**
      * Getter de la liste de cartes du jest
      * 
@@ -568,9 +539,15 @@ public class Jest implements Serializable {
      * 
      * @return
      */
-    public List<Carte> getTrophees() {
-        return trophees;
-    }
+ 
+    
+    // Permet de faire un seul jest final : en ajoutant les trophées au jestPerso pour pouvoir compter le score final
+    public List<Carte> getToutesLesCartes() {
+		List<Carte> toutes = new ArrayList<>();
+		toutes.addAll(this.cartes);
+		
+		return toutes;
+	}
 }
 package jest_package1;
 
@@ -584,7 +561,7 @@ public class Jeu implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private List<Joueur> joueurs; // liste des joueurs de la partie
 	private RegleJeu regleJeu; // regle du jeu de Jest
-	private Extension extension; // carte d'extension
+	private boolean avecExtension = false; // boolean qui permet de savoir si le jeu se joue avec ou sans extension
 	private Partie partieCourante; // variable qui fait reference à l'unique instance partie (permet d'avoir une
 									// seule partie par jeu)
 	private EtatPartie etat; // etat de la partie, utile pour la sauvegarde/configuration pour éviter les
@@ -600,6 +577,10 @@ public class Jeu implements Serializable {
 	public Jeu() {
 		this.joueurs = new ArrayList<>();
 		this.etat = EtatPartie.CONFIGURATION;
+	}
+
+	public RegleJeu getRegleJeu() {
+		return regleJeu;
 	}
 
 	public void configurerJeu() {
@@ -648,6 +629,26 @@ public class Jeu implements Serializable {
 		// Compléter avec des bots jusqu'à 3 joueurs minimum
 		int nbBots = Math.max(0, 3 - nbJoueurs);
 		String[] nomsBots = { "Alpha", "Beta", "Gamma", "Delta" }; // noms des bots qui sont appender
+		/*
+		 * String info;
+		 * Random va = new Random();
+		 * int nombre;
+		 * nombre=va.nextInt(3);
+		 * // System.out.println(nombre);
+		 * switch(nombre) {
+		 * case 0:
+		 * info="SPORT";
+		 * break;
+		 * case 1:
+		 * info="POLITQUE";
+		 * break;
+		 * case 2:
+		 * info="ECONOMIE";
+		 * break;
+		 * default:
+		 * info="SPORT"; //cas par défaut mit à sport pour eviter les erreurs
+		 * }
+		 */
 		Strategie[] strategies = {
 				new StrategieOffensive(), // 1
 				new StrategieDefensive(), // 2
@@ -667,9 +668,9 @@ public class Jeu implements Serializable {
 
 	private void choisirVariante() {
 		System.out.println("\n=== Choix de la variante ===");
-		System.out.println("1. Règles Standard");
-		System.out.println("2. Variante Rapide (5 manches max)");
-		System.out.println("3. Variante Stratégique (offres visibles, scores modifiés)");
+		System.out.println("1. Règles Standards");
+		System.out.println("2. Variante Rapide (3 manches max)");
+		System.out.println("3. Variante Stratégique (offres visibles)");
 		System.out.print("Votre choix (1-3): ");
 
 		int choix = 1;
@@ -686,7 +687,7 @@ public class Jeu implements Serializable {
 				System.out.println("✓ Variante Rapide sélectionnée");
 				break;
 			case 3:
-				this.regleJeu = new VarianteStrategique();
+				this.regleJeu = new RegleStrategique();
 				System.out.println("✓ Variante Stratégique sélectionnée");
 				break;
 			default:
@@ -697,16 +698,16 @@ public class Jeu implements Serializable {
 
 	private void choisirExtension() {
 		System.out.println("\n=== Extension ===");
-		System.out.print("Activer l'extension 'Cartes Magiques' ? (o/n): ");
+		System.out.print("Activer l'extension 'Nouvelles Cartes' ? (o/n): ");
 		String reponse = scanner.nextLine().trim().toLowerCase();
 
 		if (reponse.equals("o") || reponse.equals("oui")) {
-			this.extension = Extension.creerExtensionStandard();
-			this.extension.activer();
+			// this.extension = Extension.creerExtensionStandard();
+			avecExtension = true;
 			System.out.println("✓ Extension activée!");
-			System.out.println("  Cartes ajoutées: Doublement, Inversion, Miroir");
+			System.out.println("  Cartes ajoutées: Etoiles, Triangles, Soleils");
 		} else {
-			this.extension = null;
+			avecExtension = false;
 			System.out.println("✓ Pas d'extension");
 		}
 	}
@@ -723,7 +724,11 @@ public class Jeu implements Serializable {
 			System.out.println("    • " + j.getNom() + " (" + type + ")");
 		}
 		System.out.println("  Règles: " + regleJeu.getClass().getSimpleName());
-		System.out.println("  Extension: " + (extension != null ? "Oui" : "Non"));
+		if (avecExtension == true) {
+			System.out.println("  Extension: Oui");
+		} else {
+			System.out.println("  Extension: Non");
+		}
 		System.out.println("╚════════════════════════════════════╝\n");
 	}
 
@@ -754,19 +759,6 @@ public class Jeu implements Serializable {
 	}
 
 	/**
-	 * Activte les extensions
-	 * 
-	 * @param extension l'extension choisit
-	 */
-	public void activerExtension(Extension extension) {
-		if (etat != EtatPartie.CONFIGURATION) {
-			System.out.println("Impossible d'activer une extension : jeu déjà démarré.");
-			return;
-		}
-		this.extension = extension;
-	}
-
-	/**
 	 * Demarre la partie, en créant l'instance de la classe et permet alors de
 	 * configurer comme que le joueur souhaite
 	 */
@@ -777,7 +769,7 @@ public class Jeu implements Serializable {
 			Partie.reinitialiser();
 			partieCourante = Partie.getInstance();
 			partieCourante.setJeuReference(this);
-			partieCourante.initialiser(joueurs, regleJeu, extension);
+			partieCourante.initialiser(joueurs, regleJeu, avecExtension);
 		} else {
 			// PARTIE CHARGÉE
 			partieCourante.setJeuReference(this);
@@ -827,18 +819,27 @@ public class Jeu implements Serializable {
 			System.out.println("\n  Trophée " + (i + 1) + ": " + c);
 			System.out.println("  ┗━━ " + description);
 		}
-
-		System.out.println("\n╔════════════════════════════════════════╗");
-		System.out.println("║  ℹ️  RAPPEL DES RÈGLES                ║");
-		System.out.println("╠════════════════════════════════════════╣");
-		System.out.println("║  Piques ♠ & Trèfles ♣ : +points       ║");
-		System.out.println("║  Carreaux ♦ : -points                  ║");
-		System.out.println("║  Cœurs ♥ : 0 pts (sauf avec Joker)    ║");
-		System.out.println("║  Joker seul : +4 pts                   ║");
-		System.out.println("║  Joker + 4 Cœurs : Cœurs positifs!    ║");
-		System.out.println("║  Paire noire (♠+♣ même valeur): +2    ║");
-		System.out.println("║  As seul de sa couleur : vaut 5        ║");
-		System.out.println("╚════════════════════════════════════════╝\n");
+		System.out.println("╚═══════════════════════════════════════╝\n");
+		System.out.println("\n╔═══════════════════════════════════════════════════════╗");
+		System.out.println("║  ℹ️  RAPPEL DES RÈGLES                                ║");
+		System.out.println("╠═══════════════════════════════════════════════════════╣");
+		System.out.println("║    Piques ♠ & Trèfles ♣ : +points                     ║");
+		System.out.println("║    Carreaux ♦ : -points                               ║");
+		System.out.println("║    Cœurs ♥ : 0 pts (sauf avec Joker)                  ║");
+		System.out.println("║    Joker seul : +4 pts                                ║");
+		System.out.println("║    Joker + 4 Cœurs ♥ : Cœurs positifs!                ║");
+		System.out.println("║    Joker + 1 à 3 Cœurs ♥ : Cœurs négatifs...          ║");
+		System.out.println("║    Paire noire (♠ + ♣ même valeur): +2                ║");
+		System.out.println("║    As seul de sa couleur : vaut 5                     ║");
+		if (avecExtension == true) {
+			System.out.println("║    Etoiles ☆ : +2*points                              ║");
+			System.out.println("║    Triangles ▲ : 0 pts (sauf avec Joker)              ║");
+			System.out.println("║    Joker + 1 à 3 Triangles ▲ : Triangles positifs!    ║");
+			System.out.println("║    Joker + 4 Triangles ▲ : Triangles négatifs...      ║");
+			System.out.println("║    Soleils ☼ chiffre impair : +points                 ║");
+			System.out.println("║    Soleils ☼ chiffre pair :  -points                  ║");
+		}
+		System.out.println("╚═══════════════════════════════════════════════════════╝\n");
 	}
 
 	/**
@@ -947,45 +948,468 @@ public class Jeu implements Serializable {
 
 		jeu.demarrer();
 	}
+
+	public List<Joueur> getJoueurs() {
+		return joueurs;
+	}
+}package jest_package1;
+
+import javax.swing.*;
+import java.awt.*;
+
+/**
+ * Classe principale de l'interface graphique
+ * À ouvrir avec Window Builder dans Eclipse
+ */
+public class JeuGUI extends JFrame {
+    private JPanel contentPane;
+    private CardLayout cardLayout;
+
+    // Référence aux différents panels
+    private MenuPanel menuPanel;
+    private ConfigPanel configPanel;
+    private JeuPanel jeuPanel;
+    private FinPanel finPanel;
+
+    private Jeu jeu;
+
+    /**
+     * Launch the application - MODE GRAPHIQUE
+     */
+    public static void main(String[] args) {
+        // Vérifier si on veut le mode console
+        if (args.length > 0 && args[0].equals("--console")) {
+            // Mode console
+            Jeu.main(new String[0]);
+        } else {
+            // Mode graphique
+            EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    try {
+                        JeuGUI frame = new JeuGUI();
+                        frame.setVisible(true);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Create the frame.
+     */
+    public JeuGUI() {
+        setTitle("Jeu de JEST");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 1200, 800);
+
+        cardLayout = new CardLayout();
+        contentPane = new JPanel();
+        contentPane.setLayout(cardLayout);
+        setContentPane(contentPane);
+
+        // Initialiser les panels
+        menuPanel = new MenuPanel(this);
+        configPanel = new ConfigPanel(this);
+        jeuPanel = new JeuPanel(this);
+        finPanel = new FinPanel(this);
+
+        // Ajouter les panels au CardLayout
+        contentPane.add(menuPanel, "MENU");
+        contentPane.add(configPanel, "CONFIG");
+        contentPane.add(jeuPanel, "JEU");
+        contentPane.add(finPanel, "FIN");
+
+        // Afficher le menu principal
+        showPanel("MENU");
+    }
+
+    public void showPanel(String panelName) {
+        cardLayout.show(contentPane, panelName);
+    }
+
+    public void setJeu(Jeu jeu) {
+        this.jeu = jeu;
+    }
+
+    public Jeu getJeu() {
+        return jeu;
+    }
+
+    public JeuPanel getJeuPanel() {
+        return jeuPanel;
+    }
+
+    public FinPanel getFinPanel() {
+        return finPanel;
+    }
+
+    /**
+     * Utilitaire pour charger les images des cartes
+     */
+    public static ImageIcon getImageCarte(Carte carte) {
+        String nomFichier = "";
+
+        if (carte instanceof Joker) {
+            nomFichier = "joker.png";
+        } else if (carte instanceof CarteCouleur) {
+            CarteCouleur cc = (CarteCouleur) carte;
+            String valeur = "";
+            String couleur = "";
+
+            // Valeur
+            switch (cc.getValeur()) {
+                case AS:
+                    valeur = "as";
+                    break;
+                case DEUX:
+                    valeur = "deux";
+                    break;
+                case TROIS:
+                    valeur = "trois";
+                    break;
+                case QUATRE:
+                    valeur = "quatre";
+                    break;
+            }
+
+            // Couleur
+            switch (cc.getCouleur()) {
+                case PIQUE:
+                    couleur = "pique";
+                    break;
+                case TREFLE:
+                    couleur = "trefle";
+                    break;
+                case CARREAU:
+                    couleur = "carreau";
+                    break;
+                case COEUR:
+                    couleur = "coeur";
+                    break;
+                default:
+                    couleur = "pique"; // Par défaut
+            }
+
+            nomFichier = valeur + "_" + couleur + ".png";
+        }
+
+        try {
+            // Chemin relatif depuis la racine du projet
+            ImageIcon icon = new ImageIcon("images/" + nomFichier);
+
+            // Redimensionner l'image
+            Image img = icon.getImage().getScaledInstance(80, 120, Image.SCALE_SMOOTH);
+            return new ImageIcon(img);
+        } catch (Exception e) {
+            // Si l'image n'est pas trouvée, retourner une image par défaut
+            System.err.println("Image non trouvée: " + nomFichier);
+            return createDefaultCardIcon(carte);
+        }
+    }
+
+    /**
+     * Crée une icône par défaut si l'image n'est pas trouvée
+     */
+    private static ImageIcon createDefaultCardIcon(Carte carte) {
+        JLabel label = new JLabel(carte.toString());
+        label.setPreferredSize(new Dimension(80, 120));
+        label.setOpaque(true);
+        label.setBackground(Color.WHITE);
+        label.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        label.setFont(new Font("Arial", Font.BOLD, 14));
+
+        // Créer une image à partir du label
+        java.awt.image.BufferedImage img = new java.awt.image.BufferedImage(
+                80, 120, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = img.createGraphics();
+        label.paint(g2d);
+        g2d.dispose();
+
+        return new ImageIcon(img);
+    }
+}package jest_package1;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
+
+class JeuPanel extends JPanel {
+    private JeuGUI parent;
+    private Partie partie;
+    private JLabel lblManche;
+    private JLabel lblMessagePhase;
+    private JPanel tropheesPanel;
+    private JPanel cartesPanel;
+    private JPanel offresPanel;
+    private JTextArea logArea;
+    private JButton btnDistribuer;
+    private JButton btnSauvegarder;
+    private boolean mancheEnCours = false;
+
+    public JeuPanel(JeuGUI parent) {
+        this.parent = parent;
+        setBackground(new Color(0, 100, 0));
+        setLayout(new BorderLayout());
+
+        // Panel trophées en haut
+        tropheesPanel = new JPanel();
+        tropheesPanel.setBackground(new Color(0, 100, 0));
+        add(tropheesPanel, BorderLayout.NORTH);
+
+        // Panel central avec split
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+
+        // Panel des offres (haut)
+        offresPanel = new JPanel();
+        offresPanel.setBackground(new Color(0, 120, 0));
+        offresPanel.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.YELLOW, 2),
+                "Offres", 0, 0, new Font("Arial", Font.BOLD, 16), Color.YELLOW));
+        JScrollPane scrollOffres = new JScrollPane(offresPanel);
+        splitPane.setTopComponent(scrollOffres);
+
+        // Panel des cartes du joueur (bas)
+        cartesPanel = new JPanel();
+        cartesPanel.setBackground(new Color(0, 80, 0));
+        cartesPanel.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.YELLOW, 2),
+                "Vos cartes", 0, 0, new Font("Arial", Font.BOLD, 16), Color.YELLOW));
+        JScrollPane scrollCartes = new JScrollPane(cartesPanel);
+        splitPane.setBottomComponent(scrollCartes);
+
+        splitPane.setDividerLocation(300);
+        add(splitPane, BorderLayout.CENTER);
+
+        // Panel de droite avec log
+        JPanel rightPanel = new JPanel(new BorderLayout());
+
+        lblManche = new JLabel("Manche 1", SwingConstants.CENTER);
+        lblManche.setFont(new Font("Arial", Font.BOLD, 20));
+        lblManche.setForeground(Color.YELLOW);
+        rightPanel.add(lblManche, BorderLayout.NORTH);
+
+        // Message de phase
+        lblMessagePhase = new JLabel("", SwingConstants.CENTER);
+        lblMessagePhase.setFont(new Font("Arial", Font.BOLD, 16));
+        lblMessagePhase.setForeground(Color.WHITE);
+        rightPanel.add(lblMessagePhase, BorderLayout.NORTH);
+
+        logArea = new JTextArea(10, 30);
+        logArea.setEditable(false);
+        logArea.setFont(new Font("Monospaced", Font.PLAIN, 11));
+        JScrollPane scrollLog = new JScrollPane(logArea);
+        rightPanel.add(scrollLog, BorderLayout.CENTER);
+
+        // Boutons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(new Color(0, 100, 0));
+
+        btnDistribuer = new JButton("Distribuer les cartes");
+        btnDistribuer.setFont(new Font("Arial", Font.BOLD, 14));
+        btnDistribuer.addActionListener(e -> distribuerEtJouer());
+        buttonPanel.add(btnDistribuer);
+
+        btnSauvegarder = new JButton("Sauvegarder");
+        btnSauvegarder.addActionListener(e -> {
+            parent.getJeu().sauvegarder();
+            JOptionPane.showMessageDialog(this, "Partie sauvegardée !");
+        });
+        buttonPanel.add(btnSauvegarder);
+
+        rightPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        add(rightPanel, BorderLayout.EAST);
+    }
+
+    public void demarrerPartie(Partie partie) {
+        this.partie = partie;
+        mancheEnCours = false;
+        afficherTrophees();
+        lblManche.setText("Manche " + partie.getNumeroManche());
+        lblMessagePhase.setText("Prêt à commencer ?");
+        logArea.setText("=== Nouvelle Partie ===\nCliquez sur 'Distribuer les cartes' pour débuter.\n");
+        cartesPanel.removeAll();
+        offresPanel.removeAll();
+        cartesPanel.revalidate();
+        offresPanel.revalidate();
+        btnDistribuer.setEnabled(true);
+        btnDistribuer.setText("Distribuer les cartes");
+    }
+
+    public void chargerPartie() {
+        this.partie = Partie.getInstance();
+        mancheEnCours = false;
+        afficherTrophees();
+        lblManche.setText("Manche " + partie.getNumeroManche());
+        lblMessagePhase.setText("Partie chargée");
+    }
+
+    private void afficherTrophees() {
+        tropheesPanel.removeAll();
+        JLabel lbl = new JLabel("🏆 Trophées: ");
+        lbl.setForeground(Color.YELLOW);
+        lbl.setFont(new Font("Arial", Font.BOLD, 16));
+        tropheesPanel.add(lbl);
+
+        for (Carte t : partie.getTrophees()) {
+            JLabel lblCarte = new JLabel(JeuGUI.getImageCarte(t));
+            lblCarte.setToolTipText(t.toString());
+            tropheesPanel.add(lblCarte);
+        }
+        tropheesPanel.revalidate();
+        tropheesPanel.repaint();
+    }
+
+    private void distribuerEtJouer() {
+        if (!mancheEnCours) {
+            // Première étape: distribuer les cartes
+            logArea.append("\n>>> Distribution des cartes...\n");
+            partie.distribuerCartes();
+
+            for (Joueur j : partie.getJoueurs()) {
+                logArea.append(j.getNom() + ": " + j.getJest().getCartes().size() + " cartes\n");
+            }
+
+            btnDistribuer.setEnabled(false);
+            mancheEnCours = true;
+            lblMessagePhase.setText("Cartes distribuées. Création des offres en cours...");
+
+            // Attendre un peu avant de créer les offres
+            Timer timer = new Timer(1000, e -> creerOffresAutomatiquement());
+            timer.setRepeats(false);
+            timer.start();
+        }
+    }
+
+    private void creerOffresAutomatiquement() {
+        logArea.append("\n>>> Création des offres...\n");
+        partie.creerOffres();
+        afficherOffresTousLesJoueurs();
+        lblMessagePhase.setText("Offres créées !");
+        logArea.append("Offres créées. Jeu en cours...\n");
+
+        // Attendre avant de commencer les tours
+        Timer timer = new Timer(2000, e -> jouerManches());
+        timer.setRepeats(false);
+        timer.start();
+    }
+
+    private void afficherOffresTousLesJoueurs() {
+        offresPanel.removeAll();
+        offresPanel.setLayout(new FlowLayout());
+
+        List<Joueur> joueurs = partie.getJoueurs();
+        for (Joueur j : joueurs) {
+            Offre offre = j.getOffreCourante();
+
+            JPanel offrePanel = new JPanel();
+            offrePanel.setLayout(new BoxLayout(offrePanel, BoxLayout.Y_AXIS));
+            offrePanel.setBackground(Color.WHITE);
+            offrePanel.setBorder(BorderFactory.createTitledBorder(
+                    BorderFactory.createLineBorder(Color.BLACK, 2), j.getNom()));
+
+            JLabel lblVisible = new JLabel(JeuGUI.getImageCarte(offre.getCarteVisible()));
+            lblVisible.setAlignmentX(Component.CENTER_ALIGNMENT);
+            offrePanel.add(new JLabel("Visible:"));
+            offrePanel.add(lblVisible);
+
+            if (offre.getCarteCachee().estVisible()) {
+                JLabel lblCachee = new JLabel(JeuGUI.getImageCarte(offre.getCarteCachee()));
+                lblCachee.setAlignmentX(Component.CENTER_ALIGNMENT);
+                offrePanel.add(new JLabel("Carte 2:"));
+                offrePanel.add(lblCachee);
+            } else {
+                JLabel lblCachee = new JLabel("❓");
+                lblCachee.setFont(new Font("Arial", Font.BOLD, 60));
+                lblCachee.setAlignmentX(Component.CENTER_ALIGNMENT);
+                offrePanel.add(new JLabel("Cachée:"));
+                offrePanel.add(lblCachee);
+            }
+
+            offresPanel.add(offrePanel);
+        }
+
+        offresPanel.revalidate();
+        offresPanel.repaint();
+    }
+
+    private void jouerManches() {
+        // Jouer les tours jusqu'à fin de manche
+        while (!partie.verifierFinManche()) {
+            logArea.append("\n>>> Tour en cours...\n");
+            partie.resoudreTour();
+            afficherOffresTousLesJoueurs();
+
+            // Petit délai pour voir les changements
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Fin de la manche
+        logArea.append("\n=== Fin de la manche ===\n");
+        afficherTrophees();
+
+        if (partie.verifierFinJeu()) {
+            logArea.append("=== FIN DU JEU ===\n");
+            partie.terminerPartie();
+            mancheEnCours = false;
+            parent.getFinPanel().afficherResultats(partie);
+
+            Timer timer = new Timer(2000, e -> parent.showPanel("FIN"));
+            timer.setRepeats(false);
+            timer.start();
+        } else {
+            lblManche.setText("Manche " + partie.getNumeroManche());
+            lblMessagePhase.setText("Manche suivante - Cliquez sur 'Distribuer les cartes'");
+            btnDistribuer.setEnabled(true);
+            btnDistribuer.setText("Manche " + partie.getNumeroManche());
+            mancheEnCours = false;
+        }
+    }
 }package jest_package1;
 
 public class Joker extends Carte {
-    /**
-     * Identifiant de version pour la sérialisation.
-     */
-    private static final long serialVersionUID = 1L;
+	/**
+	 * Identifiant de version pour la sérialisation.
+	 */
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Constructeur par défaut du Joker.
-     * Initialise la couleur à {@code null} car le Joker
-     * n’a pas de couleur spécifique.
-     */
-    public Joker() {
-        this.couleur = null; // Joker n’a pas de couleur
-    }
+	/**
+	 * Constructeur par défaut du Joker. Initialise la couleur à {@code null} car le
+	 * Joker n’a pas de couleur spécifique.
+	 */
+	public Joker() {
+		this.couleur = null; // Joker n’a pas de couleur
+	}
 
-    /**
-     * Retourne la représentation textuelle de la carte.
-     *
-     * @return la chaîne {@code "Joker"}
-     */
-    @Override
-    public String toString() {
-        return "Joker";
-    }
+	/**
+	 * Retourne la représentation textuelle de la carte.
+	 *
+	 * @return la chaîne {@code "Joker"}
+	 */
+	@Override
+	public String toString() {
+		return "Joker";
+	}
 
-    /**
-     * Accepte un visiteur de score pour calculer la valeur
-     * du Joker dans une partie donnée de Jest.
-     *
-     * @param visiteur le visiteur de score qui calcule le score
-     * @param jest     la partie de Jest dans laquelle la carte est jouée
-     * @return le score calculé par le visiteur pour cette carte
-     */
-    @Override
-    public int accepter(VisiteurScore visiteur, Jest jest) {
-        return visiteur.visiterJoker(this, jest);
-    }
+	/**
+	 * Accepte un visiteur de score pour calculer la valeur du Joker dans une partie
+	 * donnée de Jest.
+	 *
+	 * @param visiteur le visiteur de score qui calcule le score
+	 * @param jest     la partie de Jest dans laquelle la carte est jouée
+	 * @return le score calculé par le visiteur pour cette carte
+	 */
+	@Override
+	public int accepter(VisiteurScore visiteur, Jest jest) {
+		return visiteur.visiterJoker(this, jest);
+	}
 }package jest_package1;
 
 import java.io.Serializable;
@@ -1034,7 +1458,8 @@ public abstract class Joueur implements Serializable {
      *
      * @return l'offre créée par le joueur
      */
-    public abstract Offre faireOffre();
+    public abstract Offre faireOffre(boolean offresVisibles);
+    
 
     /**
      * Demande au joueur de choisir une carte parmi les offres disponibles.
@@ -1127,10 +1552,23 @@ public class JoueurHumain extends Joueur {
 				if (o.getProprietaire() == this && o.estComplete()) {
 					System.out.println("\n[" + this.nom + "] Vous êtes le dernier joueur.");
 					System.out.println("Vous devez choisir dans votre propre offre.");
+					boolean offresVisibles = false;
+					if(o.getCarteCachee().estVisible()) {
+						//Variante stratégique, toutes les cartes sont visibles
+						offresVisibles = true;
+					}
 
-					System.out.println("  1. Visible: " + o.getCarteVisible());
-					System.out.println("  2. Cachée: [?]");
+					if(offresVisibles) {
+						System.out.println("\n[" + this.nom + "] Quelle carte voulez-vous ?");
+						System.out.println("  1. Carte 1 : " + o.getCarteVisible());
+						System.out.println("  2. Carte 2 : " + o.getCarteCachee());
+					} else {
+						System.out.println("\n[" + this.nom + "] Quelle carte voulez-vous ?");
+						System.out.println("  1. Visible : " + o.getCarteVisible());
+						System.out.println("  2. Cachée : [?] ");
+					}
 					System.out.print("[" + this.nom + "] Votre choix (1 ou 2): ");
+					
 
 					String choixCarte = "";
 					try {
@@ -1155,10 +1593,20 @@ public class JoueurHumain extends Joueur {
 
 		// Afficher les offres disponibles
 		System.out.println("\n[" + this.nom + "] Offres disponibles:");
+		boolean offresVisibles = false;
+		
 		for (int i = 0; i < offresDisponibles.size(); i++) {
 			Offre o = offresDisponibles.get(i);
-			System.out.println("  " + (i + 1) + ". [" + o.getProprietaire().getNom() +
-					"] Visible: " + o.getCarteVisible() + " | Cachée: [?]");
+			// Afficher la carte cachée si elle est visible (variante stratégique)
+			if(o.getCarteCachee().estVisible()) {
+				//Variante stratégique, toutes les cartes sont visibles
+				offresVisibles = true;
+				System.out.println("  " + (i + 1) + ". [" + o.getProprietaire().getNom() + "] Carte 1 : " + o.getCarteVisible() + " | Carte 2 : " + o.getCarteCachee());
+			} else {
+				//Jeu standard donc une carte cachée, une carte visible
+				System.out.println("  " + (i + 1) + ". [" + o.getProprietaire().getNom() + "] Visible : " + o.getCarteVisible() + " | Cachée : [?]");
+
+			}
 		}
 
 		// Demander le choix de l'offre
@@ -1182,10 +1630,16 @@ public class JoueurHumain extends Joueur {
 
 		Offre offreChoisie = offresDisponibles.get(choixOffre - 1);
 
-		// Demander le choix de la carte (visible ou cachée)
-		System.out.println("\n[" + this.nom + "] Quelle carte voulez-vous ?");
-		System.out.println("  1. Visible: " + offreChoisie.getCarteVisible());
-		System.out.println("  2. Cachée: [?]");
+		// Demander le choix de la carte (visible ou cachée (standard) ou 1 ou 2 (variante stratégique))
+		if(offresVisibles) {
+			System.out.println("\n[" + this.nom + "] Quelle carte voulez-vous ?");
+			System.out.println("  1. Carte 1 : " + offreChoisie.getCarteVisible());
+			System.out.println("  2. Carte 2 : " + offreChoisie.getCarteCachee());
+		} else {
+			System.out.println("\n[" + this.nom + "] Quelle carte voulez-vous ?");
+			System.out.println("  1. Visible : " + offreChoisie.getCarteVisible());
+			System.out.println("  2. Cachée : [?] ");
+		}
 		System.out.print("[" + this.nom + "] Votre choix (1 ou 2): ");
 
 		String choixCarte = "";
@@ -1205,44 +1659,59 @@ public class JoueurHumain extends Joueur {
 		return new ChoixCarte(offreChoisie, carteChoisie);
 	}
 
-	@Override
-	public Offre faireOffre() {
-		String choix = "0";
-		System.out.println("\n[" + this.nom + "] Quelle carte doit être cachée?");
+	public Offre faireOffre(boolean offresVisibles) {
 		List<Carte> cartes = this.jest.getCartes();
-
-		for (int i = 0; i < cartes.size(); i++) {
-			if (!(cartes.get(i) instanceof Joker)) {
-				System.out.println(
-						"  Choix " + (i + 1) + ": " + cartes.get(i).getValeur() + " de "
-								+ cartes.get(i).getCouleur().getSymbole());
-			} else {
-				System.out.println("  Choix " + (i + 1) + ": Joker");
-			}
-		}
-
-		System.out.print("[" + this.nom + "] La 1 ou la 2? ");
-		choix = Jeu.scanner.nextLine().trim();
 		Carte c1;
 		Carte c2;
-		if (choix.equals("1")) {
-			c1 = cartes.get(0);
-			c2 = cartes.get(1);
-		} else if (choix.equals("2")) {
-			c2 = cartes.get(0);
-			c1 = cartes.get(1);
-		} else {
-			System.out.println("Mauvais choix, première carte mise par défaut");
-			c1 = cartes.get(0);
-			c2 = cartes.get(1);
-		}
-
+		c1 = cartes.get(0);
+		c2 = cartes.get(1);
+		
 		// On enlève les cartes du Jest TEMPORAIRE
 		this.jest.enleverCarte(c1);
 		this.jest.enleverCarte(c2);
-
-		this.offreCourante = new Offre(c1, c2, this);
-		return this.offreCourante;
+					
+		if (offresVisibles) {
+			// Variante stratégique, pas besoin de choisir quelle carte est cachée et l'autre visible : les deux visibles
+			System.out.println("\\n[" + this.nom + "] Mode Stratégique : Les cartes sont toutes visibles donc vous n'avez pas à créer d'offre");
+			System.out.println("  Carte 1 : " + c1);
+			System.out.println("  Carte 2 : " + c2);
+			
+			this.offreCourante = new Offre(c1, c2, this);
+			return this.offreCourante;
+		} else {
+			// Jeu standard donc il faut choisir quelle carte est cachée
+			String choix = "0";
+			System.out.println("\n[" + this.nom + "] Quelle carte doit être cachée ?");
+			if (!(c1 instanceof Joker)) {
+				System.out.println("  Choix 1 : " + c1);
+			} else {
+				System.out.println("  Choix 1 : Joker");
+			}
+			if (!(c2 instanceof Joker)) {
+				System.out.println("  Choix 2 : " + c2);
+			} else {
+				System.out.println("  Choix 2 : Joker");
+			}
+			
+			System.out.print("[" + this.nom + "] La 1 ou la 2? ");
+			choix = Jeu.scanner.nextLine().trim();
+			Carte carteCachee;
+			Carte carteVisible;
+			if (choix.equals("1")) {
+				carteCachee = c1;
+				carteVisible = c2;
+			} else if (choix.equals("2")) {
+				carteCachee = c2;
+				carteVisible = c1;
+			} else {
+				System.out.println("Mauvais choix, première carte mise par défaut");
+				carteCachee = c1;
+				carteVisible = c2;
+			}
+			
+			this.offreCourante = new Offre(carteCachee, carteVisible, this);
+			return this.offreCourante;
+		}
 	}
 }package jest_package1;
 
@@ -1267,7 +1736,7 @@ public class JoueurVirtuel extends Joueur {
     }
 
     @Override
-    public Offre faireOffre() {
+    public Offre faireOffre(boolean offresVisibles) {
         List<Carte> cartes = jest.getCartes();
         if (cartes.size() < 2) {
             throw new IllegalStateException("Pas assez de cartes pour faire une offre");
@@ -1275,14 +1744,21 @@ public class JoueurVirtuel extends Joueur {
 
         Carte c1 = cartes.remove(0);
         Carte c2 = cartes.remove(0);
+        
+        if(offresVisibles) {
+        	// Variante stratégique : pas de stratégie pour les bot car les deux cartes sont visibles
+        	this.offreCourante = new Offre(c1, c2, this);
+        	System.out.println("[" + nom + "] (Bot) Offre créée - Carte 1 : " + c1 + " | Carte 2 : " + c2);
+        } else {
+        	// Jeu standard : Utiliser la stratégie pour choisir quelle carte cacher
+            Offre offre = strategie.choisirCartesOffre(c1, c2);
+            this.offreCourante = new Offre(offre.getCarteCachee(), offre.getCarteVisible(), this);
 
-        // Utiliser la stratégie pour choisir quelle carte cacher
-        Offre offre = strategie.choisirCartesOffre(c1, c2);
-        this.offreCourante = new Offre(offre.getCarteCachee(), offre.getCarteVisible(), this);
+            System.out.println("[" + nom + "] (Bot) Offre créée - Visible: " +
+                    this.offreCourante.getCarteVisible());
 
-        System.out.println("[" + nom + "] (Bot) Offre créée - Visible: " +
-                this.offreCourante.getCarteVisible());
-
+        }
+        
         return this.offreCourante;
     }
 
@@ -1328,6 +1804,180 @@ public class JoueurVirtuel extends Joueur {
      */
     public Strategie getStrategie() {
         return strategie;
+    }
+}package jest_package1;
+
+import javax.swing.*;
+import java.awt.*;
+
+class MenuPanel extends JPanel {
+    private JeuGUI parent;
+
+    public MenuPanel(JeuGUI parent) {
+        this.parent = parent;
+        setBackground(new Color(34, 139, 34));
+        setLayout(null);
+
+        JLabel lblTitre = new JLabel("JEU DE JEST");
+        lblTitre.setForeground(Color.WHITE);
+        lblTitre.setFont(new Font("Arial", Font.BOLD, 48));
+        lblTitre.setBounds(400, 100, 400, 80);
+        add(lblTitre);
+
+        JButton btnNouvelle = new JButton("Nouvelle Partie");
+        btnNouvelle.setFont(new Font("Arial", Font.BOLD, 16));
+        btnNouvelle.setBounds(475, 250, 250, 50);
+        btnNouvelle.addActionListener(e -> {
+            parent.setJeu(new Jeu());
+            parent.showPanel("CONFIG");
+        });
+        add(btnNouvelle);
+
+        JButton btnCharger = new JButton("Charger une Partie");
+        btnCharger.setFont(new Font("Arial", Font.BOLD, 16));
+        btnCharger.setBounds(475, 320, 250, 50);
+        btnCharger.addActionListener(e -> chargerPartie());
+        add(btnCharger);
+
+        JButton btnQuitter = new JButton("Quitter");
+        btnQuitter.setFont(new Font("Arial", Font.BOLD, 16));
+        btnQuitter.setBounds(475, 390, 250, 50);
+        btnQuitter.addActionListener(e -> System.exit(0));
+        add(btnQuitter);
+    }
+
+    private void chargerPartie() {
+        Jeu jeu = Jeu.charger("sauvegarde_jeu.dat");
+        if (jeu != null) {
+            parent.setJeu(jeu);
+            parent.showPanel("JEU");
+            parent.getJeuPanel().chargerPartie();
+        } else {
+            JOptionPane.showMessageDialog(this, "Erreur lors du chargement");
+        }
+    }
+}
+
+// ============================================================
+// CONFIG PANEL
+// ============================================================
+class ConfigPanel extends JPanel {
+    private JeuGUI parent;
+    private JSpinner spinnerJoueurs;
+    private JTextField[] champsNoms;
+    private JComboBox<String> comboVariante;
+    private JCheckBox checkExtension;
+
+    public ConfigPanel(JeuGUI parent) {
+        this.parent = parent;
+        setBackground(Color.WHITE);
+        setLayout(null);
+
+        JLabel lblTitre = new JLabel("Configuration de la Partie");
+        lblTitre.setFont(new Font("Arial", Font.BOLD, 24));
+        lblTitre.setBounds(400, 30, 400, 40);
+        add(lblTitre);
+
+        JLabel lblNbJoueurs = new JLabel("Nombre de joueurs humains:");
+        lblNbJoueurs.setBounds(300, 100, 250, 25);
+        add(lblNbJoueurs);
+
+        spinnerJoueurs = new JSpinner(new SpinnerNumberModel(1, 1, 4, 1));
+        spinnerJoueurs.setBounds(550, 100, 100, 25);
+        add(spinnerJoueurs);
+
+        // Champs pour les noms
+        champsNoms = new JTextField[4];
+        for (int i = 0; i < 4; i++) {
+            JLabel lbl = new JLabel("Joueur " + (i + 1) + ":");
+            lbl.setBounds(300, 150 + i * 40, 100, 25);
+            add(lbl);
+
+            champsNoms[i] = new JTextField();
+            champsNoms[i].setBounds(400, 150 + i * 40, 250, 25);
+            champsNoms[i].setEnabled(i == 0);
+            add(champsNoms[i]);
+        }
+
+        spinnerJoueurs.addChangeListener(e -> {
+            int nb = (Integer) spinnerJoueurs.getValue();
+            for (int i = 0; i < 4; i++) {
+                champsNoms[i].setEnabled(i < nb);
+            }
+        });
+
+        JLabel lblVariante = new JLabel("Variante:");
+        lblVariante.setBounds(300, 330, 100, 25);
+        add(lblVariante);
+
+        comboVariante = new JComboBox<>(new String[] {
+                "Standard", "Rapide (3 manches)", "Stratégique (offres visibles)"
+        });
+        comboVariante.setBounds(400, 330, 250, 25);
+        add(comboVariante);
+
+        checkExtension = new JCheckBox("Activer l'extension (Nouvelles Cartes)");
+        checkExtension.setBounds(300, 380, 350, 25);
+        add(checkExtension);
+
+        JButton btnDemarrer = new JButton("Démarrer la Partie");
+        btnDemarrer.setFont(new Font("Arial", Font.BOLD, 16));
+        btnDemarrer.setBounds(475, 450, 250, 50);
+        btnDemarrer.addActionListener(e -> demarrerPartie());
+        add(btnDemarrer);
+    }
+
+    private void demarrerPartie() {
+        int nbJoueursHumains = (Integer) spinnerJoueurs.getValue();
+        Jeu jeu = parent.getJeu();
+
+        // Ajouter joueurs humains
+        for (int i = 0; i < nbJoueursHumains; i++) {
+            String nom = champsNoms[i].getText().trim();
+            if (nom.isEmpty())
+                nom = "Joueur" + (i + 1);
+            jeu.ajouterJoueur(new JoueurHumain(nom));
+        }
+
+        // Ajouter bots
+        int nbBots = Math.max(0, 3 - nbJoueursHumains);
+        String[] nomsBots = { "Alpha", "Beta", "Gamma", "Delta" };
+        Strategie[] strategies = {
+                new StrategieOffensive(),
+                new StrategieDefensive(),
+                new StrategieAleatoire()
+        };
+
+        for (int i = 0; i < nbBots; i++) {
+            JoueurVirtuel bot = new JoueurVirtuel("Bot_" + nomsBots[i]);
+            bot.setStrategie(strategies[i % strategies.length]);
+            jeu.ajouterJoueur(bot);
+        }
+
+        // Règle
+        RegleJeu regle;
+        switch (comboVariante.getSelectedIndex()) {
+            case 1:
+                regle = new VarianteRapide();
+                break;
+            case 2:
+                regle = new RegleStrategique();
+                break;
+            default:
+                regle = new RegleStandard();
+        }
+        jeu.choisirRegle(regle);
+
+        boolean avecExtension = checkExtension.isSelected();
+
+        // Initialiser partie
+        Partie.reinitialiser();
+        Partie partie = Partie.getInstance();
+        partie.setJeuReference(jeu);
+        partie.initialiser(jeu.getJoueurs(), regle, avecExtension);
+
+        parent.getJeuPanel().demarrerPartie(partie);
+        parent.showPanel("JEU");
     }
 }package jest_package1;
 
@@ -1430,8 +2080,8 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Classe Partie implémentant le patron Singleton.
- * Gère le déroulement d'une partie de Jest.
+ * Classe Partie implémentant le patron Singleton. Gère le déroulement d'une
+ * partie de Jest.
  */
 public class Partie implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -1470,7 +2120,7 @@ public class Partie implements Serializable {
 		instance = new Partie();
 	}
 
-	public void initialiser(List<Joueur> joueurs, RegleJeu regleJeu, Extension extension) {
+	public void initialiser(List<Joueur> joueurs, RegleJeu regleJeu, boolean avecExtension) {
 		List<Joueur> joueursInitialises = new ArrayList<>();
 
 		for (Joueur p : joueurs) {
@@ -1484,11 +2134,7 @@ public class Partie implements Serializable {
 		}
 
 		// Initialisation de la pioche avec extension si présente
-		pioche.initialiser(extension != null);
-		if (extension != null && extension.estActive()) {
-			pioche.ajouterCartes(new ArrayList<>(extension.getCartes()));
-		}
-
+		pioche.initialiser(avecExtension);
 		System.out.println("Pioche initialisée avec " + pioche.getTaille() + " cartes.");
 		pioche.melanger();
 		System.out.println("Pioche mélangée.");
@@ -1530,14 +2176,20 @@ public class Partie implements Serializable {
 		}
 
 		mancheEnCours = false;
+
+		// Appliquer les règles spéciales (ex: incrémenter le compteur de manches pour
+		// VarianteRapide)
+		if (jeuReference != null) {
+			regleJeu.appliquerReglesSpeciales(jeuReference);
+		}
+
 		numeroManche++;
 	}
 
 	/**
-	 * Distribue 2 cartes à chaque joueur.
-	 * Première manche: cartes piochées directement
-	 * Autres manches: récupère les cartes non choisies + nouvelles cartes de la
-	 * pioche
+	 * Distribue 2 cartes à chaque joueur. Première manche: cartes piochées
+	 * directement Autres manches: récupère les cartes non choisies + nouvelles
+	 * cartes de la pioche
 	 */
 	public void distribuerCartes() {
 
@@ -1579,41 +2231,51 @@ public class Partie implements Serializable {
 		for (Joueur j : joueurs) {
 			System.out.println("[DEBUG] " + j.getNom() + ":");
 			System.out.println("  ├─ jest (temporaire)     : " + j.getJest().getCartes());
-			System.out.println("  └─ jestPerso (définitif) : " + j.getJestPerso().getCartes()); // TODO: remplacer par
-			// jestPerso
-		}
-	}
-
-	/**
-	 * Crée les offres de chaque joueur (1 carte visible + 1 carte cachée)
-	 * Chaque joueur choisit 2 cartes de sa main pour faire une offre
-	 */
-	public void creerOffres() {
-		offresActuelles = new ArrayList<>();
-		System.out.println("\n=== Création des offres ===");
-
-		// Boucle: chaque joueur propose ses 2 cartes (1 visible, 1 cachée)
-		for (Joueur j : joueurs) {
-			Offre offre = j.faireOffre();
-			offresActuelles.add(offre);
-
-			System.out.println("[" + j.getNom() + "] Offre créée - Visible: " +
-					offre.getCarteVisible() + " | Cachée: [?]");
-
-			// DEBUG: Afficher l'état des deux Jest après création offre
-			System.out.println("[DEBUG] " + j.getNom() + " APRÈS offre:");
-			System.out.println("  ├─ jest (temporaire)     : " + j.getJest().getCartes() + " (cartes pour l'offre)");
-			System.out.println("  ├─ Carte visible : " + offre.getCarteVisible());
-			System.out.println("  ├─ Carte cachée  : " + offre.getCarteCachee());
 			System.out.println("  └─ jestPerso (définitif) : " + j.getJestPerso().getCartes());
 
 		}
 	}
 
 	/**
+	 * Crée les offres de chaque joueur (1 carte visible + 1 carte cachée) Chaque
+	 * joueur choisit 2 cartes de sa main pour faire une offre
+	 */
+	public void creerOffres() {
+		offresActuelles = new ArrayList<>();
+		System.out.println("\n=== Création des offres ===");
+
+		boolean offresVisibles = regleJeu.sontOffresVisibles();
+		
+		// Boucle: chaque joueur propose ses 2 cartes (1 visible, 1 cachée)
+		for (Joueur j : joueurs) {
+			Offre offre = j.faireOffre(offresVisibles);
+			// La visibilité change selon la variante
+			offre = regleJeu.creerOffre(j, offre.getCarteCachee(), offre.getCarteVisible());
+			offresActuelles.add(offre);
+
+			// Affichage différent suivant la variante
+			if (offresVisibles) {
+				System.out.println("[" + j.getNom() + "] Offre créée - Carte 1 : " + offre.getCarteVisible()
+						+ " | Carte 2 : " + offre.getCarteCachee());
+			} else {
+				System.out.println(
+						"[" + j.getNom() + "] Offre créée - Visible : " + offre.getCarteVisible() + " | Cachée : [?]");
+			}
+
+			// DEBUG: Afficher l'état des deux Jest après création offre
+			System.out.println("[DEBUG] " + j.getNom() + " APRÈS offre:");
+			System.out.println("  ├─ jest (temporaire)     : " + j.getJest().getCartes() + " (cartes pour l'offre)");
+			System.out.println("  ├─ Carte visible : " + offre.getCarteVisible() + " (visible="
+					+ offre.getCarteVisible().estVisible() + ")");
+			System.out.println("  ├─ Carte cachée  : " + offre.getCarteCachee() + " (visible="
+					+ offre.getCarteCachee().estVisible() + ")");
+			System.out.println("  └─ jestPerso (définitif) : " + j.getJestPerso().getCartes());
+		}
+	}
+
+	/**
 	 * Gère un tour complet: chaque joueur choisit une carte jusqu'à fin de la
-	 * manche
-	 * L'ordre des joueurs dépend de la valeur de leurs cartes visibles
+	 * manche L'ordre des joueurs dépend de la valeur de leurs cartes visibles
 	 * NOUVELLE VERSION : Gère correctement l'ordre des joueurs selon les règles
 	 */
 	public void resoudreTour() {
@@ -1638,10 +2300,7 @@ public class Partie implements Serializable {
 				// DEBUG: Afficher l'état des deux Jest après prise de carte
 				System.out.println("[DEBUG] " + joueurActif.getNom() + " APRÈS avoir pris la carte:");
 				System.out.println("  ├─ jest (temporaire)     : " + joueurActif.getJest().getCartes());
-				System.out.println("  └─ jestPerso (définitif) : " + joueurActif.getJestPerso().getCartes()); // TODO:
-																												// remplacer
-																												// par
-																												// jestPerso
+				System.out.println("  └─ jestPerso (définitif) : " + joueurActif.getJestPerso().getCartes());
 				// Marquer ce joueur comme ayant joué
 				joueursAyantJoue.add(joueurActif);
 
@@ -1680,11 +2339,10 @@ public class Partie implements Serializable {
 	}
 
 	/**
-	 * Détermine le premier joueur selon les règles :
-	 * - Celui avec la carte visible de plus grande valeur
-	 * - En cas d'égalité, celui avec la couleur la plus forte
-	 * - Joker = valeur 0
-	 * Boucle: compare chaque joueur pour trouver celui avec la meilleure carte
+	 * Détermine le premier joueur selon les règles : - Celui avec la carte visible
+	 * de plus grande valeur - En cas d'égalité, celui avec la couleur la plus forte
+	 * - Joker = valeur 0 Boucle: compare chaque joueur pour trouver celui avec la
+	 * meilleure carte
 	 */
 	private Joueur determinerPremierJoueur() {
 		Joueur premier = joueurs.get(0);
@@ -1717,11 +2375,10 @@ public class Partie implements Serializable {
 	}
 
 	/**
-	 * Détermine le prochain joueur selon les règles :
-	 * - C'est le propriétaire de l'offre choisie (s'il n'a pas encore joué)
-	 * - Sinon, c'est le joueur restant avec la plus grande carte visible
-	 * Boucle: parcourt les joueurs restants pour trouver celui avec la meilleure
-	 * carte
+	 * Détermine le prochain joueur selon les règles : - C'est le propriétaire de
+	 * l'offre choisie (s'il n'a pas encore joué) - Sinon, c'est le joueur restant
+	 * avec la plus grande carte visible Boucle: parcourt les joueurs restants pour
+	 * trouver celui avec la meilleure carte
 	 */
 	private Joueur determinerProchainJoueur(Joueur proprietaireOffre, Set<Joueur> joueursAyantJoue) {
 		// Si le propriétaire n'a pas encore joué, c'est à lui
@@ -1759,8 +2416,8 @@ public class Partie implements Serializable {
 	}
 
 	/**
-	 * Retourne la valeur de la carte visible d'un joueur (Joker = 0)
-	 * Condition: si c'est un Joker, retourne 0; sinon retourne sa valeur numérique
+	 * Retourne la valeur de la carte visible d'un joueur (Joker = 0) Condition: si
+	 * c'est un Joker, retourne 0; sinon retourne sa valeur numérique
 	 */
 	private int getValeurCarteVisible(Joueur joueur) {
 		Offre offre = trouverOffreDeJoueur(joueur);
@@ -1793,8 +2450,8 @@ public class Partie implements Serializable {
 	}
 
 	/**
-	 * Trouve l'offre d'un joueur donné
-	 * Boucle: parcourt toutes les offres pour trouver celle appartenant au joueur
+	 * Trouve l'offre d'un joueur donné Boucle: parcourt toutes les offres pour
+	 * trouver celle appartenant au joueur
 	 */
 	private Offre trouverOffreDeJoueur(Joueur joueur) {
 		// Boucle: parcourt les offres jusqu'à trouver celle du joueur
@@ -1816,6 +2473,14 @@ public class Partie implements Serializable {
 	}
 
 	public boolean verifierFinJeu() {
+		// Vérifier d'abord si la règle de jeu spécifique dit que la partie est terminée
+		if (regleJeu instanceof VarianteRapide) {
+			VarianteRapide variante = (VarianteRapide) regleJeu;
+			if (variante.partiTerminee()) {
+				return true;
+			}
+		}
+		// Sinon, vérifier si la pioche est vide (comportement standard)
 		return pioche.estVide();
 	}
 
@@ -1844,12 +2509,12 @@ public class Partie implements Serializable {
 	}
 
 	/**
-	 * Attribue les trophées aux joueurs selon les règles de jeu
-	 * Boucle: pour chaque trophée, détermine le gagnant et l'ajoute à son jest
+	 * Attribue les trophées aux joueurs selon les règles de jeu Boucle: pour chaque
+	 * trophée, détermine le gagnant et l'ajoute à son jest
 	 */
 	/**
-	 * Attribue les trophées aux joueurs selon les règles de jeu
-	 * Boucle: pour chaque trophée, détermine le gagnant et l'ajoute à son jest
+	 * Attribue les trophées aux joueurs selon les règles de jeu Boucle: pour chaque
+	 * trophée, détermine le gagnant et l'ajoute à son jest
 	 */
 	public void attribuerTrophees() {
 		System.out.println("\n╔════════════════════════════════════════╗");
@@ -1867,7 +2532,7 @@ public class Partie implements Serializable {
 			Joueur gagnant = regleJeu.determinerGagnantTrophee(joueurs, trophee);
 
 			if (gagnant != null) {
-				gagnant.getJestPerso().ajouterTrophee(trophee);
+				gagnant.getJestPerso().ajouterCarte(trophee);
 				System.out.println("│ ✅ Attribué à: " + gagnant.getNom());
 
 				// Afficher pourquoi ce joueur a gagné (debug utile)
@@ -1968,9 +2633,8 @@ public class Partie implements Serializable {
 	}
 
 	/**
-	 * Calcule le score final de chaque joueur et détermine le gagnant
-	 * Boucle: parcourt chaque joueur et calcule son score, puis détermine le
-	 * meilleur
+	 * Calcule le score final de chaque joueur et détermine le gagnant Boucle:
+	 * parcourt chaque joueur et calcule son score, puis détermine le meilleur
 	 */
 	public Joueur calculerGagnant() {
 		System.out.println("\n=== Calcul des scores ===");
@@ -1984,7 +2648,7 @@ public class Partie implements Serializable {
 			int score = calculateur.calculerScore(j.getJestPerso());
 			System.out.println("[" + j.getNom() + "] Score: " + score);
 			// DEBUG: Afficher le jest du joueur avant calcul final
-			System.out.println("[DEBUG] Jest final de " + j.getNom() + ": " + j.getJest().getCartes());
+			System.out.println("[DEBUG] Jest final de " + j.getNom() + ": " + j.getJestPerso().getCartes());
 
 			// Condition: si le score est meilleur, ce joueur devient le gagnant
 			if (score > scoreMax) {
@@ -2018,10 +2682,25 @@ public class Pioche implements Serializable {
     private static final long serialVersionUID = 1L;
     // création de la pioche
     private Stack<Carte> pioche = new Stack<>();
-
+    
+        
     // ajouter les nouvelles cartes si on ajoute une extension
     public void initialiser(boolean avecExtension) {
-        for (Couleur c : Couleur.values()) {
+    	pioche.clear();
+    	//Cartes pour le jeu standard
+        List<Couleur> couleurs = new ArrayList<>();
+        couleurs.add(Couleur.PIQUE);
+        couleurs.add(Couleur.TREFLE);
+        couleurs.add(Couleur.CARREAU);
+        couleurs.add(Couleur.COEUR);
+        
+        if(avecExtension) {
+            couleurs.add(Couleur.ETOILE);
+            couleurs.add(Couleur.TRIANGLE);
+            couleurs.add(Couleur.SOLEIL);
+        }
+        
+        for (Couleur c : couleurs) {
             for (Valeur v : Valeur.values()) {
                 pioche.add(new CarteCouleur(c, v));
             }
@@ -2085,17 +2764,21 @@ import java.util.List;
  * 
  */
 public interface RegleJeu extends Serializable {
-    int calculerValeurJest(Jest jest);
+	int calculerValeurJest(Jest jest);
 
-    boolean verifierConditionTrophee(Jest jest, Carte carte);
+	boolean verifierConditionTrophee(Jest jest, Carte carte);
 
-    List<Joueur> determinerOrdreJeu(List<Offre> offres);
+	List<Joueur> determinerOrdreJeu(List<Offre> offres);
 
-    Joueur determinerGagnantTrophee(List<Joueur> joueurs, Carte trophee);
+	Joueur determinerGagnantTrophee(List<Joueur> joueurs, Carte trophee);
 
-    void appliquerReglesSpeciales(Jeu jeu);
-}
-package jest_package1;
+	void appliquerReglesSpeciales(Jeu jeu);
+	
+	Offre creerOffre(Joueur joueur, Carte carteCachee, Carte carteVisible);
+	
+	// va permettre de changer les règles du jeu si la variante stratégique est choisie
+	boolean sontOffresVisibles();
+}package jest_package1;
 
 import java.util.*;
 
@@ -2103,430 +2786,575 @@ import java.util.*;
  * Implémentation des règles standard du jeu Jest
  */
 public class RegleStandard implements RegleJeu {
+	private static final long serialVersionUID = 1L;
+	
+	
+
+	@Override
+	public boolean sontOffresVisibles() {
+		// TODO Auto-generated method stub
+		return false; // dans le jeu standard, une carte est cachée et l'autre visible
+	}
+
+	@Override
+	public int calculerValeurJest(Jest jest) {
+		CalculateurScoreStandard calculateur = new CalculateurScoreStandard();
+		return calculateur.calculerScore(jest);
+	}
+
+	@Override
+	public boolean verifierConditionTrophee(Jest jest, Carte trophee) {
+		return true;
+	}
+	
+	public Offre creerOffre(Joueur joueur, Carte carteCachee, Carte carteVisible) {
+		carteVisible.setVisible(true);
+		carteCachee.setVisible(false);
+		return new Offre(carteCachee, carteVisible, joueur);
+	}
+
+	@Override
+	public List<Joueur> determinerOrdreJeu(List<Offre> offres) {
+		List<Joueur> ordre = new ArrayList<>();
+		List<Offre> offresTriees = new ArrayList<>(offres);
+
+		offresTriees.sort((o1, o2) -> {
+			int val1 = o1.getCarteVisible() instanceof Joker ? 0 : o1.getCarteVisible().getValeurNumerique();
+			int val2 = o2.getCarteVisible() instanceof Joker ? 0 : o2.getCarteVisible().getValeurNumerique();
+
+			if (val1 != val2) {
+				return Integer.compare(val2, val1);
+			}
+
+			if (o1.getCarteVisible() instanceof Joker)
+				return 1;
+			if (o2.getCarteVisible() instanceof Joker)
+				return -1;
+
+			return Integer.compare(o2.getCarteVisible().getCouleur().getForce(),
+					o1.getCarteVisible().getCouleur().getForce());
+		});
+
+		for (Offre o : offresTriees) {
+			ordre.add(o.getProprietaire());
+		}
+
+		return ordre;
+	}
+
+	@Override
+	public void appliquerReglesSpeciales(Jeu jeu) {
+		// Pas de règles spéciales pour la version standard
+	}
+
+	/**
+	 * Retourne la description de la condition pour gagner un trophée
+	 */
+	public static String getDescriptionTrophee(Carte trophee) {
+		// JOKER
+		if (trophee instanceof Joker) {
+			return "⭐ Meilleur Jest (score le plus élevé)";
+		}
+
+		// Cas des cartes de couleur
+		if (trophee instanceof CarteCouleur) {
+			CarteCouleur ct = (CarteCouleur) trophee;
+			Couleur couleur = ct.getCouleur();
+			Valeur valeur = ct.getValeur();
+
+			// CŒURS - Tous vont au joueur avec le Joker
+			if (couleur == Couleur.COEUR) {
+				return "🃏 Possède le Joker";
+			}
+
+			// CARREAUX
+			if (couleur == Couleur.CARREAU) {
+				if (valeur == Valeur.QUATRE) {
+					return "⭐ Meilleur Jest SANS Joker";
+				} else if (valeur == Valeur.AS) {
+					return "📊 Le plus de cartes 4";
+				} else if (valeur == Valeur.DEUX) {
+					return "📊 Le plus de Carreaux ♦";
+				} else if (valeur == Valeur.TROIS) {
+					return "📊 Le MOINS de Carreaux ♦";
+				}
+					
+			}
+
+			// PIQUES
+			if (couleur == Couleur.PIQUE) {
+				if (valeur == Valeur.TROIS) {
+					return "📊 Le plus de cartes 2";
+				} else if (valeur == Valeur.DEUX) {
+					return "📊 Le plus de cartes 3";
+				} else if (valeur == Valeur.QUATRE) {
+					return "📊 Le MOINS de Trèfles ♣";
+				} else if (valeur == Valeur.AS) {
+					return "📊 Le plus de Trèfles ♣";
+				}
+			}
+
+			// TRÈFLES
+			if (couleur == Couleur.TREFLE) {
+				if (valeur == Valeur.QUATRE) {
+					return "📊 Le MOINS de Piques ♠";
+				} else if (valeur == Valeur.AS) {
+					return "📊 Le plus de Piques ♠";
+				} else if (valeur == Valeur.DEUX) {
+					return "📊 Le MOINS de Cœurs ♥";
+				} else if (valeur == Valeur.TROIS) {
+					return "📊 Le plus de Cœurs ♥";
+				} 
+			}
+			// ETOILES
+			if (couleur == Couleur.ETOILE) {
+				if (valeur == Valeur.QUATRE) {
+					return "📊 Le plus de cartes 4";
+				} else if (valeur == Valeur.AS) {
+					return "📊 Le plus de Cœurs ♥";
+				} else if (valeur == Valeur.DEUX) {
+					return "📊 Le MOINS de Piques ♠";
+				} else if (valeur == Valeur.TROIS) {
+					return "📊 Le plus de Trèfles ♣";
+				} 
+			}
+			// TRIANGLES
+			if (couleur == Couleur.TRIANGLE) {
+				if (valeur == Valeur.QUATRE) {
+					return "📊 Le MOINS de Trèfles ♣";
+				} else if (valeur == Valeur.AS) {
+					return "⭐ Meilleur Jest SANS Joker";
+				} else if (valeur == Valeur.DEUX) {
+					return "📊 Le plus de cartes 2";
+				} else if (valeur == Valeur.TROIS) {
+					return "⭐ Meilleur Jest SANS Joker";
+				} 
+			}
+			// SOLEILS
+			if (couleur == Couleur.SOLEIL) {
+				if (valeur == Valeur.QUATRE) {
+					return "📊 Le plus de cartes As";
+				} else if (valeur == Valeur.AS) {
+					return "📊 Le MOINS de Cœurs ♥";
+				} else if (valeur == Valeur.DEUX) {
+					return "⭐ Meilleur Jest SANS Joker";
+				} else if (valeur == Valeur.TROIS) {
+					return "📊 Le plus de Piques ♠";
+				} 
+			}
+		}
+
+		return "❓ Condition inconnue";
+	}
+
+	/**
+	 * Détermine le gagnant d'un trophée selon les règles spécifiques
+	 */
+	@Override
+	public Joueur determinerGagnantTrophee(List<Joueur> joueurs, Carte trophee) {
+		// JOKER
+		if (trophee instanceof Joker) {
+			return determinerMeilleurJest(joueurs, false);
+		}
+
+		// Cas des cartes de couleur
+		if (trophee instanceof CarteCouleur) {
+			CarteCouleur ct = (CarteCouleur) trophee;
+			Couleur couleur = ct.getCouleur();
+			Valeur valeur = ct.getValeur();
+
+			// CŒURS - Tous vont au joueur avec le Joker
+			if (couleur == Couleur.COEUR) {
+				return determinerJoueurAvecJoker(joueurs);
+			}
+
+			// CARREAUX
+			if (couleur == Couleur.CARREAU) {
+				if (valeur == Valeur.QUATRE) {
+					// 4♦ → Meilleur Jest SANS Joker
+					return determinerMeilleurJest(joueurs, true);
+				} else if (valeur == Valeur.AS) {
+					// A♦ → Le plus de 4
+					return determinerMajoriteValeur(joueurs, Valeur.QUATRE);
+				} else if (valeur == Valeur.DEUX) {
+					// 2♦ → Le plus de Carreaux
+					return determinerMajoriteCouleur(joueurs, Couleur.CARREAU);
+				} else if (valeur == Valeur.TROIS) {
+					// 3♦ → Le moins de Carreaux
+					return determinerMinoriteCouleur(joueurs, Couleur.CARREAU);
+				}
+			}
+
+			// PIQUES
+			if (couleur == Couleur.PIQUE) {
+				if (valeur == Valeur.TROIS) {
+					// 3♠ → Le plus de 2
+					return determinerMajoriteValeur(joueurs, Valeur.DEUX);
+				} else if (valeur == Valeur.DEUX) {
+					// 2♠ → Le plus de 3
+					return determinerMajoriteValeur(joueurs, Valeur.TROIS);
+				} else if (valeur == Valeur.QUATRE) {
+					// 4♠ → Le MOINS de Trèfles
+					return determinerMinoriteCouleur(joueurs, Couleur.TREFLE);
+				} else if (valeur == Valeur.AS) {
+					// A♠ → Le plus de Trèfles
+					return determinerMajoriteCouleur(joueurs, Couleur.TREFLE);
+				}
+			}
+
+			// TRÈFLES
+			if (couleur == Couleur.TREFLE) {
+				if (valeur == Valeur.QUATRE) {
+					// 4♣ → Le moins de Piques
+					return determinerMinoriteCouleur(joueurs, Couleur.PIQUE);
+				} else if (valeur == Valeur.AS) {
+					// A♣ → Le plus de Piques
+					return determinerMajoriteCouleur(joueurs, Couleur.PIQUE);
+				} else if (valeur == Valeur.DEUX) {
+					// 2♣ → Le moins de Cœurs
+					return determinerMinoriteCouleur(joueurs, Couleur.COEUR);
+				} else if (valeur == Valeur.TROIS) {
+					// 3♣ → Le plus de Cœurs
+					return determinerMajoriteCouleur(joueurs, Couleur.COEUR);
+				}
+			}
+			// ETOILES
+			if (couleur == Couleur.ETOILE) {
+				if (valeur == Valeur.QUATRE) {
+					// 4☆ → Le plus de cartes 4
+					return determinerMajoriteValeur(joueurs, Valeur.QUATRE);
+				} else if (valeur == Valeur.AS) {
+					// A☆ → Le plus de Cœurs ♥
+					return determinerMajoriteCouleur(joueurs, Couleur.COEUR);
+				} else if (valeur == Valeur.DEUX) {
+					// 2☆ → Le MOINS de Piques ♠
+					return determinerMinoriteCouleur(joueurs, Couleur.PIQUE);
+				} else if (valeur == Valeur.TROIS) {
+					// 3☆ → Le plus de Trèfles ♣
+					return determinerMajoriteCouleur(joueurs, Couleur.TREFLE);
+				}
+			}
+			// SOLEIL
+			if (couleur == Couleur.SOLEIL) {
+				if (valeur == Valeur.QUATRE) {
+					// 4☼ → Le plus de cartes As
+					return determinerMajoriteValeur(joueurs, Valeur.AS);
+				} else if (valeur == Valeur.AS) {
+					// A☼ → Le MOINS de Cœurs ♥
+					return determinerMinoriteCouleur(joueurs, Couleur.COEUR);
+				} else if (valeur == Valeur.DEUX) {
+					// 2☼ → Meilleur Jest SANS Joker
+					return determinerMeilleurJest(joueurs, true);
+				} else if (valeur == Valeur.TROIS) {
+					// 3☼ → Le plus de Piques ♠
+					return determinerMajoriteCouleur(joueurs, Couleur.PIQUE);
+				}
+			}	
+			// TRIANGLES
+			if (couleur == Couleur.TRIANGLE) {
+				if (valeur == Valeur.QUATRE) {
+					// 4▲ → Le moins de Trèfles ♣
+					return determinerMinoriteCouleur(joueurs, Couleur.TREFLE);
+				} else if (valeur == Valeur.AS) {
+					// A▲ → Meilleur Jest SANS Joker
+					return determinerMeilleurJest(joueurs, true);
+				} else if (valeur == Valeur.DEUX) {
+					// 2▲ → Le plus de 2
+					return determinerMajoriteValeur(joueurs, Valeur.DEUX);
+				} else if (valeur == Valeur.TROIS) {
+					// 3▲ → Meilleur Jest SANS Joker
+					return determinerMeilleurJest(joueurs, true);
+				}
+			}			
+		}
+
+		return null;
+	}
+
+	// ==================== MÉTHODES UTILITAIRES ====================
+
+	/**
+	 * Trouve le joueur avec le meilleur Jest
+	 * 
+	 * @param sansJoker si true, ignore les joueurs ayant le Joker
+	 */
+	private Joueur determinerMeilleurJest(List<Joueur> joueurs, boolean sansJoker) {
+		CalculateurScoreStandard calc = new CalculateurScoreStandard();
+		int scoreMax = Integer.MIN_VALUE;
+		Joueur gagnant = null;
+		int valeurCarteMax = 0;
+		Couleur couleurMax = null;
+
+		for (Joueur j : joueurs) {
+			// Si on veut sans Joker, vérifier que le joueur n'a pas de Joker
+			if (sansJoker && aJoker(j.getJestPerso())) {
+				continue;
+			}
+
+			int score = calc.calculerScore(j.getJestPerso());
+
+			if (score > scoreMax) {
+				scoreMax = score;
+				gagnant = j;
+				// Trouver la carte de plus haute valeur
+				ResultatCarteForte resultat = trouverCarteLaPlusForte(j.getJestPerso());
+				valeurCarteMax = resultat.valeur;
+				couleurMax = resultat.couleur;
+			} else if (score == scoreMax) {
+				// Tie-breaker: carte de plus haute valeur
+				ResultatCarteForte resultat = trouverCarteLaPlusForte(j.getJestPerso());
+				if (resultat.valeur > valeurCarteMax
+						|| (resultat.valeur == valeurCarteMax && resultat.couleur.getForce() > couleurMax.getForce())) {
+					gagnant = j;
+					valeurCarteMax = resultat.valeur;
+					couleurMax = resultat.couleur;
+				}
+			}
+		}
+
+		return gagnant;
+	}
+
+	/**
+	 * Trouve le joueur qui possède le Joker
+	 */
+	private Joueur determinerJoueurAvecJoker(List<Joueur> joueurs) {
+		for (Joueur j : joueurs) {
+			if (aJoker(j.getJestPerso())) {
+				return j;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Vérifie si un Jest contient le Joker
+	 */
+	private boolean aJoker(Jest jest) {
+		for (Carte c : jest.getCartes()) {
+			if (c instanceof Joker) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Trouve le joueur avec la majorité d'une couleur donnée
+	 */
+	private Joueur determinerMajoriteCouleur(List<Joueur> joueurs, Couleur couleur) {
+		int maxCount = 0;
+		Joueur gagnant = null;
+		int valeurMax = 0;
+		Couleur couleurCarteMax = null;
+
+		for (Joueur j : joueurs) {
+			int count = 0;
+			int valeurDeCetteCouleur = 0;
+			Couleur couleurDeCetteValeur = null;
+
+			for (Carte c : j.getJestPerso().getCartes()) {
+				if (c instanceof CarteCouleur) {
+					CarteCouleur cc = (CarteCouleur) c;
+					if (cc.getCouleur() == couleur) {
+						count++;
+						// Trouver la carte de cette couleur avec la plus haute valeur
+						if (cc.getValeurNumerique() > valeurDeCetteCouleur) {
+							valeurDeCetteCouleur = cc.getValeurNumerique();
+							couleurDeCetteValeur = couleur;
+						}
+					}
+				}
+			}
+
+			if (count > maxCount) {
+				maxCount = count;
+				gagnant = j;
+				valeurMax = valeurDeCetteCouleur;
+				couleurCarteMax = couleurDeCetteValeur;
+			} else if (count == maxCount && count > 0) {
+				// Tie-breaker: celui avec la carte de cette valeur dans la couleur la plus
+				// forte
+				if (valeurDeCetteCouleur > valeurMax
+						|| (valeurDeCetteCouleur == valeurMax && couleur.getForce() > couleurCarteMax.getForce())) {
+					gagnant = j;
+					valeurMax = valeurDeCetteCouleur;
+					couleurCarteMax = couleurDeCetteValeur;
+				}
+			}
+		}
+
+		return gagnant;
+	}
+
+	/**
+	 * Trouve le joueur avec la minorité (le moins) d'une couleur donnée
+	 */
+	private Joueur determinerMinoriteCouleur(List<Joueur> joueurs, Couleur couleur) {
+		int minCount = Integer.MAX_VALUE;
+		Joueur gagnant = null;
+		int valeurMax = 0;
+		Couleur couleurCarteMax = null;
+
+		for (Joueur j : joueurs) {
+			int count = 0;
+			int valeurDeCetteCouleur = 0;
+
+			for (Carte c : j.getJestPerso().getCartes()) {
+				if (c instanceof CarteCouleur) {
+					CarteCouleur cc = (CarteCouleur) c;
+					if (cc.getCouleur() == couleur) {
+						count++;
+						if (cc.getValeurNumerique() > valeurDeCetteCouleur) {
+							valeurDeCetteCouleur = cc.getValeurNumerique();
+						}
+					}
+				}
+			}
+
+			if (count < minCount) {
+				minCount = count;
+				gagnant = j;
+				valeurMax = valeurDeCetteCouleur;
+				couleurCarteMax = couleur;
+			} else if (count == minCount) {
+				// Tie-breaker similaire
+				if (valeurDeCetteCouleur > valeurMax
+						|| (valeurDeCetteCouleur == valeurMax && couleur.getForce() > couleurCarteMax.getForce())) {
+					gagnant = j;
+					valeurMax = valeurDeCetteCouleur;
+					couleurCarteMax = couleur;
+				}
+			}
+		}
+
+		return gagnant;
+	}
+
+	/**
+	 * Trouve le joueur avec la majorité d'une valeur donnée
+	 */
+	private Joueur determinerMajoriteValeur(List<Joueur> joueurs, Valeur valeur) {
+		int maxCount = 0;
+		Joueur gagnant = null;
+		Couleur couleurMax = null;
+
+		for (Joueur j : joueurs) {
+			int count = 0;
+			Couleur couleurDeCetteValeur = null;
+
+			for (Carte c : j.getJestPerso().getCartes()) {
+				if (c instanceof CarteCouleur) {
+					CarteCouleur cc = (CarteCouleur) c;
+					if (cc.getValeur() == valeur) {
+						count++;
+						// Garder la couleur la plus forte de cette valeur
+						if (couleurDeCetteValeur == null
+								|| cc.getCouleur().getForce() > couleurDeCetteValeur.getForce()) {
+							couleurDeCetteValeur = cc.getCouleur();
+						}
+					}
+				}
+			}
+
+			if (count > maxCount) {
+				maxCount = count;
+				gagnant = j;
+				couleurMax = couleurDeCetteValeur;
+			} else if (count == maxCount && count > 0) {
+				// Tie-breaker: couleur la plus forte
+				if (couleurDeCetteValeur != null
+						&& (couleurMax == null || couleurDeCetteValeur.getForce() > couleurMax.getForce())) {
+					gagnant = j;
+					couleurMax = couleurDeCetteValeur;
+				}
+			}
+		}
+
+		return gagnant;
+	}
+
+	/**
+	 * Trouve la carte de plus haute valeur dans un Jest
+	 */
+	private ResultatCarteForte trouverCarteLaPlusForte(Jest jest) {
+		int valeurMax = 0;
+		Couleur couleurMax = null;
+
+		for (Carte c : jest.getCartes()) {
+			if (c instanceof CarteCouleur) {
+				CarteCouleur cc = (CarteCouleur) c;
+				int valeur = cc.getValeurNumerique();
+
+				if (valeur > valeurMax || (valeur == valeurMax && cc.getCouleur().getForce() > couleurMax.getForce())) {
+					valeurMax = valeur;
+					couleurMax = cc.getCouleur();
+				}
+			}
+		}
+
+		return new ResultatCarteForte(valeurMax, couleurMax);
+	}
+
+	/**
+	 * Classe interne pour retourner valeur + couleur
+	 */
+	private static class ResultatCarteForte {
+		int valeur;
+		Couleur couleur;
+
+		ResultatCarteForte(int valeur, Couleur couleur) {
+			this.valeur = valeur;
+			this.couleur = couleur;
+		}
+	}
+}package jest_package1;
+
+import java.util.List;
+
+public class RegleStrategique implements RegleJeu {
+
     private static final long serialVersionUID = 1L;
 
     @Override
     public int calculerValeurJest(Jest jest) {
-        CalculateurScoreStandard calculateur = new CalculateurScoreStandard();
-        return calculateur.calculerScore(jest);
+        return new RegleStandard().calculerValeurJest(jest);
     }
 
     @Override
-    public boolean verifierConditionTrophee(Jest jest, Carte trophee) {
+    public boolean verifierConditionTrophee(Jest jest, Carte carte) {
         return true;
     }
 
     @Override
     public List<Joueur> determinerOrdreJeu(List<Offre> offres) {
-        List<Joueur> ordre = new ArrayList<>();
-        List<Offre> offresTriees = new ArrayList<>(offres);
+        return new RegleStandard().determinerOrdreJeu(offres);
+    }
 
-        offresTriees.sort((o1, o2) -> {
-            int val1 = o1.getCarteVisible() instanceof Joker ? 0 : o1.getCarteVisible().getValeurNumerique();
-            int val2 = o2.getCarteVisible() instanceof Joker ? 0 : o2.getCarteVisible().getValeurNumerique();
-
-            if (val1 != val2) {
-                return Integer.compare(val2, val1);
-            }
-
-            if (o1.getCarteVisible() instanceof Joker)
-                return 1;
-            if (o2.getCarteVisible() instanceof Joker)
-                return -1;
-
-            return Integer.compare(
-                    o2.getCarteVisible().getCouleur().getForce(),
-                    o1.getCarteVisible().getCouleur().getForce());
-        });
-
-        for (Offre o : offresTriees) {
-            ordre.add(o.getProprietaire());
-        }
-
-        return ordre;
+    @Override
+    public Joueur determinerGagnantTrophee(List<Joueur> joueurs, Carte trophee) {
+        return new RegleStandard().determinerGagnantTrophee(joueurs, trophee);
     }
 
     @Override
     public void appliquerReglesSpeciales(Jeu jeu) {
-        // Pas de règles spéciales pour la version standard
+        // pas de règles spéciales, tout est dans la visibilité des cartes des offres
     }
 
-    /**
-     * Retourne la description de la condition pour gagner un trophée
-     */
-    public static String getDescriptionTrophee(Carte trophee) {
-        // JOKER
-        if (trophee instanceof Joker) {
-            return "⭐ Meilleur Jest (score le plus élevé)";
-        }
-
-        // Cas des cartes de couleur
-        if (trophee instanceof CarteCouleur) {
-            CarteCouleur ct = (CarteCouleur) trophee;
-            Couleur couleur = ct.getCouleur();
-            Valeur valeur = ct.getValeur();
-
-            // CŒURS - Tous vont au joueur avec le Joker
-            if (couleur == Couleur.COEUR) {
-                return "🃏 Possède le Joker";
-            }
-
-            // CARREAUX
-            if (couleur == Couleur.CARREAU) {
-                if (valeur == Valeur.QUATRE) {
-                    return "⭐ Meilleur Jest SANS Joker";
-                } else if (valeur == Valeur.AS) {
-                    return "📊 Le plus de cartes 4";
-                } else if (valeur == Valeur.DEUX) {
-                    return "📊 Le plus de Carreaux ♦";
-                } else if (valeur == Valeur.TROIS) {
-                    return "📊 Le MOINS de Carreaux ♦";
-                }
-            }
-
-            // PIQUES
-            if (couleur == Couleur.PIQUE) {
-                if (valeur == Valeur.TROIS) {
-                    return "📊 Le plus de cartes 2";
-                } else if (valeur == Valeur.DEUX) {
-                    return "📊 Le plus de cartes 3";
-                } else if (valeur == Valeur.QUATRE) {
-                    return "📊 Le plus de Trèfles ♣";
-                } else if (valeur == Valeur.AS) {
-                    return "📊 Le plus de Trèfles ♣";
-                }
-            }
-
-            // TRÈFLES
-            if (couleur == Couleur.TREFLE) {
-                if (valeur == Valeur.QUATRE) {
-                    return "📊 Le MOINS de Piques ♠";
-                } else if (valeur == Valeur.AS) {
-                    return "📊 Le plus de Piques ♠";
-                } else if (valeur == Valeur.DEUX) {
-                    return "📊 Le MOINS de Cœurs ♥";
-                } else if (valeur == Valeur.TROIS) {
-                    return "📊 Le plus de Cœurs ♥";
-                }
-            }
-        }
-
-        return "❓ Condition inconnue";
-    }
-
-    /**
-     * Détermine le gagnant d'un trophée selon les règles spécifiques
-     */
     @Override
-    public Joueur determinerGagnantTrophee(List<Joueur> joueurs, Carte trophee) {
-        // JOKER
-        if (trophee instanceof Joker) {
-            return determinerMeilleurJest(joueurs, false);
-        }
-
-        // Cas des cartes de couleur
-        if (trophee instanceof CarteCouleur) {
-            CarteCouleur ct = (CarteCouleur) trophee;
-            Couleur couleur = ct.getCouleur();
-            Valeur valeur = ct.getValeur();
-
-            // CŒURS - Tous vont au joueur avec le Joker
-            if (couleur == Couleur.COEUR) {
-                return determinerJoueurAvecJoker(joueurs);
-            }
-
-            // CARREAUX
-            if (couleur == Couleur.CARREAU) {
-                if (valeur == Valeur.QUATRE) {
-                    // 4♦ → Meilleur Jest SANS Joker
-                    return determinerMeilleurJest(joueurs, true);
-                } else if (valeur == Valeur.AS) {
-                    // A♦ → Le plus de 4
-                    return determinerMajoriteValeur(joueurs, Valeur.QUATRE);
-                } else if (valeur == Valeur.DEUX) {
-                    // 2♦ → Le plus de Carreaux
-                    return determinerMajoriteCouleur(joueurs, Couleur.CARREAU);
-                } else if (valeur == Valeur.TROIS) {
-                    // 3♦ → Le moins de Carreaux
-                    return determinerMinoriteCouleur(joueurs, Couleur.CARREAU);
-                }
-            }
-
-            // PIQUES
-            if (couleur == Couleur.PIQUE) {
-                if (valeur == Valeur.TROIS) {
-                    // 3♠ → Le plus de 2
-                    return determinerMajoriteValeur(joueurs, Valeur.DEUX);
-                } else if (valeur == Valeur.DEUX) {
-                    // 2♠ → Le plus de 3
-                    return determinerMajoriteValeur(joueurs, Valeur.TROIS);
-                } else if (valeur == Valeur.QUATRE) {
-                    // 4♠ → Le plus de Trèfles
-                    return determinerMajoriteCouleur(joueurs, Couleur.TREFLE);
-                } else if (valeur == Valeur.AS) {
-                    // A♠ → Le plus de Trèfles
-                    return determinerMajoriteCouleur(joueurs, Couleur.TREFLE);
-                }
-            }
-
-            // TRÈFLES
-            if (couleur == Couleur.TREFLE) {
-                if (valeur == Valeur.QUATRE) {
-                    // 4♣ → Le moins de Piques
-                    return determinerMinoriteCouleur(joueurs, Couleur.PIQUE);
-                } else if (valeur == Valeur.AS) {
-                    // A♣ → Le plus de Piques
-                    return determinerMajoriteCouleur(joueurs, Couleur.PIQUE);
-                } else if (valeur == Valeur.DEUX) {
-                    // 2♣ → Le moins de Cœurs
-                    return determinerMinoriteCouleur(joueurs, Couleur.COEUR);
-                } else if (valeur == Valeur.TROIS) {
-                    // 3♣ → Le plus de Cœurs
-                    return determinerMajoriteCouleur(joueurs, Couleur.COEUR);
-                }
-            }
-        }
-
-        return null;
+    public Offre creerOffre(Joueur joueur, Carte c1, Carte c2) {
+        // Variante stratégique donc les deux cartes sont visibles
+        c1.setVisible(true);
+        c2.setVisible(true);
+        return new Offre(c1, c2, joueur);
     }
 
-    // ==================== MÉTHODES UTILITAIRES ====================
-
-    /**
-     * Trouve le joueur avec le meilleur Jest
-     * 
-     * @param sansJoker si true, ignore les joueurs ayant le Joker
-     */
-    private Joueur determinerMeilleurJest(List<Joueur> joueurs, boolean sansJoker) {
-        CalculateurScoreStandard calc = new CalculateurScoreStandard();
-        int scoreMax = Integer.MIN_VALUE;
-        Joueur gagnant = null;
-        int valeurCarteMax = 0;
-        Couleur couleurMax = null;
-
-        for (Joueur j : joueurs) {
-            // Si on veut sans Joker, vérifier que le joueur n'a pas de Joker
-            if (sansJoker && aJoker(j.getJestPerso())) {
-                continue;
-            }
-
-            int score = calc.calculerScore(j.getJestPerso());
-
-            if (score > scoreMax) {
-                scoreMax = score;
-                gagnant = j;
-                // Trouver la carte de plus haute valeur
-                ResultatCarteForte resultat = trouverCarteLaPlusForte(j.getJestPerso());
-                valeurCarteMax = resultat.valeur;
-                couleurMax = resultat.couleur;
-            } else if (score == scoreMax) {
-                // Tie-breaker: carte de plus haute valeur
-                ResultatCarteForte resultat = trouverCarteLaPlusForte(j.getJestPerso());
-                if (resultat.valeur > valeurCarteMax ||
-                        (resultat.valeur == valeurCarteMax && resultat.couleur.getForce() > couleurMax.getForce())) {
-                    gagnant = j;
-                    valeurCarteMax = resultat.valeur;
-                    couleurMax = resultat.couleur;
-                }
-            }
-        }
-
-        return gagnant;
+    @Override
+    public boolean sontOffresVisibles() {
+        // TODO Auto-generated method stub
+        return true; // variante où toutes les cartes des offres sont visibles
     }
 
-    /**
-     * Trouve le joueur qui possède le Joker
-     */
-    private Joueur determinerJoueurAvecJoker(List<Joueur> joueurs) {
-        for (Joueur j : joueurs) {
-            if (aJoker(j.getJestPerso())) {
-                return j;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Vérifie si un Jest contient le Joker
-     */
-    private boolean aJoker(Jest jest) {
-        for (Carte c : jest.getCartes()) {
-            if (c instanceof Joker) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Trouve le joueur avec la majorité d'une couleur donnée
-     */
-    private Joueur determinerMajoriteCouleur(List<Joueur> joueurs, Couleur couleur) {
-        int maxCount = 0;
-        Joueur gagnant = null;
-        int valeurMax = 0;
-        Couleur couleurCarteMax = null;
-
-        for (Joueur j : joueurs) {
-            int count = 0;
-            int valeurDeCetteCouleur = 0;
-            Couleur couleurDeCetteValeur = null;
-
-            for (Carte c : j.getJestPerso().getCartes()) {
-                if (c instanceof CarteCouleur) {
-                    CarteCouleur cc = (CarteCouleur) c;
-                    if (cc.getCouleur() == couleur) {
-                        count++;
-                        // Trouver la carte de cette couleur avec la plus haute valeur
-                        if (cc.getValeurNumerique() > valeurDeCetteCouleur) {
-                            valeurDeCetteCouleur = cc.getValeurNumerique();
-                            couleurDeCetteValeur = couleur;
-                        }
-                    }
-                }
-            }
-
-            if (count > maxCount) {
-                maxCount = count;
-                gagnant = j;
-                valeurMax = valeurDeCetteCouleur;
-                couleurCarteMax = couleurDeCetteValeur;
-            } else if (count == maxCount && count > 0) {
-                // Tie-breaker: celui avec la carte de cette valeur dans la couleur la plus
-                // forte
-                if (valeurDeCetteCouleur > valeurMax ||
-                        (valeurDeCetteCouleur == valeurMax && couleur.getForce() > couleurCarteMax.getForce())) {
-                    gagnant = j;
-                    valeurMax = valeurDeCetteCouleur;
-                    couleurCarteMax = couleurDeCetteValeur;
-                }
-            }
-        }
-
-        return gagnant;
-    }
-
-    /**
-     * Trouve le joueur avec la minorité (le moins) d'une couleur donnée
-     */
-    private Joueur determinerMinoriteCouleur(List<Joueur> joueurs, Couleur couleur) {
-        int minCount = Integer.MAX_VALUE;
-        Joueur gagnant = null;
-        int valeurMax = 0;
-        Couleur couleurCarteMax = null;
-
-        for (Joueur j : joueurs) {
-            int count = 0;
-            int valeurDeCetteCouleur = 0;
-
-            for (Carte c : j.getJestPerso().getCartes()) {
-                if (c instanceof CarteCouleur) {
-                    CarteCouleur cc = (CarteCouleur) c;
-                    if (cc.getCouleur() == couleur) {
-                        count++;
-                        if (cc.getValeurNumerique() > valeurDeCetteCouleur) {
-                            valeurDeCetteCouleur = cc.getValeurNumerique();
-                        }
-                    }
-                }
-            }
-
-            if (count < minCount) {
-                minCount = count;
-                gagnant = j;
-                valeurMax = valeurDeCetteCouleur;
-                couleurCarteMax = couleur;
-            } else if (count == minCount) {
-                // Tie-breaker similaire
-                if (valeurDeCetteCouleur > valeurMax ||
-                        (valeurDeCetteCouleur == valeurMax && couleur.getForce() > couleurCarteMax.getForce())) {
-                    gagnant = j;
-                    valeurMax = valeurDeCetteCouleur;
-                    couleurCarteMax = couleur;
-                }
-            }
-        }
-
-        return gagnant;
-    }
-
-    /**
-     * Trouve le joueur avec la majorité d'une valeur donnée
-     */
-    private Joueur determinerMajoriteValeur(List<Joueur> joueurs, Valeur valeur) {
-        int maxCount = 0;
-        Joueur gagnant = null;
-        Couleur couleurMax = null;
-
-        for (Joueur j : joueurs) {
-            int count = 0;
-            Couleur couleurDeCetteValeur = null;
-
-            for (Carte c : j.getJestPerso().getCartes()) {
-                if (c instanceof CarteCouleur) {
-                    CarteCouleur cc = (CarteCouleur) c;
-                    if (cc.getValeur() == valeur) {
-                        count++;
-                        // Garder la couleur la plus forte de cette valeur
-                        if (couleurDeCetteValeur == null
-                                || cc.getCouleur().getForce() > couleurDeCetteValeur.getForce()) {
-                            couleurDeCetteValeur = cc.getCouleur();
-                        }
-                    }
-                }
-            }
-
-            if (count > maxCount) {
-                maxCount = count;
-                gagnant = j;
-                couleurMax = couleurDeCetteValeur;
-            } else if (count == maxCount && count > 0) {
-                // Tie-breaker: couleur la plus forte
-                if (couleurDeCetteValeur != null &&
-                        (couleurMax == null || couleurDeCetteValeur.getForce() > couleurMax.getForce())) {
-                    gagnant = j;
-                    couleurMax = couleurDeCetteValeur;
-                }
-            }
-        }
-
-        return gagnant;
-    }
-
-    /**
-     * Trouve la carte de plus haute valeur dans un Jest
-     */
-    private ResultatCarteForte trouverCarteLaPlusForte(Jest jest) {
-        int valeurMax = 0;
-        Couleur couleurMax = null;
-
-        for (Carte c : jest.getCartes()) {
-            if (c instanceof CarteCouleur) {
-                CarteCouleur cc = (CarteCouleur) c;
-                int valeur = cc.getValeurNumerique();
-
-                if (valeur > valeurMax || (valeur == valeurMax && cc.getCouleur().getForce() > couleurMax.getForce())) {
-                    valeurMax = valeur;
-                    couleurMax = cc.getCouleur();
-                }
-            }
-        }
-
-        return new ResultatCarteForte(valeurMax, couleurMax);
-    }
-
-    /**
-     * Classe interne pour retourner valeur + couleur
-     */
-    private static class ResultatCarteForte {
-        int valeur;
-        Couleur couleur;
-
-        ResultatCarteForte(int valeur, Couleur couleur) {
-            this.valeur = valeur;
-            this.couleur = couleur;
-        }
-    }
 }package jest_package1;
 
 import java.io.Serializable;
@@ -2639,10 +3467,14 @@ public class StrategieDefensive implements Strategie {
                 case CARREAU:
                     return valeur * 2; // Très dangereux (points négatifs)
                 case COEUR:
-                    return valeur; // Danger moyen (dépend du Joker)
+                case SOLEIL:
+                    return valeur; // Danger moyen (dépend du Joker ou dépend de pair ou impair)
                 case PIQUE:
                 case TREFLE:
+                case TRIANGLE:
                     return -valeur; // Pas dangereux (valeur négative = bon)
+                case ETOILE:
+                	return -valeur * 2; // Pas dangereux du tout
             }
         }
         return 0;
@@ -2709,19 +3541,22 @@ public class StrategieOffensive implements Strategie {
             int valeur = cc.getValeurNumerique();
 
             switch (cc.getCouleur()) {
-                case PIQUE:
+            	case ETOILE:
+            		return valeur*2;
+            	case PIQUE:
                 case TREFLE:
+                case TRIANGLE:
                     return valeur; // Positif
                 case CARREAU:
                     return -valeur; // Négatif
                 case COEUR:
+                case SOLEIL:
                     return 0; // Neutre (dépend du Joker)
             }
         }
         return 0;
     }
-}
-package jest_package1;
+}package jest_package1;
 
 public class TestDesFonctions {
 
@@ -2744,7 +3579,7 @@ public class TestDesFonctions {
 		j1.getJest().getCartes().add(c2);
 
 		System.out.println("");
-		j1.faireOffre();
+		// j1.faireOffre();
 
 		System.out.println("Cachée " + j1.getOffreCourante().getCarteCachee());
 		System.out.println("Visible " + j1.getOffreCourante().getCarteVisible());
@@ -2754,7 +3589,7 @@ public class TestDesFonctions {
 }
 package jest_package1;
 
-public class Trophee extends Carte {
+public class Trophee {
 	@SuppressWarnings("unused")
 	private TypeCondition typeCondition;
 	@SuppressWarnings("unused")
@@ -2817,7 +3652,15 @@ public class VarianteRapide implements RegleJeu {
     private int nombreManchesMax = 3;
     private int manchesJouees = 0;
 
+    
+    
     @Override
+	public boolean sontOffresVisibles() {
+		// TODO Auto-generated method stub
+		return false; // dans la variante rapide, pareil que le jeu standard, une carte est cachée et l'autre visible
+	}
+
+	@Override
     public int calculerValeurJest(Jest jest) {
         // Utilise le même calcul que les règles standard
         CalculateurScoreStandard calc = new CalculateurScoreStandard();
@@ -2851,45 +3694,75 @@ public class VarianteRapide implements RegleJeu {
     public boolean partiTerminee() {
         return manchesJouees >= nombreManchesMax;
     }
+
+	@Override
+	public Offre creerOffre(Joueur joueur, Carte c1, Carte c2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
-package jest_package1;
+/*package jest_package1;
 
 import java.util.List;
 
+// Variante Stratégique: Les offres sont visibles
 public class VarianteStrategique implements RegleJeu {
     private static final long serialVersionUID = 1L;
-    @SuppressWarnings("unused")
     private boolean offresVisibles = true;
 
+    @Override
     public int calculerValeurJest(Jest jest) {
-        return 0;
-    }
-
-    public boolean verifierConditionTrophee(Jest jest, Carte carte) {
-        return false;
-    }
-
-    public List<Joueur> determinerOrdreJeu(List<Offre> offres) {
-        return null;
-    }
-
-    public void appliquerReglesSpeciales(Jeu jeu) {
+        CalculateurScoreStandard calc = new CalculateurScoreStandard();
+        return calc.calculerScore(jest);
     }
 
     @Override
-    public Joueur determinerGagnantTrophee(List<Joueur> joueurs, Carte trophee) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'determinerGagnantTrophee'");
+    public boolean verifierConditionTrophee(Jest jest, Carte carte) {
+        return true;
     }
-}
-package jest_package1;
+
+    @Override
+    public List<Joueur> determinerOrdreJeu(List<Offre> offres) {
+        RegleStandard standard = new RegleStandard();
+        return standard.determinerOrdreJeu(offres);
+    }
+
+    @Override
+    public void appliquerReglesSpeciales(Jeu jeu) {
+        if (offresVisibles) {
+            System.out.println("📋 Mode OFFRES VISIBLES: Toutes les cartes sont révélées!");
+        }
+    }
+
+    public Joueur determinerGagnantTrophee(List<Joueur> joueurs, Carte trophee) {
+        RegleStandard standard = new RegleStandard();
+        return standard.determinerGagnantTrophee(joueurs, trophee);
+    }
+
+    public boolean sontOffresVisibles() {
+        return offresVisibles;
+    }
+
+	@Override
+	public Offre creerOffre(Joueur joueur, Carte c1, Carte c2) {
+		// Variante Stratégique donc les deux cartes sont visibles
+		c1.setVisible(true);
+		c2.setVisible(true);
+		return new Offre(c1, c2, joueur);
+	}
+	
+	
+}*/package jest_package1;
 
 public interface VisiteurScore {
     int visiterPique(CarteCouleur carte, Jest jest);
     int visiterTrefle(CarteCouleur carte, Jest jest);
     int visiterCarreau(CarteCouleur carte, Jest jest);
     int visiterCoeur(CarteCouleur carte, Jest jest);
+    int visiterEtoile(CarteCouleur carte, Jest jest);
+    int visiterTriangle(CarteCouleur carte, Jest jest);
+    int visiterSoleil(CarteCouleur carte, Jest jest);
     int visiterJoker(Joker carte, Jest jest);
-    int visiterExtension(CarteExtension carte, Jest jest);
+    //int visiterExtension(CarteExtension carte, Jest jest);
     int calculerScore(Jest jest);
 }

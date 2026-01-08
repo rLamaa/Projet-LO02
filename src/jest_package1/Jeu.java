@@ -78,24 +78,26 @@ public class Jeu implements Serializable {
 		// Compléter avec des bots jusqu'à 3 joueurs minimum
 		int nbBots = Math.max(0, 3 - nbJoueurs);
 		String[] nomsBots = { "Alpha", "Beta", "Gamma", "Delta" }; // noms des bots qui sont appender
-		/*String info;
-		Random va = new Random();
-		int nombre;
-		nombre=va.nextInt(3);
-		//	System.out.println(nombre);
-		switch(nombre) {
-			case 0:
-				info="SPORT";
-				break;
-			case 1:
-				info="POLITQUE";
-				break;
-			case 2:
-				info="ECONOMIE";
-				break;
-	        default:
-	        	info="SPORT"; //cas par défaut mit à sport pour eviter les erreurs
-		}*/
+		/*
+		 * String info;
+		 * Random va = new Random();
+		 * int nombre;
+		 * nombre=va.nextInt(3);
+		 * // System.out.println(nombre);
+		 * switch(nombre) {
+		 * case 0:
+		 * info="SPORT";
+		 * break;
+		 * case 1:
+		 * info="POLITQUE";
+		 * break;
+		 * case 2:
+		 * info="ECONOMIE";
+		 * break;
+		 * default:
+		 * info="SPORT"; //cas par défaut mit à sport pour eviter les erreurs
+		 * }
+		 */
 		Strategie[] strategies = {
 				new StrategieOffensive(), // 1
 				new StrategieDefensive(), // 2
@@ -149,7 +151,7 @@ public class Jeu implements Serializable {
 		String reponse = scanner.nextLine().trim().toLowerCase();
 
 		if (reponse.equals("o") || reponse.equals("oui")) {
-			//this.extension = Extension.creerExtensionStandard();
+			// this.extension = Extension.creerExtensionStandard();
 			avecExtension = true;
 			System.out.println("✓ Extension activée!");
 			System.out.println("  Cartes ajoutées: Etoiles, Triangles, Soleils");
@@ -171,7 +173,7 @@ public class Jeu implements Serializable {
 			System.out.println("    • " + j.getNom() + " (" + type + ")");
 		}
 		System.out.println("  Règles: " + regleJeu.getClass().getSimpleName());
-		if(avecExtension==true) {
+		if (avecExtension == true) {
 			System.out.println("  Extension: Oui");
 		} else {
 			System.out.println("  Extension: Non");
@@ -266,23 +268,27 @@ public class Jeu implements Serializable {
 			System.out.println("\n  Trophée " + (i + 1) + ": " + c);
 			System.out.println("  ┗━━ " + description);
 		}
-
-		System.out.println("\n╔═══════════════════════════════════════╗");
-		System.out.println("║  ℹ️  RAPPEL DES RÈGLES                ║");
-		System.out.println("╠═══════════════════════════════════════╣");
-		System.out.println("║  Piques ♠ & Trèfles ♣ : +points       ║");
-		System.out.println("║  Carreaux ♦ : -points                 ║");
-		System.out.println("║  Cœurs ♥ : 0 pts (sauf avec Joker)    ║");
-		System.out.println("║  Joker seul : +4 pts                  ║");
-		System.out.println("║  Joker + 4 Cœurs : Cœurs positifs!    ║");
-		System.out.println("║  Paire noire (♠+♣ même valeur): +2    ║");
-		System.out.println("║  As seul de sa couleur : vaut 5       ║");
-		if(avecExtension==true) {
-			System.out.println("║  Etoiles : vaut         ║");
-			System.out.println("║  Trangles : vaut         ║");
-			System.out.println("║  Soleils : vaut         ║");
-		}
 		System.out.println("╚═══════════════════════════════════════╝\n");
+		System.out.println("\n╔═══════════════════════════════════════════════════════╗");
+		System.out.println("║  ℹ️  RAPPEL DES RÈGLES                                ║");
+		System.out.println("╠═══════════════════════════════════════════════════════╣");
+		System.out.println("║    Piques ♠ & Trèfles ♣ : +points                     ║");
+		System.out.println("║    Carreaux ♦ : -points                               ║");
+		System.out.println("║    Cœurs ♥ : 0 pts (sauf avec Joker)                  ║");
+		System.out.println("║    Joker seul : +4 pts                                ║");
+		System.out.println("║    Joker + 4 Cœurs ♥ : Cœurs positifs!                ║");
+		System.out.println("║    Joker + 1 à 3 Cœurs ♥ : Cœurs négatifs...          ║");
+		System.out.println("║    Paire noire (♠ + ♣ même valeur): +2                ║");
+		System.out.println("║    As seul de sa couleur : vaut 5                     ║");
+		if (avecExtension == true) {
+			System.out.println("║    Etoiles ☆ : +2*points                              ║");
+			System.out.println("║    Triangles ▲ : 0 pts (sauf avec Joker)              ║");
+			System.out.println("║    Joker + 1 à 3 Triangles ▲ : Triangles positifs!    ║");
+			System.out.println("║    Joker + 4 Triangles ▲ : Triangles négatifs...      ║");
+			System.out.println("║    Soleils ☼ chiffre impair : +points                 ║");
+			System.out.println("║    Soleils ☼ chiffre pair :  -points                  ║");
+		}
+		System.out.println("╚═══════════════════════════════════════════════════════╝\n");
 	}
 
 	/**
@@ -390,5 +396,9 @@ public class Jeu implements Serializable {
 		}
 
 		jeu.demarrer();
+	}
+
+	public List<Joueur> getJoueurs() {
+		return joueurs;
 	}
 }

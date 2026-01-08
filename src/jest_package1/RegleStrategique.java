@@ -41,7 +41,6 @@ public class RegleStrategique implements RegleJeu {
 
     @Override
     public boolean sontOffresVisibles() {
-        // TODO Auto-generated method stub
         return true; // variante où toutes les cartes des offres sont visibles
     }
 

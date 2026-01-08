@@ -169,7 +169,7 @@ public class Partie implements Serializable {
 		System.out.println("\n=== Création des offres ===");
 
 		boolean offresVisibles = regleJeu.sontOffresVisibles();
-		
+
 		// Boucle: chaque joueur propose ses 2 cartes (1 visible, 1 cachée)
 		for (Joueur j : joueurs) {
 			Offre offre = j.faireOffre(offresVisibles);
@@ -268,7 +268,7 @@ public class Partie implements Serializable {
 	 * - Joker = valeur 0 Boucle: compare chaque joueur pour trouver celui avec la
 	 * meilleure carte
 	 */
-	private Joueur determinerPremierJoueur() {
+	public Joueur determinerPremierJoueur() {
 		Joueur premier = joueurs.get(0);
 		int valeurMax = getValeurCarteVisible(premier);
 		Couleur couleurMax = getCouleurCarteVisible(premier);
@@ -595,5 +595,9 @@ public class Partie implements Serializable {
 
 	public List<Joueur> getJoueurs() {
 		return joueurs;
+	}
+
+	public RegleJeu getRegleJeu() {
+		return regleJeu;
 	}
 }
