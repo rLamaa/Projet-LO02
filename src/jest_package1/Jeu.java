@@ -1,7 +1,14 @@
 package jest_package1;
 
 import java.io.*;
+
 import java.util.*;
+
+import javax.swing.*;
+
+import Vue.InterfaceGraphiqueJest;
+import Vue.VueConsoleJest;
+import Controleur.ControleurJest;
 
 public class Jeu implements Serializable {
 	/**
@@ -18,6 +25,14 @@ public class Jeu implements Serializable {
 	public static Scanner scanner = new Scanner(System.in); // NE PAS TOUCHER, buffer commun pour lire les input de
 															// l'utilisateur
 
+	
+	//Attributs pour l'interface graphique (GUI)
+	 private transient InterfaceGraphiqueJest interfaceGraphique;
+	 private transient VueConsoleJest vueConsole;
+	 private transient ControleurJest controleurGUI;
+	 private boolean avecGUI = false;
+	 private boolean modeConsoleEtGUI = false;
+	
 	/**
 	 * Constructeur de la classe Jeu
 	 * 
@@ -159,7 +174,7 @@ public class Jeu implements Serializable {
 		}
 	}
 
-	// utile pour que le joueur verifie qu'il a bien tout fait commeil voulait et
+	// utile pour que le joueur verifie qu'il a bien tout fait comme il voulait et
 	// pour nous debug
 	private void afficherRecapitulatif() {
 		System.out.println("\n╔════════════════════════════════════╗");
@@ -204,6 +219,80 @@ public class Jeu implements Serializable {
 		}
 		this.regleJeu = regleJeu;
 	}
+	
+	/**
+     * Initialisation de l'interface graphique
+     */
+    private void initialiserInterfaceGraphique() {
+        // Trouver le joueur humain
+        JoueurHumainGUI joueurHumain = null;
+        for (Joueur j : joueurs) {
+            if (j instanceof JoueurHumain) {
+                // Remplacer le JoueurHumain par un JoueurHumainGUI
+                int index = joueurs.indexOf(j);
+                joueurHumain = new JoueurHumainGUI(j.getNom());
+                joueurHumain.setUtiliseGUI(true);
+                
+                // Copier l'état du joueur
+                for (Carte c : j.getJest().getCartes()) {
+                    joueurHumain.ajouterCarteJest(c);
+                }
+                for (Carte c : j.getJestPerso().getCartes()) {
+                    joueurHumain.ajouterCarteJestPerso(c);
+                }
+                
+                joueurs.set(index, joueurHumain);
+                break;
+            }
+        }
+        
+        if (joueurHumain == null) {
+            System.out.println("⚠ Pas de joueur humain détecté, GUI désactivée.");
+            avecGUI = false;
+            return;
+        }
+        
+        final JoueurHumainGUI joueurFinal = joueurHumain;
+        
+        // Réinitialiser la partie avec les nouveaux joueurs
+        if (partieCourante != null) {
+            partieCourante.setJeuReference(this);
+            partieCourante.setModeGUI(!modeConsoleEtGUI);
+        }
+        
+        // Créer l'interface dans le thread EDT
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    try {
+                        interfaceGraphique = new InterfaceGraphiqueJest(partieCourante, joueurFinal);
+                        controleurGUI = new ControleurJest(partieCourante, joueurFinal, interfaceGraphique);
+                        
+                        // Enregistrer l'interface comme observateur
+                        partieCourante.addObserver(interfaceGraphique);
+                        
+                        interfaceGraphique.afficher();
+                        interfaceGraphique.ajouterLog("=== Jeu de Jest ===");
+                        interfaceGraphique.ajouterLog("Interface graphique initialisée");
+                        
+                        System.out.println("✓ Interface graphique initialisée");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        } catch (Exception e) {
+            System.err.println("Erreur lors de l'initialisation de la GUI");
+            e.printStackTrace();
+        }
+        
+        // Si mode mixte, créer aussi la vue console
+        if (modeConsoleEtGUI) {
+            vueConsole = new VueConsoleJest(partieCourante);
+            System.out.println("✓ Vue console initialisée (mode mixte)");
+        }
+    }	
+	
 
 	/**
 	 * Demarre la partie, en créant l'instance de la classe et permet alors de
@@ -221,13 +310,18 @@ public class Jeu implements Serializable {
 			// PARTIE CHARGÉE
 			partieCourante.setJeuReference(this);
 		}
+		
+		if (avecGUI) {
+			initialiserInterfaceGraphique();
+		}
+		
 		this.etat = EtatPartie.EN_COURS;
 		afficherTrophees();
 
 		// Boucle principale du jeu
 		while (!partieCourante.verifierFinJeu()) {
 			System.out.println("\n╔════════════════════════════════════╗");
-			System.out.println("║   MANCHE " + partieCourante.getNumeroManche() + "                          ║");
+			System.out.println("║   MANCHE " + partieCourante.getNumeroManche() + "                         ║");
 			System.out.println("╚════════════════════════════════════╝");
 
 			partieCourante.jouerManche();
@@ -244,6 +338,14 @@ public class Jeu implements Serializable {
 		// Fin de partie
 		partieCourante.terminerPartie();
 		this.etat = EtatPartie.TERMINEE;
+		
+		// Message final dans la GUI
+        if (avecGUI && interfaceGraphique != null) {
+            interfaceGraphique.ajouterLog("\n=== PARTIE TERMINÉE ===");
+            JOptionPane.showMessageDialog(interfaceGraphique.getFrame(),
+                "Partie terminée ! Consultez les scores dans la console.",
+                "Fin de partie", JOptionPane.INFORMATION_MESSAGE);
+        }
 	}
 
 	/**
@@ -254,7 +356,7 @@ public class Jeu implements Serializable {
 	 */
 	private void afficherTrophees() {
 		System.out.println("\n╔════════════════════════════════════════╗");
-		System.out.println("║  🏆 TROPHÉES DE LA PARTIE 🏆         ║");
+		System.out.println("║  🏆 TROPHÉES DE LA PARTIE 🏆            ║");
 		System.out.println("╚════════════════════════════════════════╝");
 
 		List<Carte> trophees = partieCourante.getTrophees();
@@ -267,23 +369,34 @@ public class Jeu implements Serializable {
 			System.out.println("  ┗━━ " + description);
 		}
 
-		System.out.println("\n╔═══════════════════════════════════════╗");
-		System.out.println("║  ℹ️  RAPPEL DES RÈGLES                ║");
-		System.out.println("╠═══════════════════════════════════════╣");
-		System.out.println("║  Piques ♠ & Trèfles ♣ : +points       ║");
-		System.out.println("║  Carreaux ♦ : -points                 ║");
-		System.out.println("║  Cœurs ♥ : 0 pts (sauf avec Joker)    ║");
-		System.out.println("║  Joker seul : +4 pts                  ║");
-		System.out.println("║  Joker + 4 Cœurs : Cœurs positifs!    ║");
-		System.out.println("║  Paire noire (♠+♣ même valeur): +2    ║");
-		System.out.println("║  As seul de sa couleur : vaut 5       ║");
+		//On affiche les règles
+		System.out.println("\n╔═══════════════════════════════════════════════════════╗");
+		System.out.println("║  ℹ️  RAPPEL DES RÈGLES                                ║");
+		System.out.println("╠═══════════════════════════════════════════════════════╣");
+		System.out.println("║    Piques ♠ & Trèfles ♣ : +points                     ║");
+		System.out.println("║    Carreaux ♦ : -points                               ║");
+		System.out.println("║    Cœurs ♥ : 0 pts (sauf avec Joker)                  ║");
+		System.out.println("║    Joker seul : +4 pts                                ║");
+		System.out.println("║    Joker + 4 Cœurs ♥ : Cœurs positifs!                ║");
+		System.out.println("║    Joker + 1 à 3 Cœurs ♥ : Cœurs négatifs...          ║");
+		System.out.println("║    Paire noire (♠ + ♣ même valeur): +2                ║");
+		System.out.println("║    As seul de sa couleur : vaut 5                     ║");
+		//Si il y a extension, il y a des règles en plus (concernant les cartes de l'extension)
 		if(avecExtension==true) {
-			System.out.println("║  Etoiles : vaut         ║");
-			System.out.println("║  Trangles : vaut         ║");
-			System.out.println("║  Soleils : vaut         ║");
+			System.out.println("║    Etoiles ☆ : +2*points                              ║");
+			System.out.println("║    Triangles ▲ : 0 pts (sauf avec Joker)              ║");
+			System.out.println("║    Joker + 1 à 3 Triangles ▲ : Triangles positifs!    ║");
+			System.out.println("║    Joker + 4 Triangles ▲ : Triangles négatifs...      ║");
+			System.out.println("║    Soleils ☼ chiffre impair : +points                 ║");
+			System.out.println("║    Soleils ☼ chiffre pair :  -points                  ║");
 		}
-		System.out.println("╚═══════════════════════════════════════╝\n");
+		System.out.println("╚═══════════════════════════════════════════════════════╝\n");
 	}
+	
+	// Sans Joker, les Triangles valent 0
+			
+	// Avec Joker et 4 Triangles, les Triangles perdent leur valeur
+	// Avec Joker et 1-3 Triangles, les Triangles augmentent le score
 
 	/**
 	 * La fonction demande à l'utilisateur si il souahite sauvegarder puis quitter
@@ -355,7 +468,8 @@ public class Jeu implements Serializable {
 	}
 
 	/**
-	 * Fonction principale du jeu, point d'accés
+	 * Fonction principale du jeu, point d'accès
+	 * On propose le choix du mode d'affichage
 	 * 
 	 * @param args
 	 */
@@ -364,6 +478,23 @@ public class Jeu implements Serializable {
 		System.out.println("║          JEU DE JEST               ║");
 		System.out.println("╚════════════════════════════════════╝\n");
 
+		
+		// Choix du mode d'affichage
+        System.out.println("Mode d'affichage :");
+        System.out.println("1. Console uniquement");
+        System.out.println("2. Interface graphique uniquement");
+        System.out.println("3. Console + Interface graphique (mode mixte)");
+        System.out.print("Votre choix (1-3): ");
+
+        int choixMode = 1;
+        try {
+            choixMode = scanner.nextInt();
+            scanner.nextLine();
+        } catch (InputMismatchException e) {
+            scanner.nextLine();
+        }
+        
+        // Choix création ou chargement de partie
 		System.out.println("1. Nouvelle partie");
 		System.out.println("2. Charger une partie");
 		System.out.print("Votre choix: ");
@@ -389,6 +520,24 @@ public class Jeu implements Serializable {
 			jeu.configurerJeu();
 		}
 
+		// Configuration du mode d'affichage
+        switch (choixMode) {
+            case 2:
+                jeu.avecGUI = true;
+                jeu.modeConsoleEtGUI = false;
+                System.out.println("✓ Mode Interface Graphique activé");
+                break;
+            case 3:
+                jeu.avecGUI = true;
+                jeu.modeConsoleEtGUI = true;
+                System.out.println("✓ Mode Mixte (Console + GUI) activé");
+                break;
+            default:
+                jeu.avecGUI = false;
+                jeu.modeConsoleEtGUI = false;
+                System.out.println("✓ Mode Console uniquement");
+        }
+        
 		jeu.demarrer();
 	}
 }

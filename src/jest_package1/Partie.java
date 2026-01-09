@@ -6,8 +6,10 @@ import java.util.*;
 /**
  * Classe Partie implémentant le patron Singleton. Gère le déroulement d'une
  * partie de Jest.
+ * Elle hérite de Observable pour le pattern MVC
  */
-public class Partie implements Serializable {
+@SuppressWarnings("deprecation")
+public class Partie extends Observable implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static Partie instance;
 
@@ -19,7 +21,21 @@ public class Partie implements Serializable {
 	private List<Offre> offresActuelles;
 	private transient Jeu jeuReference;
 	private boolean mancheEnCours;
+	private boolean modeGUI = false;
 
+	public void setModeGUI(boolean modeGUI) {
+		this.modeGUI = modeGUI;
+	}
+	
+	/**
+     * Notifie les observateurs que la partie a changé
+     */
+    private void notifierChangement() {
+        setChanged();
+        notifyObservers();
+    }
+	
+	
 	/**
 	 * Constructeur privé pour le pattern Singleton
 	 */
@@ -68,7 +84,8 @@ public class Partie implements Serializable {
 		this.numeroManche = 1;
 
 		initialiserTrophees();
-
+		
+		notifierChangement();
 	}
 
 	private void initialiserTrophees() {
@@ -94,9 +111,11 @@ public class Partie implements Serializable {
 		}
 
 		creerOffres();
+		notifierChangement(); // notifier pour la création des offres
 
 		while (!verifierFinManche()) {
 			resoudreTour();
+			notifierChangement(); // notifier pour chaque tour
 		}
 
 		mancheEnCours = false;
@@ -108,6 +127,7 @@ public class Partie implements Serializable {
 		}
 
 		numeroManche++;
+		notifierChangement();
 	}
 
 	/**
@@ -158,6 +178,7 @@ public class Partie implements Serializable {
 			System.out.println("  └─ jestPerso (définitif) : " + j.getJestPerso().getCartes());
 
 		}
+		notifierChangement();
 	}
 
 	/**
@@ -195,6 +216,8 @@ public class Partie implements Serializable {
 					+ offre.getCarteCachee().estVisible() + ")");
 			System.out.println("  └─ jestPerso (définitif) : " + j.getJestPerso().getCartes());
 		}
+		
+		notifierChangement();
 	}
 
 	/**
@@ -227,7 +250,9 @@ public class Partie implements Serializable {
 				System.out.println("  └─ jestPerso (définitif) : " + joueurActif.getJestPerso().getCartes());
 				// Marquer ce joueur comme ayant joué
 				joueursAyantJoue.add(joueurActif);
-
+				
+				notifierChangement();
+				
 				// Déterminer le prochain joueur
 				joueurActif = determinerProchainJoueur(offreChoisie.getProprietaire(), joueursAyantJoue);
 			} else {
@@ -239,17 +264,28 @@ public class Partie implements Serializable {
 
 					// Demander quelle carte prendre de sa propre offre
 					Carte carteChoisie;
-					if (joueurActif instanceof JoueurHumain) {
-						System.out.println("  1. Visible: " + offreJoueur.getCarteVisible());
-						System.out.println("  2. Cachée: [?]");
-						System.out.print("[" + joueurActif.getNom() + "] Votre choix (1 ou 2): ");
-						String choixCarte = Jeu.scanner.nextLine().trim();
-						carteChoisie = choixCarte.equals("2") ? offreJoueur.getCarteCachee()
-								: offreJoueur.getCarteVisible();
-					} else {
-						// Bot prend la visible par défaut
-						carteChoisie = offreJoueur.getCarteVisible();
-					}
+					if (joueurActif instanceof JoueurHumainGUI && ((JoueurHumainGUI)joueurActif).utiliseGUI()) {
+                        // Mode GUI : le joueur choisira via l'interface
+                        // On crée un faux choix pour déclencher l'interface
+                        ChoixCarte choixDernier = joueurActif.choisirCarte(offresActuelles);
+                        if (choixDernier != null) {
+                            carteChoisie = choixDernier.getCarte();
+                        } else {
+                            // Fallback
+                            carteChoisie = offreJoueur.getCarteVisible();
+                        }
+                    } else if (joueurActif instanceof JoueurHumain && !modeGUI) {
+                        // Mode console
+                        System.out.println("  1. Visible: " + offreJoueur.getCarteVisible());
+                        System.out.println("  2. Cachée: [?]");
+                        System.out.print("[" + joueurActif.getNom() + "] Votre choix (1 ou 2): ");
+                        String choixCarte = Jeu.scanner.nextLine().trim();
+                        carteChoisie = choixCarte.equals("2") ? offreJoueur.getCarteCachee()
+                                : offreJoueur.getCarteVisible();
+                    } else {
+                        // Bot prend la visible par défaut
+                        carteChoisie = offreJoueur.getCarteVisible();
+                    }
 
 					joueurActif.ajouterCarteJestPerso(carteChoisie);
 					offreJoueur.retirerCarte(carteChoisie);
@@ -260,6 +296,8 @@ public class Partie implements Serializable {
 				break; // Fin du tour
 			}
 		}
+		
+		notifierChangement();
 	}
 
 	/**
@@ -339,6 +377,13 @@ public class Partie implements Serializable {
 		return prochain;
 	}
 
+	/*// Getter pour vérifier si c'est le tour d'un joueur spécifique
+    public boolean estTourDuJoueur(Joueur joueur) {
+        // Logique pour déterminer si c'est le tour du joueur
+        // À implémenter selon votre logique de jeu
+        return false;
+    }*/
+	
 	/**
 	 * Retourne la valeur de la carte visible d'un joueur (Joker = 0) Condition: si
 	 * c'est un Joker, retourne 0; sinon retourne sa valeur numérique
@@ -386,6 +431,13 @@ public class Partie implements Serializable {
 		}
 		return null;
 	}
+	
+	/**
+     * Méthode pour obtenir les offres actuelles (utile pour l'interface graphique)
+     */	
+	public List<Offre> getOffresActuelles(){
+		return offresActuelles;
+	}
 
 	public boolean verifierFinManche() {
 		for (Offre o : offresActuelles) {
@@ -430,6 +482,8 @@ public class Partie implements Serializable {
 
 		attribuerTrophees();
 		calculerGagnant();
+		
+		notifierChangement();
 	}
 
 	/**
@@ -466,6 +520,8 @@ public class Partie implements Serializable {
 			}
 			System.out.println("└────────────────────────────────────────\n");
 		}
+		
+		notifierChangement();
 	}
 
 	/**
@@ -582,6 +638,9 @@ public class Partie implements Serializable {
 		}
 
 		System.out.println("\n🏆 GAGNANT: " + gagnant.getNom() + " avec " + scoreMax + " points!");
+		
+		notifierChangement();
+		
 		return gagnant;
 	}
 
