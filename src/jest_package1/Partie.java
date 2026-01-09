@@ -26,16 +26,15 @@ public class Partie extends Observable implements Serializable {
 	public void setModeGUI(boolean modeGUI) {
 		this.modeGUI = modeGUI;
 	}
-	
+
 	/**
-     * Notifie les observateurs que la partie a changé
-     */
-    private void notifierChangement() {
-        setChanged();
-        notifyObservers();
-    }
-	
-	
+	 * Notifie les observateurs que la partie a changé
+	 */
+	private void notifierChangement() {
+		setChanged();
+		notifyObservers();
+	}
+
 	/**
 	 * Constructeur privé pour le pattern Singleton
 	 */
@@ -84,7 +83,7 @@ public class Partie extends Observable implements Serializable {
 		this.numeroManche = 1;
 
 		initialiserTrophees();
-		
+
 		notifierChangement();
 	}
 
@@ -190,12 +189,23 @@ public class Partie extends Observable implements Serializable {
 		System.out.println("\n=== Création des offres ===");
 
 		boolean offresVisibles = regleJeu.sontOffresVisibles();
-		
+
 		// Boucle: chaque joueur propose ses 2 cartes (1 visible, 1 cachée)
 		for (Joueur j : joueurs) {
-			Offre offre = j.faireOffre(offresVisibles);
-			// La visibilité change selon la variante
-			offre = regleJeu.creerOffre(j, offre.getCarteCachee(), offre.getCarteVisible());
+			Offre offre = null;
+
+			// Pour les joueurs humains avec GUI, utiliser la méthode de Jeu
+			if (j instanceof JoueurHumain && jeuReference != null) {
+				offre = jeuReference.creerOffre((JoueurHumain) j);
+			}
+
+			// Sinon utiliser la méthode standard du joueur (console ou bot)
+			if (offre == null) {
+				offre = j.faireOffre(offresVisibles);
+				// La visibilité change selon la variante
+				offre = regleJeu.creerOffre(j, offre.getCarteCachee(), offre.getCarteVisible());
+			}
+
 			offresActuelles.add(offre);
 
 			// Affichage différent suivant la variante
@@ -216,7 +226,7 @@ public class Partie extends Observable implements Serializable {
 					+ offre.getCarteCachee().estVisible() + ")");
 			System.out.println("  └─ jestPerso (définitif) : " + j.getJestPerso().getCartes());
 		}
-		
+
 		notifierChangement();
 	}
 
@@ -234,7 +244,17 @@ public class Partie extends Observable implements Serializable {
 			System.out.println("\n--- Tour de " + joueurActif.getNom() + " ---");
 
 			// Le joueur actif choisit une carte parmi les offres disponibles
-			ChoixCarte choix = joueurActif.choisirCarte(offresActuelles);
+			ChoixCarte choix = null;
+
+			// Pour les joueurs humains avec GUI, utiliser la méthode de Jeu
+			if (joueurActif instanceof JoueurHumain && jeuReference != null) {
+				choix = jeuReference.choisirCarte((JoueurHumain) joueurActif);
+			}
+
+			// Sinon utiliser la méthode standard du joueur (console ou bot)
+			if (choix == null) {
+				choix = joueurActif.choisirCarte(offresActuelles);
+			}
 
 			if (choix != null) {
 				Carte carteChoisie = choix.getCarte();
@@ -250,9 +270,9 @@ public class Partie extends Observable implements Serializable {
 				System.out.println("  └─ jestPerso (définitif) : " + joueurActif.getJestPerso().getCartes());
 				// Marquer ce joueur comme ayant joué
 				joueursAyantJoue.add(joueurActif);
-				
+
 				notifierChangement();
-				
+
 				// Déterminer le prochain joueur
 				joueurActif = determinerProchainJoueur(offreChoisie.getProprietaire(), joueursAyantJoue);
 			} else {
@@ -264,28 +284,28 @@ public class Partie extends Observable implements Serializable {
 
 					// Demander quelle carte prendre de sa propre offre
 					Carte carteChoisie;
-					if (joueurActif instanceof JoueurHumainGUI && ((JoueurHumainGUI)joueurActif).utiliseGUI()) {
-                        // Mode GUI : le joueur choisira via l'interface
-                        // On crée un faux choix pour déclencher l'interface
-                        ChoixCarte choixDernier = joueurActif.choisirCarte(offresActuelles);
-                        if (choixDernier != null) {
-                            carteChoisie = choixDernier.getCarte();
-                        } else {
-                            // Fallback
-                            carteChoisie = offreJoueur.getCarteVisible();
-                        }
-                    } else if (joueurActif instanceof JoueurHumain && !modeGUI) {
-                        // Mode console
-                        System.out.println("  1. Visible: " + offreJoueur.getCarteVisible());
-                        System.out.println("  2. Cachée: [?]");
-                        System.out.print("[" + joueurActif.getNom() + "] Votre choix (1 ou 2): ");
-                        String choixCarte = Jeu.scanner.nextLine().trim();
-                        carteChoisie = choixCarte.equals("2") ? offreJoueur.getCarteCachee()
-                                : offreJoueur.getCarteVisible();
-                    } else {
-                        // Bot prend la visible par défaut
-                        carteChoisie = offreJoueur.getCarteVisible();
-                    }
+					if (joueurActif instanceof JoueurHumainGUI && ((JoueurHumainGUI) joueurActif).utiliseGUI()) {
+						// Mode GUI : le joueur choisira via l'interface
+						// On crée un faux choix pour déclencher l'interface
+						ChoixCarte choixDernier = joueurActif.choisirCarte(offresActuelles);
+						if (choixDernier != null) {
+							carteChoisie = choixDernier.getCarte();
+						} else {
+							// Fallback
+							carteChoisie = offreJoueur.getCarteVisible();
+						}
+					} else if (joueurActif instanceof JoueurHumain && !modeGUI) {
+						// Mode console
+						System.out.println("  1. Visible: " + offreJoueur.getCarteVisible());
+						System.out.println("  2. Cachée: [?]");
+						System.out.print("[" + joueurActif.getNom() + "] Votre choix (1 ou 2): ");
+						String choixCarte = Jeu.scanner.nextLine().trim();
+						carteChoisie = choixCarte.equals("2") ? offreJoueur.getCarteCachee()
+								: offreJoueur.getCarteVisible();
+					} else {
+						// Bot prend la visible par défaut
+						carteChoisie = offreJoueur.getCarteVisible();
+					}
 
 					joueurActif.ajouterCarteJestPerso(carteChoisie);
 					offreJoueur.retirerCarte(carteChoisie);
@@ -296,7 +316,7 @@ public class Partie extends Observable implements Serializable {
 				break; // Fin du tour
 			}
 		}
-		
+
 		notifierChangement();
 	}
 
@@ -377,13 +397,15 @@ public class Partie extends Observable implements Serializable {
 		return prochain;
 	}
 
-	/*// Getter pour vérifier si c'est le tour d'un joueur spécifique
-    public boolean estTourDuJoueur(Joueur joueur) {
-        // Logique pour déterminer si c'est le tour du joueur
-        // À implémenter selon votre logique de jeu
-        return false;
-    }*/
-	
+	/*
+	 * // Getter pour vérifier si c'est le tour d'un joueur spécifique
+	 * public boolean estTourDuJoueur(Joueur joueur) {
+	 * // Logique pour déterminer si c'est le tour du joueur
+	 * // À implémenter selon votre logique de jeu
+	 * return false;
+	 * }
+	 */
+
 	/**
 	 * Retourne la valeur de la carte visible d'un joueur (Joker = 0) Condition: si
 	 * c'est un Joker, retourne 0; sinon retourne sa valeur numérique
@@ -431,11 +453,11 @@ public class Partie extends Observable implements Serializable {
 		}
 		return null;
 	}
-	
+
 	/**
-     * Méthode pour obtenir les offres actuelles (utile pour l'interface graphique)
-     */	
-	public List<Offre> getOffresActuelles(){
+	 * Méthode pour obtenir les offres actuelles (utile pour l'interface graphique)
+	 */
+	public List<Offre> getOffresActuelles() {
 		return offresActuelles;
 	}
 
@@ -482,7 +504,7 @@ public class Partie extends Observable implements Serializable {
 
 		attribuerTrophees();
 		calculerGagnant();
-		
+
 		notifierChangement();
 	}
 
@@ -520,7 +542,7 @@ public class Partie extends Observable implements Serializable {
 			}
 			System.out.println("└────────────────────────────────────────\n");
 		}
-		
+
 		notifierChangement();
 	}
 
@@ -638,9 +660,9 @@ public class Partie extends Observable implements Serializable {
 		}
 
 		System.out.println("\n🏆 GAGNANT: " + gagnant.getNom() + " avec " + scoreMax + " points!");
-		
+
 		notifierChangement();
-		
+
 		return gagnant;
 	}
 

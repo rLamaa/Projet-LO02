@@ -25,14 +25,13 @@ public class Jeu implements Serializable {
 	public static Scanner scanner = new Scanner(System.in); // NE PAS TOUCHER, buffer commun pour lire les input de
 															// l'utilisateur
 
-	
-	//Attributs pour l'interface graphique (GUI)
-	 private transient InterfaceGraphiqueJest interfaceGraphique;
-	 private transient VueConsoleJest vueConsole;
-	 private transient ControleurJest controleurGUI;
-	 private boolean avecGUI = false;
-	 private boolean modeConsoleEtGUI = false;
-	
+	// Attributs pour l'interface graphique (GUI)
+	private transient InterfaceGraphiqueJest interfaceGraphique;
+	private transient VueConsoleJest vueConsole;
+	private transient ControleurJest controleurGUI;
+	private boolean avecGUI = false;
+	private boolean modeConsoleEtGUI = false;
+
 	/**
 	 * Constructeur de la classe Jeu
 	 * 
@@ -93,24 +92,26 @@ public class Jeu implements Serializable {
 		// Compléter avec des bots jusqu'à 3 joueurs minimum
 		int nbBots = Math.max(0, 3 - nbJoueurs);
 		String[] nomsBots = { "Alpha", "Beta", "Gamma", "Delta" }; // noms des bots qui sont appender
-		/*String info;
-		Random va = new Random();
-		int nombre;
-		nombre=va.nextInt(3);
-		//	System.out.println(nombre);
-		switch(nombre) {
-			case 0:
-				info="SPORT";
-				break;
-			case 1:
-				info="POLITQUE";
-				break;
-			case 2:
-				info="ECONOMIE";
-				break;
-	        default:
-	        	info="SPORT"; //cas par défaut mit à sport pour eviter les erreurs
-		}*/
+		/*
+		 * String info;
+		 * Random va = new Random();
+		 * int nombre;
+		 * nombre=va.nextInt(3);
+		 * // System.out.println(nombre);
+		 * switch(nombre) {
+		 * case 0:
+		 * info="SPORT";
+		 * break;
+		 * case 1:
+		 * info="POLITQUE";
+		 * break;
+		 * case 2:
+		 * info="ECONOMIE";
+		 * break;
+		 * default:
+		 * info="SPORT"; //cas par défaut mit à sport pour eviter les erreurs
+		 * }
+		 */
 		Strategie[] strategies = {
 				new StrategieOffensive(), // 1
 				new StrategieDefensive(), // 2
@@ -164,7 +165,7 @@ public class Jeu implements Serializable {
 		String reponse = scanner.nextLine().trim().toLowerCase();
 
 		if (reponse.equals("o") || reponse.equals("oui")) {
-			//this.extension = Extension.creerExtensionStandard();
+			// this.extension = Extension.creerExtensionStandard();
 			avecExtension = true;
 			System.out.println("✓ Extension activée!");
 			System.out.println("  Cartes ajoutées: Etoiles, Triangles, Soleils");
@@ -186,7 +187,7 @@ public class Jeu implements Serializable {
 			System.out.println("    • " + j.getNom() + " (" + type + ")");
 		}
 		System.out.println("  Règles: " + regleJeu.getClass().getSimpleName());
-		if(avecExtension==true) {
+		if (avecExtension == true) {
 			System.out.println("  Extension: Oui");
 		} else {
 			System.out.println("  Extension: Non");
@@ -219,80 +220,79 @@ public class Jeu implements Serializable {
 		}
 		this.regleJeu = regleJeu;
 	}
-	
+
 	/**
-     * Initialisation de l'interface graphique
-     */
-    private void initialiserInterfaceGraphique() {
-        // Trouver le joueur humain
-        JoueurHumainGUI joueurHumain = null;
-        for (Joueur j : joueurs) {
-            if (j instanceof JoueurHumain) {
-                // Remplacer le JoueurHumain par un JoueurHumainGUI
-                int index = joueurs.indexOf(j);
-                joueurHumain = new JoueurHumainGUI(j.getNom());
-                joueurHumain.setUtiliseGUI(true);
-                
-                // Copier l'état du joueur
-                for (Carte c : j.getJest().getCartes()) {
-                    joueurHumain.ajouterCarteJest(c);
-                }
-                for (Carte c : j.getJestPerso().getCartes()) {
-                    joueurHumain.ajouterCarteJestPerso(c);
-                }
-                
-                joueurs.set(index, joueurHumain);
-                break;
-            }
-        }
-        
-        if (joueurHumain == null) {
-            System.out.println("⚠ Pas de joueur humain détecté, GUI désactivée.");
-            avecGUI = false;
-            return;
-        }
-        
-        final JoueurHumainGUI joueurFinal = joueurHumain;
-        
-        // Réinitialiser la partie avec les nouveaux joueurs
-        if (partieCourante != null) {
-            partieCourante.setJeuReference(this);
-            partieCourante.setModeGUI(!modeConsoleEtGUI);
-        }
-        
-        // Créer l'interface dans le thread EDT
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    try {
-                        interfaceGraphique = new InterfaceGraphiqueJest(partieCourante, joueurFinal);
-                        controleurGUI = new ControleurJest(partieCourante, joueurFinal, interfaceGraphique);
-                        
-                        // Enregistrer l'interface comme observateur
-                        partieCourante.addObserver(interfaceGraphique);
-                        
-                        interfaceGraphique.afficher();
-                        interfaceGraphique.ajouterLog("=== Jeu de Jest ===");
-                        interfaceGraphique.ajouterLog("Interface graphique initialisée");
-                        
-                        System.out.println("✓ Interface graphique initialisée");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-        } catch (Exception e) {
-            System.err.println("Erreur lors de l'initialisation de la GUI");
-            e.printStackTrace();
-        }
-        
-        // Si mode mixte, créer aussi la vue console
-        if (modeConsoleEtGUI) {
-            vueConsole = new VueConsoleJest(partieCourante);
-            System.out.println("✓ Vue console initialisée (mode mixte)");
-        }
-    }	
-	
+	 * Initialisation de l'interface graphique
+	 */
+	private void initialiserInterfaceGraphique() {
+		// Trouver le joueur humain
+		JoueurHumainGUI joueurHumain = null;
+		for (Joueur j : joueurs) {
+			if (j instanceof JoueurHumain) {
+				// Remplacer le JoueurHumain par un JoueurHumainGUI
+				int index = joueurs.indexOf(j);
+				joueurHumain = new JoueurHumainGUI(j.getNom());
+				joueurHumain.setUtiliseGUI(true);
+
+				// Copier l'état du joueur
+				for (Carte c : j.getJest().getCartes()) {
+					joueurHumain.ajouterCarteJest(c);
+				}
+				for (Carte c : j.getJestPerso().getCartes()) {
+					joueurHumain.ajouterCarteJestPerso(c);
+				}
+
+				joueurs.set(index, joueurHumain);
+				break;
+			}
+		}
+
+		if (joueurHumain == null) {
+			System.out.println("⚠ Pas de joueur humain détecté, GUI désactivée.");
+			avecGUI = false;
+			return;
+		}
+
+		final JoueurHumainGUI joueurFinal = joueurHumain;
+
+		// Réinitialiser la partie avec les nouveaux joueurs
+		if (partieCourante != null) {
+			partieCourante.setJeuReference(this);
+			partieCourante.setModeGUI(!modeConsoleEtGUI);
+		}
+
+		// Créer l'interface dans le thread EDT
+		try {
+			SwingUtilities.invokeAndWait(new Runnable() {
+				public void run() {
+					try {
+						interfaceGraphique = new InterfaceGraphiqueJest(partieCourante, joueurFinal);
+						controleurGUI = new ControleurJest(partieCourante, joueurFinal, interfaceGraphique);
+
+						// Enregistrer l'interface comme observateur
+						partieCourante.addObserver(interfaceGraphique);
+
+						interfaceGraphique.afficher();
+						interfaceGraphique.ajouterLog("=== Jeu de Jest ===");
+						interfaceGraphique.ajouterLog("Interface graphique initialisée");
+
+						System.out.println("✓ Interface graphique initialisée");
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		} catch (Exception e) {
+			System.err.println("Erreur lors de l'initialisation de la GUI");
+			e.printStackTrace();
+		}
+
+		// Si mode mixte, créer aussi la vue console
+		if (modeConsoleEtGUI) {
+			vueConsole = new VueConsoleJest(partieCourante);
+			System.out.println("✓ Vue console initialisée (mode mixte)");
+		}
+	}
 
 	/**
 	 * Demarre la partie, en créant l'instance de la classe et permet alors de
@@ -310,11 +310,11 @@ public class Jeu implements Serializable {
 			// PARTIE CHARGÉE
 			partieCourante.setJeuReference(this);
 		}
-		
+
 		if (avecGUI) {
 			initialiserInterfaceGraphique();
 		}
-		
+
 		this.etat = EtatPartie.EN_COURS;
 		afficherTrophees();
 
@@ -338,14 +338,14 @@ public class Jeu implements Serializable {
 		// Fin de partie
 		partieCourante.terminerPartie();
 		this.etat = EtatPartie.TERMINEE;
-		
+
 		// Message final dans la GUI
-        if (avecGUI && interfaceGraphique != null) {
-            interfaceGraphique.ajouterLog("\n=== PARTIE TERMINÉE ===");
-            JOptionPane.showMessageDialog(interfaceGraphique.getFrame(),
-                "Partie terminée ! Consultez les scores dans la console.",
-                "Fin de partie", JOptionPane.INFORMATION_MESSAGE);
-        }
+		if (avecGUI && interfaceGraphique != null) {
+			interfaceGraphique.ajouterLog("\n=== PARTIE TERMINÉE ===");
+			JOptionPane.showMessageDialog(interfaceGraphique.getFrame(),
+					"Partie terminée ! Consultez les scores dans la console.",
+					"Fin de partie", JOptionPane.INFORMATION_MESSAGE);
+		}
 	}
 
 	/**
@@ -369,7 +369,7 @@ public class Jeu implements Serializable {
 			System.out.println("  ┗━━ " + description);
 		}
 
-		//On affiche les règles
+		// On affiche les règles
 		System.out.println("\n╔═══════════════════════════════════════════════════════╗");
 		System.out.println("║  ℹ️  RAPPEL DES RÈGLES                                ║");
 		System.out.println("╠═══════════════════════════════════════════════════════╣");
@@ -381,8 +381,9 @@ public class Jeu implements Serializable {
 		System.out.println("║    Joker + 1 à 3 Cœurs ♥ : Cœurs négatifs...          ║");
 		System.out.println("║    Paire noire (♠ + ♣ même valeur): +2                ║");
 		System.out.println("║    As seul de sa couleur : vaut 5                     ║");
-		//Si il y a extension, il y a des règles en plus (concernant les cartes de l'extension)
-		if(avecExtension==true) {
+		// Si il y a extension, il y a des règles en plus (concernant les cartes de
+		// l'extension)
+		if (avecExtension == true) {
 			System.out.println("║    Etoiles ☆ : +2*points                              ║");
 			System.out.println("║    Triangles ▲ : 0 pts (sauf avec Joker)              ║");
 			System.out.println("║    Joker + 1 à 3 Triangles ▲ : Triangles positifs!    ║");
@@ -392,24 +393,88 @@ public class Jeu implements Serializable {
 		}
 		System.out.println("╚═══════════════════════════════════════════════════════╝\n");
 	}
-	
+
 	// Sans Joker, les Triangles valent 0
-			
+
 	// Avec Joker et 4 Triangles, les Triangles perdent leur valeur
 	// Avec Joker et 1-3 Triangles, les Triangles augmentent le score
 
 	/**
-	 * La fonction demande à l'utilisateur si il souahite sauvegarder puis quitter
+	 * Affiche un dialogue sauvegarde/quitter qui fonctionne en console et GUI
+	 * L'utilisateur peut répondre dans l'un ou l'autre mode
 	 * 
-	 * @return
+	 * @return true si l'utilisateur a choisi de quitter
 	 */
 	public boolean proposerSauvegardeOuQuitter() {
+		if (avecGUI && interfaceGraphique != null) {
+			// Mode GUI + Console ou GUI seul
+			return afficherDialogueSauvegardeGUI();
+		} else {
+			// Mode console uniquement
+			return afficherDialogueSauvegardeConsole();
+		}
+	}
+
+	/**
+	 * Dialogue de sauvegarde en mode GUI
+	 */
+	private boolean afficherDialogueSauvegardeGUI() {
+		int result = JOptionPane.showConfirmDialog(
+				interfaceGraphique.getFrame(),
+				"💾 Sauvegarder la partie avant de quitter ?",
+				"Sauvegarde",
+				JOptionPane.YES_NO_CANCEL_OPTION,
+				JOptionPane.QUESTION_MESSAGE);
+
+		if (result == JOptionPane.YES_OPTION) {
+			sauvegarder();
+			interfaceGraphique.ajouterLog("✓ Partie sauvegardée");
+
+			int quitResult = JOptionPane.showConfirmDialog(
+					interfaceGraphique.getFrame(),
+					"Quitter la partie ?",
+					"Quitter",
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE);
+
+			if (quitResult == JOptionPane.YES_OPTION) {
+				this.etat = EtatPartie.SUSPENDUE;
+				interfaceGraphique.ajouterLog("✓ Partie arrêtée");
+				return true;
+			} else {
+				this.etat = EtatPartie.EN_COURS;
+				return false;
+			}
+		} else if (result == JOptionPane.NO_OPTION) {
+			interfaceGraphique.ajouterLog("Partie non sauvegardée");
+
+			int quitResult = JOptionPane.showConfirmDialog(
+					interfaceGraphique.getFrame(),
+					"Quitter sans sauvegarder ?",
+					"Confirmation",
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.WARNING_MESSAGE);
+
+			if (quitResult == JOptionPane.YES_OPTION) {
+				this.etat = EtatPartie.SUSPENDUE;
+				return true;
+			} else {
+				this.etat = EtatPartie.EN_COURS;
+				return false;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Dialogue de sauvegarde en mode console
+	 */
+	private boolean afficherDialogueSauvegardeConsole() {
 		System.out.print("\n💾 Sauvegarder la partie ? (o/n): ");
 		String rep = scanner.nextLine().trim().toLowerCase();
 
 		if (rep.equals("o") || rep.equals("oui")) {
 			this.etat = EtatPartie.SUSPENDUE;
-
 			sauvegarder();
 
 			System.out.print("Quitter la partie ? (o/n): ");
@@ -417,16 +482,362 @@ public class Jeu implements Serializable {
 
 			if (quitter.equals("o") || quitter.equals("oui")) {
 				this.etat = EtatPartie.SUSPENDUE;
-				// System.out.println(this.etat);
 				System.out.println("✓ Partie sauvegardée et arrêtée");
 				return true;
 			} else {
 				this.etat = EtatPartie.EN_COURS;
-				// System.out.println(this.etat);
 			}
 		}
 
 		return false;
+	}
+
+	/**
+	 * Crée une offre pour un joueur humain (fonctionne en console ou GUI)
+	 * 
+	 * @param joueur Le joueur qui crée l'offre
+	 * @return L'offre créée ou null
+	 */
+	public Offre creerOffre(JoueurHumain joueur) {
+		List<Carte> cartes = joueur.getJest().getCartes();
+
+		if (cartes.size() < 2) {
+			String message = "Vous n'avez pas assez de cartes pour faire une offre.";
+			if (avecGUI && interfaceGraphique != null) {
+				JOptionPane.showMessageDialog(interfaceGraphique.getFrame(),
+						message, "Erreur", JOptionPane.ERROR_MESSAGE);
+			} else {
+				System.out.println("⚠ " + message);
+			}
+			return null;
+		}
+
+		// Déterminer si c'est la variante stratégique
+		boolean offresVisibles = false;
+		if (partieCourante != null) {
+			List<Offre> offresActuelles = partieCourante.getOffresActuelles();
+			if (offresActuelles != null && !offresActuelles.isEmpty()) {
+				Offre premiere = offresActuelles.get(0);
+				if (premiere.getCarteCachee() != null) {
+					offresVisibles = premiere.getCarteCachee().estVisible();
+				}
+			}
+		}
+
+		Carte carteCachee, carteVisible;
+
+		if (offresVisibles) {
+			// Mode stratégique : afficher les deux cartes
+			if (avecGUI && interfaceGraphique != null) {
+				int choix = JOptionPane.showConfirmDialog(
+						interfaceGraphique.getFrame(),
+						"Mode Stratégique : Vos deux cartes seront visibles\n" +
+								"Carte 1 : " + cartes.get(0) + "\n" +
+								"Carte 2 : " + cartes.get(1) + "\n\n" +
+								"Créer cette offre ?",
+						"Offre - Variante Stratégique",
+						JOptionPane.YES_NO_OPTION);
+				if (choix != JOptionPane.YES_OPTION)
+					return null;
+			} else {
+				System.out.println("\n=== Création d'offre (Mode Stratégique) ===");
+				System.out.println("Vos deux cartes seront visibles :");
+				System.out.println("  1. " + cartes.get(0));
+				System.out.println("  2. " + cartes.get(1));
+				System.out.print("Créer cette offre ? (o/n): ");
+				String rep = scanner.nextLine().trim().toLowerCase();
+				if (!rep.equals("o") && !rep.equals("oui"))
+					return null;
+			}
+			carteCachee = cartes.get(0);
+			carteVisible = cartes.get(1);
+		} else {
+			// Mode standard : choisir la carte à cacher
+			int indexCachee = choisirIndiceCarte(cartes, "Quelle carte voulez-vous CACHER ?");
+			if (indexCachee < 0)
+				return null;
+
+			carteCachee = cartes.get(indexCachee);
+			carteVisible = cartes.get(1 - indexCachee);
+		}
+
+		// Retirer les cartes du jest
+		joueur.getJest().enleverCarte(carteCachee);
+		joueur.getJest().enleverCarte(carteVisible);
+
+		// Créer et retourner l'offre
+		Offre offre = new Offre(carteCachee, carteVisible, joueur);
+
+		String message = "[" + joueur.getNom() + "] Offre créée - Visible: " +
+				carteVisible + " | Cachée: " + (offresVisibles ? carteCachee : "[?]");
+
+		if (avecGUI && interfaceGraphique != null) {
+			interfaceGraphique.ajouterLog(message);
+		} else {
+			System.out.println("✓ " + message);
+		}
+
+		return offre;
+	}
+
+	/**
+	 * Permet au joueur de choisir une offre et une carte (fonctionne en console ou
+	 * GUI)
+	 * 
+	 * @param joueur Le joueur qui choisit
+	 * @return Le choix (offre + carte) ou null
+	 */
+	public ChoixCarte choisirCarte(JoueurHumain joueur) {
+		if (partieCourante == null) {
+			String message = "Aucune partie en cours.";
+			if (avecGUI && interfaceGraphique != null) {
+				JOptionPane.showMessageDialog(interfaceGraphique.getFrame(),
+						message, "Erreur", JOptionPane.ERROR_MESSAGE);
+			} else {
+				System.out.println("⚠ " + message);
+			}
+			return null;
+		}
+
+		List<Offre> offresActuelles = partieCourante.getOffresActuelles();
+		if (offresActuelles == null || offresActuelles.isEmpty()) {
+			String message = "Aucune offre disponible.";
+			if (avecGUI && interfaceGraphique != null) {
+				JOptionPane.showMessageDialog(interfaceGraphique.getFrame(),
+						message, "Information", JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				System.out.println("ℹ " + message);
+			}
+			return null;
+		}
+
+		// Filtrer les offres disponibles
+		List<Offre> offresDisponibles = new ArrayList<>();
+		Offre offreJoueur = null;
+
+		for (Offre o : offresActuelles) {
+			if (o.getProprietaire() == joueur) {
+				offreJoueur = o;
+			} else if (o.estComplete()) {
+				offresDisponibles.add(o);
+			}
+		}
+
+		// Cas où le joueur est dernier et doit prendre sa propre offre
+		if (offresDisponibles.isEmpty() && offreJoueur != null && offreJoueur.estComplete()) {
+			return choisirDansSaPropreOffre(offreJoueur, joueur);
+		}
+
+		if (offresDisponibles.isEmpty()) {
+			String message = "Aucune offre disponible pour vous.";
+			if (avecGUI && interfaceGraphique != null) {
+				JOptionPane.showMessageDialog(interfaceGraphique.getFrame(),
+						message, "Information", JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				System.out.println("ℹ " + message);
+			}
+			return null;
+		}
+
+		// Déterminer si les offres sont visibles
+		boolean offresVisibles = offresDisponibles.get(0).getCarteCachee().estVisible();
+
+		// Choisir une offre
+		Offre offreChoisie = choisirOffre(offresDisponibles, offresVisibles, joueur);
+		if (offreChoisie == null)
+			return null;
+
+		// Choisir une carte dans l'offre
+		Carte carteChoisie = choisirCarteFromOffre(offreChoisie, offresVisibles, joueur);
+		if (carteChoisie == null)
+			return null;
+
+		// Retourner le choix
+		String message = "[" + joueur.getNom() + "] a choisi: " + carteChoisie +
+				" de l'offre de " + offreChoisie.getProprietaire().getNom();
+
+		if (avecGUI && interfaceGraphique != null) {
+			interfaceGraphique.ajouterLog(message);
+		} else {
+			System.out.println("✓ " + message);
+		}
+
+		return new ChoixCarte(offreChoisie, carteChoisie);
+	}
+
+	/**
+	 * Affiche les offres et permet au joueur d'en choisir une
+	 */
+	private Offre choisirOffre(List<Offre> offres, boolean offresVisibles, JoueurHumain joueur) {
+		String[] options = new String[offres.size()];
+
+		for (int i = 0; i < offres.size(); i++) {
+			Offre o = offres.get(i);
+			if (offresVisibles) {
+				options[i] = (i + 1) + ". [" + o.getProprietaire().getNom() +
+						"] Carte 1: " + o.getCarteVisible() + " | Carte 2: " + o.getCarteCachee();
+			} else {
+				options[i] = (i + 1) + ". [" + o.getProprietaire().getNom() +
+						"] Visible: " + o.getCarteVisible() + " | Cachée: [?]";
+			}
+		}
+
+		if (avecGUI && interfaceGraphique != null) {
+			String choix = (String) JOptionPane.showInputDialog(
+					interfaceGraphique.getFrame(),
+					"Choisissez une offre :",
+					"Sélection d'offre",
+					JOptionPane.QUESTION_MESSAGE,
+					null,
+					options,
+					options[0]);
+			if (choix == null)
+				return null;
+			int index = Integer.parseInt(choix.substring(0, 1)) - 1;
+			return offres.get(index);
+		} else {
+			// Mode console
+			System.out.println("\n=== Offres disponibles ===");
+			for (String opt : options) {
+				System.out.println("  " + opt);
+			}
+
+			System.out.print("Votre choix (numéro) : ");
+			try {
+				int choix = scanner.nextInt();
+				scanner.nextLine();
+				if (choix >= 1 && choix <= offres.size()) {
+					return offres.get(choix - 1);
+				}
+			} catch (InputMismatchException e) {
+				scanner.nextLine();
+			}
+			System.out.println("⚠ Choix invalide");
+			return null;
+		}
+	}
+
+	/**
+	 * Permet au joueur de choisir une carte dans une offre
+	 */
+	private Carte choisirCarteFromOffre(Offre offre, boolean offresVisibles, JoueurHumain joueur) {
+		String[] choixCartes;
+
+		if (offresVisibles) {
+			choixCartes = new String[] {
+					"1. Carte 1: " + offre.getCarteVisible(),
+					"2. Carte 2: " + offre.getCarteCachee()
+			};
+		} else {
+			choixCartes = new String[] {
+					"1. Carte visible: " + offre.getCarteVisible(),
+					"2. Carte cachée: [?]"
+			};
+		}
+
+		if (avecGUI && interfaceGraphique != null) {
+			String choix = (String) JOptionPane.showInputDialog(
+					interfaceGraphique.getFrame(),
+					"Quelle carte voulez-vous prendre ?",
+					"Choix de carte",
+					JOptionPane.QUESTION_MESSAGE,
+					null,
+					choixCartes,
+					choixCartes[0]);
+			if (choix == null)
+				return null;
+			return choix.startsWith("2") ? offre.getCarteCachee() : offre.getCarteVisible();
+		} else {
+			// Mode console
+			System.out.println("\nCartes disponibles :");
+			for (String c : choixCartes) {
+				System.out.println("  " + c);
+			}
+			System.out.print("Votre choix (numéro) : ");
+			try {
+				int choix = scanner.nextInt();
+				scanner.nextLine();
+				if (choix == 2) {
+					return offre.getCarteCachee();
+				} else if (choix == 1) {
+					return offre.getCarteVisible();
+				}
+			} catch (InputMismatchException e) {
+				scanner.nextLine();
+			}
+			System.out.println("⚠ Choix invalide");
+			return null;
+		}
+	}
+
+	/**
+	 * Gère le cas où le joueur doit choisir dans sa propre offre
+	 */
+	private ChoixCarte choisirDansSaPropreOffre(Offre offre, JoueurHumain joueur) {
+		String message = "Vous êtes le dernier joueur.\nVous devez choisir dans votre propre offre.";
+
+		if (avecGUI && interfaceGraphique != null) {
+			JOptionPane.showMessageDialog(interfaceGraphique.getFrame(),
+					message, "Dernier joueur", JOptionPane.INFORMATION_MESSAGE);
+		} else {
+			System.out.println("\n⚠ " + message);
+		}
+
+		boolean offresVisibles = offre.getCarteCachee().estVisible();
+		Carte carteChoisie = choisirCarteFromOffre(offre, offresVisibles, joueur);
+		if (carteChoisie == null)
+			return null;
+
+		String logMessage = "[" + joueur.getNom() + "] a gardé: " + carteChoisie;
+		if (avecGUI && interfaceGraphique != null) {
+			interfaceGraphique.ajouterLog(logMessage);
+		} else {
+			System.out.println("✓ " + logMessage);
+		}
+
+		return new ChoixCarte(offre, carteChoisie);
+	}
+
+	/**
+	 * Utilitaire pour choisir l'indice d'une carte dans une liste
+	 */
+	private int choisirIndiceCarte(List<Carte> cartes, String titre) {
+		String[] options = new String[cartes.size()];
+		for (int i = 0; i < cartes.size(); i++) {
+			options[i] = (i + 1) + ". " + cartes.get(i).toString();
+		}
+
+		if (avecGUI && interfaceGraphique != null) {
+			String choix = (String) JOptionPane.showInputDialog(
+					interfaceGraphique.getFrame(),
+					titre,
+					"Sélection de carte",
+					JOptionPane.QUESTION_MESSAGE,
+					null,
+					options,
+					options[0]);
+			if (choix == null)
+				return -1;
+			return Integer.parseInt(choix.substring(0, 1)) - 1;
+		} else {
+			// Mode console
+			System.out.println("\n" + titre);
+			for (String opt : options) {
+				System.out.println("  " + opt);
+			}
+			System.out.print("Votre choix (numéro) : ");
+			try {
+				int choix = scanner.nextInt();
+				scanner.nextLine();
+				if (choix >= 1 && choix <= cartes.size()) {
+					return choix - 1;
+				}
+			} catch (InputMismatchException e) {
+				scanner.nextLine();
+			}
+			System.out.println("⚠ Choix invalide");
+			return -1;
+		}
 	}
 
 	/**
@@ -478,23 +889,22 @@ public class Jeu implements Serializable {
 		System.out.println("║          JEU DE JEST               ║");
 		System.out.println("╚════════════════════════════════════╝\n");
 
-		
 		// Choix du mode d'affichage
-        System.out.println("Mode d'affichage :");
-        System.out.println("1. Console uniquement");
-        System.out.println("2. Interface graphique uniquement");
-        System.out.println("3. Console + Interface graphique (mode mixte)");
-        System.out.print("Votre choix (1-3): ");
+		System.out.println("Mode d'affichage :");
+		System.out.println("1. Console uniquement");
+		System.out.println("2. Interface graphique uniquement");
+		System.out.println("3. Console + Interface graphique (mode mixte)");
+		System.out.print("Votre choix (1-3): ");
 
-        int choixMode = 1;
-        try {
-            choixMode = scanner.nextInt();
-            scanner.nextLine();
-        } catch (InputMismatchException e) {
-            scanner.nextLine();
-        }
-        
-        // Choix création ou chargement de partie
+		int choixMode = 1;
+		try {
+			choixMode = scanner.nextInt();
+			scanner.nextLine();
+		} catch (InputMismatchException e) {
+			scanner.nextLine();
+		}
+
+		// Choix création ou chargement de partie
 		System.out.println("1. Nouvelle partie");
 		System.out.println("2. Charger une partie");
 		System.out.print("Votre choix: ");
@@ -521,23 +931,23 @@ public class Jeu implements Serializable {
 		}
 
 		// Configuration du mode d'affichage
-        switch (choixMode) {
-            case 2:
-                jeu.avecGUI = true;
-                jeu.modeConsoleEtGUI = false;
-                System.out.println("✓ Mode Interface Graphique activé");
-                break;
-            case 3:
-                jeu.avecGUI = true;
-                jeu.modeConsoleEtGUI = true;
-                System.out.println("✓ Mode Mixte (Console + GUI) activé");
-                break;
-            default:
-                jeu.avecGUI = false;
-                jeu.modeConsoleEtGUI = false;
-                System.out.println("✓ Mode Console uniquement");
-        }
-        
+		switch (choixMode) {
+			case 2:
+				jeu.avecGUI = true;
+				jeu.modeConsoleEtGUI = false;
+				System.out.println("✓ Mode Interface Graphique activé");
+				break;
+			case 3:
+				jeu.avecGUI = true;
+				jeu.modeConsoleEtGUI = true;
+				System.out.println("✓ Mode Mixte (Console + GUI) activé");
+				break;
+			default:
+				jeu.avecGUI = false;
+				jeu.modeConsoleEtGUI = false;
+				System.out.println("✓ Mode Console uniquement");
+		}
+
 		jeu.demarrer();
 	}
 }
