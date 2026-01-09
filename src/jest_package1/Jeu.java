@@ -261,13 +261,6 @@ public class Jeu implements Serializable {
 
 		List<Carte> trophees = partieCourante.getTrophees();
 
-		for (int i = 0; i < trophees.size(); i++) {
-			Carte c = trophees.get(i);
-			String description = RegleStandard.getDescriptionTrophee(c);
-
-			System.out.println("\n  Trophée " + (i + 1) + ": " + c);
-			System.out.println("  ┗━━ " + description);
-		}
 		System.out.println("╚═══════════════════════════════════════╝\n");
 		System.out.println("\n╔═══════════════════════════════════════════════════════╗");
 		System.out.println("║  ℹ️  RAPPEL DES RÈGLES                                ║");

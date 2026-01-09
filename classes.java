@@ -407,92 +407,6 @@ public enum EtatPartie {
 	SUSPENDUE // etat de jen en suspens
 }package jest_package1;
 
-import javax.swing.*;
-import java.awt.*;
-
-class FinPanel extends JPanel {
-    private JeuGUI parent;
-    private JTextArea scoresArea;
-    private JLabel lblGagnant;
-    private JPanel cartesGagnantPanel;
-
-    public FinPanel(JeuGUI parent) {
-        this.parent = parent;
-        setBackground(new Color(34, 139, 34));
-        setLayout(null);
-
-        JLabel lblTitre = new JLabel("🏆 FIN DE LA PARTIE 🏆");
-        lblTitre.setFont(new Font("Arial", Font.BOLD, 36));
-        lblTitre.setForeground(Color.YELLOW);
-        lblTitre.setBounds(300, 30, 600, 50);
-        add(lblTitre);
-
-        scoresArea = new JTextArea();
-        scoresArea.setEditable(false);
-        scoresArea.setFont(new Font("Monospaced", Font.PLAIN, 16));
-        JScrollPane scrollPane = new JScrollPane(scoresArea);
-        scrollPane.setBounds(50, 120, 400, 300);
-        add(scrollPane);
-
-        lblGagnant = new JLabel("");
-        lblGagnant.setFont(new Font("Arial", Font.BOLD, 28));
-        lblGagnant.setForeground(Color.YELLOW);
-        lblGagnant.setBounds(50, 450, 600, 40);
-        add(lblGagnant);
-
-        cartesGagnantPanel = new JPanel();
-        cartesGagnantPanel.setBackground(new Color(34, 139, 34));
-        cartesGagnantPanel.setBounds(500, 120, 650, 350);
-        cartesGagnantPanel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(Color.YELLOW, 2),
-                "Cartes du Gagnant", 0, 0, new Font("Arial", Font.BOLD, 14), Color.YELLOW));
-        add(cartesGagnantPanel);
-
-        JButton btnMenu = new JButton("Retour au Menu");
-        btnMenu.setFont(new Font("Arial", Font.BOLD, 16));
-        btnMenu.setBounds(475, 650, 250, 50);
-        btnMenu.addActionListener(e -> parent.showPanel("MENU"));
-        add(btnMenu);
-    }
-
-    public void afficherResultats(Partie partie) {
-        scoresArea.setText("");
-        VisiteurScore calc = new CalculateurScoreStandard();
-
-        Joueur gagnant = null;
-        int scoreMax = Integer.MIN_VALUE;
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== SCORES FINAUX ===\n\n");
-
-        for (Joueur j : partie.getJoueurs()) {
-            int score = calc.calculerScore(j.getJestPerso());
-            sb.append(String.format("%-15s : %3d points\n", j.getNom(), score));
-
-            if (score > scoreMax) {
-                scoreMax = score;
-                gagnant = j;
-            }
-        }
-
-        scoresArea.setText(sb.toString());
-        lblGagnant.setText("🏆 GAGNANT: " + gagnant.getNom() + " avec " + scoreMax + " points! 🏆");
-
-        // Afficher les cartes du gagnant
-        cartesGagnantPanel.removeAll();
-        cartesGagnantPanel.setLayout(new FlowLayout());
-
-        for (Carte c : gagnant.getJestPerso().getCartes()) {
-            JLabel lblCarte = new JLabel(JeuGUI.getImageCarte(c));
-            lblCarte.setToolTipText(c.toString());
-            cartesGagnantPanel.add(lblCarte);
-        }
-
-        cartesGagnantPanel.revalidate();
-        cartesGagnantPanel.repaint();
-    }
-}package jest_package1;
-
 import java.io.Serializable;
 import java.util.*;
 
@@ -812,13 +726,6 @@ public class Jeu implements Serializable {
 
 		List<Carte> trophees = partieCourante.getTrophees();
 
-		for (int i = 0; i < trophees.size(); i++) {
-			Carte c = trophees.get(i);
-			String description = RegleStandard.getDescriptionTrophee(c);
-
-			System.out.println("\n  Trophée " + (i + 1) + ": " + c);
-			System.out.println("  ┗━━ " + description);
-		}
 		System.out.println("╚═══════════════════════════════════════╝\n");
 		System.out.println("\n╔═══════════════════════════════════════════════════════╗");
 		System.out.println("║  ℹ️  RAPPEL DES RÈGLES                                ║");
@@ -952,426 +859,6 @@ public class Jeu implements Serializable {
 	public List<Joueur> getJoueurs() {
 		return joueurs;
 	}
-}package jest_package1;
-
-import javax.swing.*;
-import java.awt.*;
-
-/**
- * Classe principale de l'interface graphique
- * À ouvrir avec Window Builder dans Eclipse
- */
-public class JeuGUI extends JFrame {
-    private JPanel contentPane;
-    private CardLayout cardLayout;
-
-    // Référence aux différents panels
-    private MenuPanel menuPanel;
-    private ConfigPanel configPanel;
-    private JeuPanel jeuPanel;
-    private FinPanel finPanel;
-
-    private Jeu jeu;
-
-    /**
-     * Launch the application - MODE GRAPHIQUE
-     */
-    public static void main(String[] args) {
-        // Vérifier si on veut le mode console
-        if (args.length > 0 && args[0].equals("--console")) {
-            // Mode console
-            Jeu.main(new String[0]);
-        } else {
-            // Mode graphique
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    try {
-                        JeuGUI frame = new JeuGUI();
-                        frame.setVisible(true);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-        }
-    }
-
-    /**
-     * Create the frame.
-     */
-    public JeuGUI() {
-        setTitle("Jeu de JEST");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 1200, 800);
-
-        cardLayout = new CardLayout();
-        contentPane = new JPanel();
-        contentPane.setLayout(cardLayout);
-        setContentPane(contentPane);
-
-        // Initialiser les panels
-        menuPanel = new MenuPanel(this);
-        configPanel = new ConfigPanel(this);
-        jeuPanel = new JeuPanel(this);
-        finPanel = new FinPanel(this);
-
-        // Ajouter les panels au CardLayout
-        contentPane.add(menuPanel, "MENU");
-        contentPane.add(configPanel, "CONFIG");
-        contentPane.add(jeuPanel, "JEU");
-        contentPane.add(finPanel, "FIN");
-
-        // Afficher le menu principal
-        showPanel("MENU");
-    }
-
-    public void showPanel(String panelName) {
-        cardLayout.show(contentPane, panelName);
-    }
-
-    public void setJeu(Jeu jeu) {
-        this.jeu = jeu;
-    }
-
-    public Jeu getJeu() {
-        return jeu;
-    }
-
-    public JeuPanel getJeuPanel() {
-        return jeuPanel;
-    }
-
-    public FinPanel getFinPanel() {
-        return finPanel;
-    }
-
-    /**
-     * Utilitaire pour charger les images des cartes
-     */
-    public static ImageIcon getImageCarte(Carte carte) {
-        String nomFichier = "";
-
-        if (carte instanceof Joker) {
-            nomFichier = "joker.png";
-        } else if (carte instanceof CarteCouleur) {
-            CarteCouleur cc = (CarteCouleur) carte;
-            String valeur = "";
-            String couleur = "";
-
-            // Valeur
-            switch (cc.getValeur()) {
-                case AS:
-                    valeur = "as";
-                    break;
-                case DEUX:
-                    valeur = "deux";
-                    break;
-                case TROIS:
-                    valeur = "trois";
-                    break;
-                case QUATRE:
-                    valeur = "quatre";
-                    break;
-            }
-
-            // Couleur
-            switch (cc.getCouleur()) {
-                case PIQUE:
-                    couleur = "pique";
-                    break;
-                case TREFLE:
-                    couleur = "trefle";
-                    break;
-                case CARREAU:
-                    couleur = "carreau";
-                    break;
-                case COEUR:
-                    couleur = "coeur";
-                    break;
-                default:
-                    couleur = "pique"; // Par défaut
-            }
-
-            nomFichier = valeur + "_" + couleur + ".png";
-        }
-
-        try {
-            // Chemin relatif depuis la racine du projet
-            ImageIcon icon = new ImageIcon("images/" + nomFichier);
-
-            // Redimensionner l'image
-            Image img = icon.getImage().getScaledInstance(80, 120, Image.SCALE_SMOOTH);
-            return new ImageIcon(img);
-        } catch (Exception e) {
-            // Si l'image n'est pas trouvée, retourner une image par défaut
-            System.err.println("Image non trouvée: " + nomFichier);
-            return createDefaultCardIcon(carte);
-        }
-    }
-
-    /**
-     * Crée une icône par défaut si l'image n'est pas trouvée
-     */
-    private static ImageIcon createDefaultCardIcon(Carte carte) {
-        JLabel label = new JLabel(carte.toString());
-        label.setPreferredSize(new Dimension(80, 120));
-        label.setOpaque(true);
-        label.setBackground(Color.WHITE);
-        label.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-        label.setHorizontalAlignment(SwingConstants.CENTER);
-        label.setFont(new Font("Arial", Font.BOLD, 14));
-
-        // Créer une image à partir du label
-        java.awt.image.BufferedImage img = new java.awt.image.BufferedImage(
-                80, 120, java.awt.image.BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2d = img.createGraphics();
-        label.paint(g2d);
-        g2d.dispose();
-
-        return new ImageIcon(img);
-    }
-}package jest_package1;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
-
-class JeuPanel extends JPanel {
-    private JeuGUI parent;
-    private Partie partie;
-    private JLabel lblManche;
-    private JLabel lblMessagePhase;
-    private JPanel tropheesPanel;
-    private JPanel cartesPanel;
-    private JPanel offresPanel;
-    private JTextArea logArea;
-    private JButton btnDistribuer;
-    private JButton btnSauvegarder;
-    private boolean mancheEnCours = false;
-
-    public JeuPanel(JeuGUI parent) {
-        this.parent = parent;
-        setBackground(new Color(0, 100, 0));
-        setLayout(new BorderLayout());
-
-        // Panel trophées en haut
-        tropheesPanel = new JPanel();
-        tropheesPanel.setBackground(new Color(0, 100, 0));
-        add(tropheesPanel, BorderLayout.NORTH);
-
-        // Panel central avec split
-        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-
-        // Panel des offres (haut)
-        offresPanel = new JPanel();
-        offresPanel.setBackground(new Color(0, 120, 0));
-        offresPanel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(Color.YELLOW, 2),
-                "Offres", 0, 0, new Font("Arial", Font.BOLD, 16), Color.YELLOW));
-        JScrollPane scrollOffres = new JScrollPane(offresPanel);
-        splitPane.setTopComponent(scrollOffres);
-
-        // Panel des cartes du joueur (bas)
-        cartesPanel = new JPanel();
-        cartesPanel.setBackground(new Color(0, 80, 0));
-        cartesPanel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(Color.YELLOW, 2),
-                "Vos cartes", 0, 0, new Font("Arial", Font.BOLD, 16), Color.YELLOW));
-        JScrollPane scrollCartes = new JScrollPane(cartesPanel);
-        splitPane.setBottomComponent(scrollCartes);
-
-        splitPane.setDividerLocation(300);
-        add(splitPane, BorderLayout.CENTER);
-
-        // Panel de droite avec log
-        JPanel rightPanel = new JPanel(new BorderLayout());
-
-        lblManche = new JLabel("Manche 1", SwingConstants.CENTER);
-        lblManche.setFont(new Font("Arial", Font.BOLD, 20));
-        lblManche.setForeground(Color.YELLOW);
-        rightPanel.add(lblManche, BorderLayout.NORTH);
-
-        // Message de phase
-        lblMessagePhase = new JLabel("", SwingConstants.CENTER);
-        lblMessagePhase.setFont(new Font("Arial", Font.BOLD, 16));
-        lblMessagePhase.setForeground(Color.WHITE);
-        rightPanel.add(lblMessagePhase, BorderLayout.NORTH);
-
-        logArea = new JTextArea(10, 30);
-        logArea.setEditable(false);
-        logArea.setFont(new Font("Monospaced", Font.PLAIN, 11));
-        JScrollPane scrollLog = new JScrollPane(logArea);
-        rightPanel.add(scrollLog, BorderLayout.CENTER);
-
-        // Boutons
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setBackground(new Color(0, 100, 0));
-
-        btnDistribuer = new JButton("Distribuer les cartes");
-        btnDistribuer.setFont(new Font("Arial", Font.BOLD, 14));
-        btnDistribuer.addActionListener(e -> distribuerEtJouer());
-        buttonPanel.add(btnDistribuer);
-
-        btnSauvegarder = new JButton("Sauvegarder");
-        btnSauvegarder.addActionListener(e -> {
-            parent.getJeu().sauvegarder();
-            JOptionPane.showMessageDialog(this, "Partie sauvegardée !");
-        });
-        buttonPanel.add(btnSauvegarder);
-
-        rightPanel.add(buttonPanel, BorderLayout.SOUTH);
-
-        add(rightPanel, BorderLayout.EAST);
-    }
-
-    public void demarrerPartie(Partie partie) {
-        this.partie = partie;
-        mancheEnCours = false;
-        afficherTrophees();
-        lblManche.setText("Manche " + partie.getNumeroManche());
-        lblMessagePhase.setText("Prêt à commencer ?");
-        logArea.setText("=== Nouvelle Partie ===\nCliquez sur 'Distribuer les cartes' pour débuter.\n");
-        cartesPanel.removeAll();
-        offresPanel.removeAll();
-        cartesPanel.revalidate();
-        offresPanel.revalidate();
-        btnDistribuer.setEnabled(true);
-        btnDistribuer.setText("Distribuer les cartes");
-    }
-
-    public void chargerPartie() {
-        this.partie = Partie.getInstance();
-        mancheEnCours = false;
-        afficherTrophees();
-        lblManche.setText("Manche " + partie.getNumeroManche());
-        lblMessagePhase.setText("Partie chargée");
-    }
-
-    private void afficherTrophees() {
-        tropheesPanel.removeAll();
-        JLabel lbl = new JLabel("🏆 Trophées: ");
-        lbl.setForeground(Color.YELLOW);
-        lbl.setFont(new Font("Arial", Font.BOLD, 16));
-        tropheesPanel.add(lbl);
-
-        for (Carte t : partie.getTrophees()) {
-            JLabel lblCarte = new JLabel(JeuGUI.getImageCarte(t));
-            lblCarte.setToolTipText(t.toString());
-            tropheesPanel.add(lblCarte);
-        }
-        tropheesPanel.revalidate();
-        tropheesPanel.repaint();
-    }
-
-    private void distribuerEtJouer() {
-        if (!mancheEnCours) {
-            // Première étape: distribuer les cartes
-            logArea.append("\n>>> Distribution des cartes...\n");
-            partie.distribuerCartes();
-
-            for (Joueur j : partie.getJoueurs()) {
-                logArea.append(j.getNom() + ": " + j.getJest().getCartes().size() + " cartes\n");
-            }
-
-            btnDistribuer.setEnabled(false);
-            mancheEnCours = true;
-            lblMessagePhase.setText("Cartes distribuées. Création des offres en cours...");
-
-            // Attendre un peu avant de créer les offres
-            Timer timer = new Timer(1000, e -> creerOffresAutomatiquement());
-            timer.setRepeats(false);
-            timer.start();
-        }
-    }
-
-    private void creerOffresAutomatiquement() {
-        logArea.append("\n>>> Création des offres...\n");
-        partie.creerOffres();
-        afficherOffresTousLesJoueurs();
-        lblMessagePhase.setText("Offres créées !");
-        logArea.append("Offres créées. Jeu en cours...\n");
-
-        // Attendre avant de commencer les tours
-        Timer timer = new Timer(2000, e -> jouerManches());
-        timer.setRepeats(false);
-        timer.start();
-    }
-
-    private void afficherOffresTousLesJoueurs() {
-        offresPanel.removeAll();
-        offresPanel.setLayout(new FlowLayout());
-
-        List<Joueur> joueurs = partie.getJoueurs();
-        for (Joueur j : joueurs) {
-            Offre offre = j.getOffreCourante();
-
-            JPanel offrePanel = new JPanel();
-            offrePanel.setLayout(new BoxLayout(offrePanel, BoxLayout.Y_AXIS));
-            offrePanel.setBackground(Color.WHITE);
-            offrePanel.setBorder(BorderFactory.createTitledBorder(
-                    BorderFactory.createLineBorder(Color.BLACK, 2), j.getNom()));
-
-            JLabel lblVisible = new JLabel(JeuGUI.getImageCarte(offre.getCarteVisible()));
-            lblVisible.setAlignmentX(Component.CENTER_ALIGNMENT);
-            offrePanel.add(new JLabel("Visible:"));
-            offrePanel.add(lblVisible);
-
-            if (offre.getCarteCachee().estVisible()) {
-                JLabel lblCachee = new JLabel(JeuGUI.getImageCarte(offre.getCarteCachee()));
-                lblCachee.setAlignmentX(Component.CENTER_ALIGNMENT);
-                offrePanel.add(new JLabel("Carte 2:"));
-                offrePanel.add(lblCachee);
-            } else {
-                JLabel lblCachee = new JLabel("❓");
-                lblCachee.setFont(new Font("Arial", Font.BOLD, 60));
-                lblCachee.setAlignmentX(Component.CENTER_ALIGNMENT);
-                offrePanel.add(new JLabel("Cachée:"));
-                offrePanel.add(lblCachee);
-            }
-
-            offresPanel.add(offrePanel);
-        }
-
-        offresPanel.revalidate();
-        offresPanel.repaint();
-    }
-
-    private void jouerManches() {
-        // Jouer les tours jusqu'à fin de manche
-        while (!partie.verifierFinManche()) {
-            logArea.append("\n>>> Tour en cours...\n");
-            partie.resoudreTour();
-            afficherOffresTousLesJoueurs();
-
-            // Petit délai pour voir les changements
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        // Fin de la manche
-        logArea.append("\n=== Fin de la manche ===\n");
-        afficherTrophees();
-
-        if (partie.verifierFinJeu()) {
-            logArea.append("=== FIN DU JEU ===\n");
-            partie.terminerPartie();
-            mancheEnCours = false;
-            parent.getFinPanel().afficherResultats(partie);
-
-            Timer timer = new Timer(2000, e -> parent.showPanel("FIN"));
-            timer.setRepeats(false);
-            timer.start();
-        } else {
-            lblManche.setText("Manche " + partie.getNumeroManche());
-            lblMessagePhase.setText("Manche suivante - Cliquez sur 'Distribuer les cartes'");
-            btnDistribuer.setEnabled(true);
-            btnDistribuer.setText("Manche " + partie.getNumeroManche());
-            mancheEnCours = false;
-        }
-    }
 }package jest_package1;
 
 public class Joker extends Carte {
@@ -1807,180 +1294,6 @@ public class JoueurVirtuel extends Joueur {
     }
 }package jest_package1;
 
-import javax.swing.*;
-import java.awt.*;
-
-class MenuPanel extends JPanel {
-    private JeuGUI parent;
-
-    public MenuPanel(JeuGUI parent) {
-        this.parent = parent;
-        setBackground(new Color(34, 139, 34));
-        setLayout(null);
-
-        JLabel lblTitre = new JLabel("JEU DE JEST");
-        lblTitre.setForeground(Color.WHITE);
-        lblTitre.setFont(new Font("Arial", Font.BOLD, 48));
-        lblTitre.setBounds(400, 100, 400, 80);
-        add(lblTitre);
-
-        JButton btnNouvelle = new JButton("Nouvelle Partie");
-        btnNouvelle.setFont(new Font("Arial", Font.BOLD, 16));
-        btnNouvelle.setBounds(475, 250, 250, 50);
-        btnNouvelle.addActionListener(e -> {
-            parent.setJeu(new Jeu());
-            parent.showPanel("CONFIG");
-        });
-        add(btnNouvelle);
-
-        JButton btnCharger = new JButton("Charger une Partie");
-        btnCharger.setFont(new Font("Arial", Font.BOLD, 16));
-        btnCharger.setBounds(475, 320, 250, 50);
-        btnCharger.addActionListener(e -> chargerPartie());
-        add(btnCharger);
-
-        JButton btnQuitter = new JButton("Quitter");
-        btnQuitter.setFont(new Font("Arial", Font.BOLD, 16));
-        btnQuitter.setBounds(475, 390, 250, 50);
-        btnQuitter.addActionListener(e -> System.exit(0));
-        add(btnQuitter);
-    }
-
-    private void chargerPartie() {
-        Jeu jeu = Jeu.charger("sauvegarde_jeu.dat");
-        if (jeu != null) {
-            parent.setJeu(jeu);
-            parent.showPanel("JEU");
-            parent.getJeuPanel().chargerPartie();
-        } else {
-            JOptionPane.showMessageDialog(this, "Erreur lors du chargement");
-        }
-    }
-}
-
-// ============================================================
-// CONFIG PANEL
-// ============================================================
-class ConfigPanel extends JPanel {
-    private JeuGUI parent;
-    private JSpinner spinnerJoueurs;
-    private JTextField[] champsNoms;
-    private JComboBox<String> comboVariante;
-    private JCheckBox checkExtension;
-
-    public ConfigPanel(JeuGUI parent) {
-        this.parent = parent;
-        setBackground(Color.WHITE);
-        setLayout(null);
-
-        JLabel lblTitre = new JLabel("Configuration de la Partie");
-        lblTitre.setFont(new Font("Arial", Font.BOLD, 24));
-        lblTitre.setBounds(400, 30, 400, 40);
-        add(lblTitre);
-
-        JLabel lblNbJoueurs = new JLabel("Nombre de joueurs humains:");
-        lblNbJoueurs.setBounds(300, 100, 250, 25);
-        add(lblNbJoueurs);
-
-        spinnerJoueurs = new JSpinner(new SpinnerNumberModel(1, 1, 4, 1));
-        spinnerJoueurs.setBounds(550, 100, 100, 25);
-        add(spinnerJoueurs);
-
-        // Champs pour les noms
-        champsNoms = new JTextField[4];
-        for (int i = 0; i < 4; i++) {
-            JLabel lbl = new JLabel("Joueur " + (i + 1) + ":");
-            lbl.setBounds(300, 150 + i * 40, 100, 25);
-            add(lbl);
-
-            champsNoms[i] = new JTextField();
-            champsNoms[i].setBounds(400, 150 + i * 40, 250, 25);
-            champsNoms[i].setEnabled(i == 0);
-            add(champsNoms[i]);
-        }
-
-        spinnerJoueurs.addChangeListener(e -> {
-            int nb = (Integer) spinnerJoueurs.getValue();
-            for (int i = 0; i < 4; i++) {
-                champsNoms[i].setEnabled(i < nb);
-            }
-        });
-
-        JLabel lblVariante = new JLabel("Variante:");
-        lblVariante.setBounds(300, 330, 100, 25);
-        add(lblVariante);
-
-        comboVariante = new JComboBox<>(new String[] {
-                "Standard", "Rapide (3 manches)", "Stratégique (offres visibles)"
-        });
-        comboVariante.setBounds(400, 330, 250, 25);
-        add(comboVariante);
-
-        checkExtension = new JCheckBox("Activer l'extension (Nouvelles Cartes)");
-        checkExtension.setBounds(300, 380, 350, 25);
-        add(checkExtension);
-
-        JButton btnDemarrer = new JButton("Démarrer la Partie");
-        btnDemarrer.setFont(new Font("Arial", Font.BOLD, 16));
-        btnDemarrer.setBounds(475, 450, 250, 50);
-        btnDemarrer.addActionListener(e -> demarrerPartie());
-        add(btnDemarrer);
-    }
-
-    private void demarrerPartie() {
-        int nbJoueursHumains = (Integer) spinnerJoueurs.getValue();
-        Jeu jeu = parent.getJeu();
-
-        // Ajouter joueurs humains
-        for (int i = 0; i < nbJoueursHumains; i++) {
-            String nom = champsNoms[i].getText().trim();
-            if (nom.isEmpty())
-                nom = "Joueur" + (i + 1);
-            jeu.ajouterJoueur(new JoueurHumain(nom));
-        }
-
-        // Ajouter bots
-        int nbBots = Math.max(0, 3 - nbJoueursHumains);
-        String[] nomsBots = { "Alpha", "Beta", "Gamma", "Delta" };
-        Strategie[] strategies = {
-                new StrategieOffensive(),
-                new StrategieDefensive(),
-                new StrategieAleatoire()
-        };
-
-        for (int i = 0; i < nbBots; i++) {
-            JoueurVirtuel bot = new JoueurVirtuel("Bot_" + nomsBots[i]);
-            bot.setStrategie(strategies[i % strategies.length]);
-            jeu.ajouterJoueur(bot);
-        }
-
-        // Règle
-        RegleJeu regle;
-        switch (comboVariante.getSelectedIndex()) {
-            case 1:
-                regle = new VarianteRapide();
-                break;
-            case 2:
-                regle = new RegleStrategique();
-                break;
-            default:
-                regle = new RegleStandard();
-        }
-        jeu.choisirRegle(regle);
-
-        boolean avecExtension = checkExtension.isSelected();
-
-        // Initialiser partie
-        Partie.reinitialiser();
-        Partie partie = Partie.getInstance();
-        partie.setJeuReference(jeu);
-        partie.initialiser(jeu.getJoueurs(), regle, avecExtension);
-
-        parent.getJeuPanel().demarrerPartie(partie);
-        parent.showPanel("JEU");
-    }
-}package jest_package1;
-
 import java.io.Serializable;
 
 /**
@@ -2081,7 +1394,8 @@ import java.util.*;
 
 /**
  * Classe Partie implémentant le patron Singleton. Gère le déroulement d'une
- * partie de Jest.
+ * partie de Jest. Implémente aussi le pattern Observer pour notifier les vues
+ * des changements d'état.
  */
 public class Partie implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -2096,11 +1410,17 @@ public class Partie implements Serializable {
 	private transient Jeu jeuReference;
 	private boolean mancheEnCours;
 
+	// Pattern Observer - liste des vues observatrices
+
 	/**
 	 * Constructeur privé pour le pattern Singleton
 	 */
-	private Partie() {
+	protected Partie() {
 		this.numeroManche = 0;
+	}
+
+	public List<Offre> getOffresActuelles() {
+		return offresActuelles;
 	}
 
 	/**
@@ -2245,7 +1565,7 @@ public class Partie implements Serializable {
 		System.out.println("\n=== Création des offres ===");
 
 		boolean offresVisibles = regleJeu.sontOffresVisibles();
-		
+
 		// Boucle: chaque joueur propose ses 2 cartes (1 visible, 1 cachée)
 		for (Joueur j : joueurs) {
 			Offre offre = j.faireOffre(offresVisibles);
@@ -2344,7 +1664,7 @@ public class Partie implements Serializable {
 	 * - Joker = valeur 0 Boucle: compare chaque joueur pour trouver celui avec la
 	 * meilleure carte
 	 */
-	private Joueur determinerPremierJoueur() {
+	public Joueur determinerPremierJoueur() {
 		Joueur premier = joueurs.get(0);
 		int valeurMax = getValeurCarteVisible(premier);
 		Couleur couleurMax = getCouleurCarteVisible(premier);
@@ -2672,6 +1992,10 @@ public class Partie implements Serializable {
 	public List<Joueur> getJoueurs() {
 		return joueurs;
 	}
+
+	public RegleJeu getRegleJeu() {
+		return regleJeu;
+	}
 }package jest_package1;
 
 import java.io.Serializable;
@@ -2773,10 +2097,11 @@ public interface RegleJeu extends Serializable {
 	Joueur determinerGagnantTrophee(List<Joueur> joueurs, Carte trophee);
 
 	void appliquerReglesSpeciales(Jeu jeu);
-	
+
 	Offre creerOffre(Joueur joueur, Carte carteCachee, Carte carteVisible);
-	
-	// va permettre de changer les règles du jeu si la variante stratégique est choisie
+
+	// va permettre de changer les règles du jeu si la variante stratégique est
+	// choisie
 	boolean sontOffresVisibles();
 }package jest_package1;
 
@@ -3351,7 +2676,6 @@ public class RegleStrategique implements RegleJeu {
 
     @Override
     public boolean sontOffresVisibles() {
-        // TODO Auto-generated method stub
         return true; // variante où toutes les cartes des offres sont visibles
     }
 
