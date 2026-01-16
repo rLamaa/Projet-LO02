@@ -8,7 +8,8 @@ import java.util.List;
 public class JoueurVirtuel extends Joueur {
     private static final long serialVersionUID = 1L;
     private Strategie strategie;
-
+    private transient Partie partieReference;
+    
     public JoueurVirtuel(String nom) {
         super(nom);
         // Stratégie par défaut: offensive
@@ -33,14 +34,17 @@ public class JoueurVirtuel extends Joueur {
         if(offresVisibles) {
         	// Variante stratégique : pas de stratégie pour les bot car les deux cartes sont visibles
         	this.offreCourante = new Offre(c1, c2, this);
-        	System.out.println("[" + nom + "] (Bot) Offre créée - Carte 1 : " + c1 + " | Carte 2 : " + c2);
+        	String message = "[" + nom + "] (Bot) Offre créée - Carte 1 : " + c1 + " | Carte 2 : " + c2;
+            System.out.println(message);
+            logToGUI(message);
         } else {
         	// Jeu standard : Utiliser la stratégie pour choisir quelle carte cacher
             Offre offre = strategie.choisirCartesOffre(c1, c2);
             this.offreCourante = new Offre(offre.getCarteCachee(), offre.getCarteVisible(), this);
 
-            System.out.println("[" + nom + "] (Bot) Offre créée - Visible: " +
-                    this.offreCourante.getCarteVisible());
+            String message = "[" + nom + "] (Bot) Offre créée - Visible: " + this.offreCourante.getCarteVisible();
+            System.out.println(message);
+            logToGUI(message);
 
         }
         
@@ -65,12 +69,48 @@ public class JoueurVirtuel extends Joueur {
         ChoixCarte choix = strategie.choisirCarte(offresDisponibles, jest);
 
         if (choix != null) {
-            System.out.println("[" + nom + "] (Bot) choisit la carte " +
+        	String message = "[" + nom + "] (Bot) choisit la carte " +
                     choix.getCarte() + " de l'offre de " +
-                    choix.getOffre().getProprietaire().getNom());
+                    choix.getOffre().getProprietaire().getNom();
+            System.out.println(message);
+            logToGUI(message);
         }
 
         return choix;
+    }
+    
+    /**
+     * Envoie un message au log de la GUI si disponible
+     */
+    private void logToGUI(String message) {
+        try {
+            // Récupérer la partie via réflexion pour accéder à l'interface
+            if (partieReference != null) {
+                java.lang.reflect.Field field = Partie.class.getDeclaredField("jeuReference");
+                field.setAccessible(true);
+                Jeu jeu = (Jeu) field.get(partieReference);
+                
+                if (jeu != null) {
+                    java.lang.reflect.Field guiField = Jeu.class.getDeclaredField("interfaceGraphique");
+                    guiField.setAccessible(true);
+                    Object gui = guiField.get(jeu);
+                    
+                    if (gui != null) {
+                        java.lang.reflect.Method method = gui.getClass().getMethod("ajouterLog", String.class);
+                        method.invoke(gui, message);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Silencieux si la GUI n'est pas disponible
+        }
+    }
+    
+    /**
+     * Définit la référence à la partie (appelé par Partie)
+     */
+    public void setPartieReference(Partie partie) {
+        this.partieReference = partie;
     }
 
     /**

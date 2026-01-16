@@ -514,51 +514,41 @@ public class Jeu implements Serializable {
 
 		// Déterminer si c'est la variante stratégique
 		boolean offresVisibles = false;
-		if (partieCourante != null) {
-			List<Offre> offresActuelles = partieCourante.getOffresActuelles();
-			if (offresActuelles != null && !offresActuelles.isEmpty()) {
-				Offre premiere = offresActuelles.get(0);
-				if (premiere.getCarteCachee() != null) {
-					offresVisibles = premiere.getCarteCachee().estVisible();
-				}
-			}
-		}
+		if (partieCourante != null && partieCourante.getRegleJeu() != null) {
+	        offresVisibles = partieCourante.getRegleJeu().sontOffresVisibles();
+	    }
 
 		Carte carteCachee, carteVisible;
 
 		if (offresVisibles) {
 			// Mode stratégique : afficher les deux cartes
 			if (avecGUI && interfaceGraphique != null) {
-				int choix = JOptionPane.showConfirmDialog(
-						interfaceGraphique.getFrame(),
-						"Mode Stratégique : Vos deux cartes seront visibles\n" +
-								"Carte 1 : " + cartes.get(0) + "\n" +
-								"Carte 2 : " + cartes.get(1) + "\n\n" +
-								"Créer cette offre ?",
-						"Offre - Variante Stratégique",
-						JOptionPane.YES_NO_OPTION);
-				if (choix != JOptionPane.YES_OPTION)
-					return null;
+				JOptionPane.showMessageDialog(interfaceGraphique.getFrame(),
+		                "Mode Stratégique : Vos deux cartes sont visibles \n" +
+		                "Carte 1 : " + cartes.get(0) + "\nCarte 2 : " + cartes.get(1),
+		                "Offre Créée pour " + joueur.getNom(),
+		                JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				System.out.println("\n=== Création d'offre (Mode Stratégique) ===");
-				System.out.println("Vos deux cartes seront visibles :");
+				System.out.println("Mode Stratégique : Vos deux cartes sont visibles :");
 				System.out.println("  1. " + cartes.get(0));
 				System.out.println("  2. " + cartes.get(1));
-				System.out.print("Créer cette offre ? (o/n): ");
-				String rep = scanner.nextLine().trim().toLowerCase();
-				if (!rep.equals("o") && !rep.equals("oui"))
-					return null;
 			}
 			carteCachee = cartes.get(0);
 			carteVisible = cartes.get(1);
+			// Les deux cartes sont visibles en mode stratégique
+	        carteCachee.setVisible(true);
+	        carteVisible.setVisible(true);
 		} else {
 			// Mode standard : choisir la carte à cacher
-			int indexCachee = choisirIndiceCarte(cartes, "Quelle carte voulez-vous CACHER ?");
+			int indexCachee = choisirIndiceCarte(cartes, "Quelle carte voulez-vous cacher " + joueur.getNom() + " ?");
 			if (indexCachee < 0)
 				return null;
 
 			carteCachee = cartes.get(indexCachee);
 			carteVisible = cartes.get(1 - indexCachee);
+			// Définir la visibilité
+	        carteCachee.setVisible(false);
+	        carteVisible.setVisible(true);
 		}
 
 		// Retirer les cartes du jest
@@ -568,8 +558,12 @@ public class Jeu implements Serializable {
 		// Créer et retourner l'offre
 		Offre offre = new Offre(carteCachee, carteVisible, joueur);
 
-		String message = "[" + joueur.getNom() + "] Offre créée - Visible: " +
-				carteVisible + " | Cachée: " + (offresVisibles ? carteCachee : "[?]");
+		String message = "[" + joueur.getNom() + "] Offre créée - ";
+	    if (offresVisibles) {
+	        message += "Carte 1: " + carteVisible + " | Carte 2: " + carteCachee + " (toutes visibles)";
+	    } else {
+	        message += "Visible: " + carteVisible + " | Cachée: [?]";
+	    }
 
 		if (avecGUI && interfaceGraphique != null) {
 			interfaceGraphique.ajouterLog(message);
@@ -686,7 +680,7 @@ public class Jeu implements Serializable {
 			String choix = (String) JOptionPane.showInputDialog(
 					interfaceGraphique.getFrame(),
 					"Choisissez une offre :",
-					"Sélection d'offre",
+					"Sélection d'offre - " + joueur.getNom(),
 					JOptionPane.QUESTION_MESSAGE,
 					null,
 					options,
@@ -739,7 +733,7 @@ public class Jeu implements Serializable {
 			String choix = (String) JOptionPane.showInputDialog(
 					interfaceGraphique.getFrame(),
 					"Quelle carte voulez-vous prendre ?",
-					"Choix de carte",
+					"Choix de carte - " + joueur.getNom(),
 					JOptionPane.QUESTION_MESSAGE,
 					null,
 					choixCartes,

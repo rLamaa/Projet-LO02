@@ -68,6 +68,7 @@ public class Partie extends Observable implements Serializable {
 				joueur = new JoueurHumain(p.getNom());
 			} else if (p instanceof JoueurVirtuel) {
 				joueur = new JoueurVirtuel(p.getNom());
+				((JoueurVirtuel) joueur).setPartieReference(this);
 			}
 			joueursInitialises.add(joueur);
 		}
@@ -320,41 +321,86 @@ public class Partie extends Observable implements Serializable {
 		notifierChangement();
 	}
 
-	/**
-	 * Détermine le premier joueur selon les règles : - Celui avec la carte visible
-	 * de plus grande valeur - En cas d'égalité, celui avec la couleur la plus forte
-	 * - Joker = valeur 0 Boucle: compare chaque joueur pour trouver celui avec la
-	 * meilleure carte
-	 */
 	private Joueur determinerPremierJoueur() {
-		Joueur premier = joueurs.get(0);
-		int valeurMax = getValeurCarteVisible(premier);
-		Couleur couleurMax = getCouleurCarteVisible(premier);
 
-		// Boucle: parcourt tous les joueurs pour trouver celui avec la carte la plus
-		// forte
-		for (int i = 1; i < joueurs.size(); i++) {
-			Joueur joueur = joueurs.get(i);
-			int valeur = getValeurCarteVisible(joueur);
-			Couleur couleur = getCouleurCarteVisible(joueur);
+	    Joueur premier = null;
+	    int valeurMax = Integer.MIN_VALUE;
+	    Couleur couleurMax = null;
 
-			// Condition: si la valeur est supérieure, ce joueur devient le premier
-			if (valeur > valeurMax) {
-				valeurMax = valeur;
-				couleurMax = couleur;
-				premier = joueur;
-			} else if (valeur == valeurMax && couleur != null && couleurMax != null) {
-				// En cas d'égalité, comparer les couleurs (Pique > Trèfle > Carreau > Coeur)
-				if (couleur.getForce() > couleurMax.getForce()) {
-					couleurMax = couleur;
-					premier = joueur;
-				}
-			}
-		}
+	    // Trouver la première offre valide pour initialiser
+	    for (Joueur j : joueurs) {
+	        Offre offre = trouverOffreDeJoueur(j);
+	        if (offre != null && offre.estComplete()) {
+	            premier = j;
 
-		System.out.println("[DEBUG] Premier joueur: " + premier.getNom());
-		return premier;
+	            // Variante stratégique : 2 cartes visibles
+	            if (offre.getCarteCachee().estVisible()) {
+	                Carte v = offre.getCarteVisible();
+	                Carte c = offre.getCarteCachee();
+
+	                Carte meilleure = (c.getValeurNumerique() > v.getValeurNumerique()
+	                        || (c.getValeurNumerique() == v.getValeurNumerique()
+	                        && c.getCouleur().getForce() > v.getCouleur().getForce()))
+	                        ? c : v;
+
+	                valeurMax = meilleure.getValeurNumerique();
+	                couleurMax = meilleure.getCouleur();
+	            }
+	            // Variante normale
+	            else {
+	                Carte visible = offre.getCarteVisible();
+	                valeurMax = visible.getValeurNumerique();
+	                couleurMax = visible.getCouleur();
+	            }
+	            break;
+	        }
+	    }
+
+	    if (premier == null) {
+	        throw new IllegalStateException("Impossible de déterminer le premier joueur : aucune offre valide");
+	    }
+
+	    // Comparer avec les autres joueurs
+	    for (Joueur j : joueurs) {
+	        Offre offre = trouverOffreDeJoueur(j);
+	        if (offre == null || !offre.estComplete()) continue;
+
+	        int valeur;
+	        Couleur couleur;
+
+	        if (offre.getCarteCachee().estVisible()) {
+	            Carte v = offre.getCarteVisible();
+	            Carte c = offre.getCarteCachee();
+
+	            Carte meilleure = (c.getValeurNumerique() > v.getValeurNumerique()
+	                    || (c.getValeurNumerique() == v.getValeurNumerique()
+	                    && c.getCouleur().getForce() > v.getCouleur().getForce()))
+	                    ? c : v;
+
+	            valeur = meilleure.getValeurNumerique();
+	            couleur = meilleure.getCouleur();
+	        } else {
+	            Carte visible = offre.getCarteVisible();
+	            valeur = visible.getValeurNumerique();
+	            couleur = visible.getCouleur();
+	        }
+
+	        if (valeur > valeurMax
+	                || (valeur == valeurMax && couleur.getForce() > couleurMax.getForce())) {
+	            valeurMax = valeur;
+	            couleurMax = couleur;
+	            premier = j;
+	        }
+	    }
+
+	    System.out.println("[DEBUG] Premier joueur: " + premier.getNom());
+	    return premier;
 	}
+
+
+
+
+
 
 	/**
 	 * Détermine le prochain joueur selon les règles : - C'est le propriétaire de
@@ -676,5 +722,9 @@ public class Partie extends Observable implements Serializable {
 
 	public List<Joueur> getJoueurs() {
 		return joueurs;
+	}
+	
+	public RegleJeu getRegleJeu() {
+	    return regleJeu;
 	}
 }

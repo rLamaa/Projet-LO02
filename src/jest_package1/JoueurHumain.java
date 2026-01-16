@@ -148,7 +148,7 @@ public class JoueurHumain extends Joueur {
 					
 		if (offresVisibles) {
 			// Variante stratégique, pas besoin de choisir quelle carte est cachée et l'autre visible : les deux visibles
-			System.out.println("\\n[" + this.nom + "] Mode Stratégique : Les cartes sont toutes visibles donc vous n'avez pas à créer d'offre");
+			System.out.println("\n[" + this.nom + "] Mode Stratégique : Les cartes sont toutes visibles donc vous n'avez pas à créer d'offre");
 			System.out.println("  Carte 1 : " + c1);
 			System.out.println("  Carte 2 : " + c2);
 			
