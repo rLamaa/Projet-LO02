@@ -3,12 +3,14 @@ package jest_package1;
 import java.util.*;
 
 /**
- * Implémentation des règles standard du jeu Jest
+ * Classe implémentant les règles standard du jeu Jest.
+ * Gère le calcul des scores, l'ordre de jeu et l'attribution des trophées.
+ * 
+ * @author LO02 Project Team
+ * @version 1.0
  */
 public class RegleStandard implements RegleJeu {
 	private static final long serialVersionUID = 1L;
-	
-	
 
 	@Override
 	public boolean sontOffresVisibles() {
@@ -26,7 +28,7 @@ public class RegleStandard implements RegleJeu {
 	public boolean verifierConditionTrophee(Jest jest, Carte trophee) {
 		return true;
 	}
-	
+
 	public Offre creerOffre(Joueur joueur, Carte carteCachee, Carte carteVisible) {
 		carteVisible.setVisible(true);
 		carteCachee.setVisible(false);
@@ -98,7 +100,7 @@ public class RegleStandard implements RegleJeu {
 				} else if (valeur == Valeur.TROIS) {
 					return "📊 Le MOINS de Carreaux ♦";
 				}
-					
+
 			}
 
 			// PIQUES
@@ -124,7 +126,7 @@ public class RegleStandard implements RegleJeu {
 					return "📊 Le MOINS de Cœurs ♥";
 				} else if (valeur == Valeur.TROIS) {
 					return "📊 Le plus de Cœurs ♥";
-				} 
+				}
 			}
 			// ETOILES
 			if (couleur == Couleur.ETOILE) {
@@ -136,7 +138,7 @@ public class RegleStandard implements RegleJeu {
 					return "📊 Le MOINS de Piques ♠";
 				} else if (valeur == Valeur.TROIS) {
 					return "📊 Le plus de Trèfles ♣";
-				} 
+				}
 			}
 			// TRIANGLES
 			if (couleur == Couleur.TRIANGLE) {
@@ -148,7 +150,7 @@ public class RegleStandard implements RegleJeu {
 					return "📊 Le plus de cartes 2";
 				} else if (valeur == Valeur.TROIS) {
 					return "⭐ Meilleur Jest SANS Joker";
-				} 
+				}
 			}
 			// SOLEILS
 			if (couleur == Couleur.SOLEIL) {
@@ -160,7 +162,7 @@ public class RegleStandard implements RegleJeu {
 					return "⭐ Meilleur Jest SANS Joker";
 				} else if (valeur == Valeur.TROIS) {
 					return "📊 Le plus de Piques ♠";
-				} 
+				}
 			}
 		}
 
@@ -269,7 +271,7 @@ public class RegleStandard implements RegleJeu {
 					// 3☼ → Le plus de Piques ♠
 					return determinerMajoriteCouleur(joueurs, Couleur.PIQUE);
 				}
-			}	
+			}
 			// TRIANGLES
 			if (couleur == Couleur.TRIANGLE) {
 				if (valeur == Valeur.QUATRE) {
@@ -285,7 +287,7 @@ public class RegleStandard implements RegleJeu {
 					// 3▲ → Meilleur Jest SANS Joker
 					return determinerMeilleurJest(joueurs, true);
 				}
-			}			
+			}
 		}
 
 		return null;

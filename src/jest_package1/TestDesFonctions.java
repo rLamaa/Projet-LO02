@@ -1,7 +1,19 @@
 package jest_package1;
 
+/**
+ * Classe de test pour vérifier le bon fonctionnement des composants du jeu.
+ * Classe utilitaire pour les tests unitaires et de fonctionnalités.
+ * 
+ * @author LO02 Project Team
+ * @version 1.0
+ */
 public class TestDesFonctions {
 
+	/**
+	 * Méthode main pour exécuter les tests.
+	 * 
+	 * @param args arguments de la ligne de commande (non utilisés)
+	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Carte c1 = new CarteCouleur(Couleur.PIQUE, Valeur.TROIS);

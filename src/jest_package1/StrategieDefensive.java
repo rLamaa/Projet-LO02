@@ -2,6 +2,15 @@ package jest_package1;
 
 import java.util.List;
 
+/**
+ * Stratégie de jeu défensive pour les joueurs virtuels.
+ * Le bot évite les cartes dangereuses et choisit les cartes cachées pour
+ * limiter les risques.
+ * Cache ses meilleures cartes pour piéger les adversaires.
+ * 
+ * @author LO02 Project Team
+ * @version 1.0
+ */
 public class StrategieDefensive implements Strategie {
     private static final long serialVersionUID = 1L;
 
@@ -68,7 +77,7 @@ public class StrategieDefensive implements Strategie {
                 case TRIANGLE:
                     return -valeur; // Pas dangereux (valeur négative = bon)
                 case ETOILE:
-                	return -valeur * 2; // Pas dangereux du tout
+                    return -valeur * 2; // Pas dangereux du tout
             }
         }
         return 0;

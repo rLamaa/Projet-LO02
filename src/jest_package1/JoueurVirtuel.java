@@ -3,13 +3,18 @@ package jest_package1;
 import java.util.List;
 
 /**
- * Joueur virtuel utilisant une stratégie pour prendre ses décisions
+ * Classe représentant un joueur virtuel (bot) du jeu de Jest.
+ * Utilise une stratégie pour automatiser les décisions de jeu.
+ * Permet à plusieurs bots avec différentes stratégies de jouer ensemble.
+ * 
+ * @author LO02 Project Team
+ * @version 1.0
  */
 public class JoueurVirtuel extends Joueur {
     private static final long serialVersionUID = 1L;
     private Strategie strategie;
     private transient Partie partieReference;
-    
+
     public JoueurVirtuel(String nom) {
         super(nom);
         // Stratégie par défaut: offensive
@@ -30,15 +35,16 @@ public class JoueurVirtuel extends Joueur {
 
         Carte c1 = cartes.remove(0);
         Carte c2 = cartes.remove(0);
-        
-        if(offresVisibles) {
-        	// Variante stratégique : pas de stratégie pour les bot car les deux cartes sont visibles
-        	this.offreCourante = new Offre(c1, c2, this);
-        	String message = "[" + nom + "] (Bot) Offre créée - Carte 1 : " + c1 + " | Carte 2 : " + c2;
+
+        if (offresVisibles) {
+            // Variante stratégique : pas de stratégie pour les bot car les deux cartes sont
+            // visibles
+            this.offreCourante = new Offre(c1, c2, this);
+            String message = "[" + nom + "] (Bot) Offre créée - Carte 1 : " + c1 + " | Carte 2 : " + c2;
             System.out.println(message);
             logToGUI(message);
         } else {
-        	// Jeu standard : Utiliser la stratégie pour choisir quelle carte cacher
+            // Jeu standard : Utiliser la stratégie pour choisir quelle carte cacher
             Offre offre = strategie.choisirCartesOffre(c1, c2);
             this.offreCourante = new Offre(offre.getCarteCachee(), offre.getCarteVisible(), this);
 
@@ -47,7 +53,7 @@ public class JoueurVirtuel extends Joueur {
             logToGUI(message);
 
         }
-        
+
         return this.offreCourante;
     }
 
@@ -69,7 +75,7 @@ public class JoueurVirtuel extends Joueur {
         ChoixCarte choix = strategie.choisirCarte(offresDisponibles, jest);
 
         if (choix != null) {
-        	String message = "[" + nom + "] (Bot) choisit la carte " +
+            String message = "[" + nom + "] (Bot) choisit la carte " +
                     choix.getCarte() + " de l'offre de " +
                     choix.getOffre().getProprietaire().getNom();
             System.out.println(message);
@@ -78,7 +84,7 @@ public class JoueurVirtuel extends Joueur {
 
         return choix;
     }
-    
+
     /**
      * Envoie un message au log de la GUI si disponible
      */
@@ -89,12 +95,12 @@ public class JoueurVirtuel extends Joueur {
                 java.lang.reflect.Field field = Partie.class.getDeclaredField("jeuReference");
                 field.setAccessible(true);
                 Jeu jeu = (Jeu) field.get(partieReference);
-                
+
                 if (jeu != null) {
                     java.lang.reflect.Field guiField = Jeu.class.getDeclaredField("interfaceGraphique");
                     guiField.setAccessible(true);
                     Object gui = guiField.get(jeu);
-                    
+
                     if (gui != null) {
                         java.lang.reflect.Method method = gui.getClass().getMethod("ajouterLog", String.class);
                         method.invoke(gui, message);
@@ -105,7 +111,7 @@ public class JoueurVirtuel extends Joueur {
             // Silencieux si la GUI n'est pas disponible
         }
     }
-    
+
     /**
      * Définit la référence à la partie (appelé par Partie)
      */

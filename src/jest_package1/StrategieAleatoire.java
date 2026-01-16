@@ -3,6 +3,14 @@ package jest_package1;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Stratégie de jeu aléatoire pour les joueurs virtuels.
+ * Le bot prend des décisions complètement aléatoires.
+ * Utile pour le test et pour offrir une certaine imprévisibilité.
+ * 
+ * @author LO02 Project Team
+ * @version 1.0
+ */
 public class StrategieAleatoire implements Strategie {
     private static final long serialVersionUID = 1L;
     private Random random = new Random();

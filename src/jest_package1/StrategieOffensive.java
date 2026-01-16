@@ -2,6 +2,14 @@ package jest_package1;
 
 import java.util.List;
 
+/**
+ * Stratégie de jeu offensive pour les joueurs virtuels.
+ * Le bot cherche à prendre les cartes les plus fortes visibles.
+ * Montre ses meilleures cartes pour attirer les adversaires.
+ * 
+ * @author LO02 Project Team
+ * @version 1.0
+ */
 public class StrategieOffensive implements Strategie {
     private static final long serialVersionUID = 1L;
 
@@ -60,9 +68,9 @@ public class StrategieOffensive implements Strategie {
             int valeur = cc.getValeurNumerique();
 
             switch (cc.getCouleur()) {
-            	case ETOILE:
-            		return valeur*2;
-            	case PIQUE:
+                case ETOILE:
+                    return valeur * 2;
+                case PIQUE:
                 case TREFLE:
                 case TRIANGLE:
                     return valeur; // Positif

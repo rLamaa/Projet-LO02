@@ -10,6 +10,15 @@ import Vue.InterfaceGraphiqueJest;
 import Vue.VueConsoleJest;
 import Controleur.ControleurJest;
 
+/**
+ * Classe principale du jeu de Jest.
+ * Gère la configuration, l'initialisation et l'exécution du jeu.
+ * Supporte les modes console, GUI et hybride.
+ * Implémente Serializable pour la sauvegarde/chargement de parties.
+ * 
+ * @author LO02 Project Team
+ * @version 1.0
+ */
 public class Jeu implements Serializable {
 	/**
 	 * Identifiant de version pour la sérialisation.
@@ -515,8 +524,8 @@ public class Jeu implements Serializable {
 		// Déterminer si c'est la variante stratégique
 		boolean offresVisibles = false;
 		if (partieCourante != null && partieCourante.getRegleJeu() != null) {
-	        offresVisibles = partieCourante.getRegleJeu().sontOffresVisibles();
-	    }
+			offresVisibles = partieCourante.getRegleJeu().sontOffresVisibles();
+		}
 
 		Carte carteCachee, carteVisible;
 
@@ -524,10 +533,10 @@ public class Jeu implements Serializable {
 			// Mode stratégique : afficher les deux cartes
 			if (avecGUI && interfaceGraphique != null) {
 				JOptionPane.showMessageDialog(interfaceGraphique.getFrame(),
-		                "Mode Stratégique : Vos deux cartes sont visibles \n" +
-		                "Carte 1 : " + cartes.get(0) + "\nCarte 2 : " + cartes.get(1),
-		                "Offre Créée pour " + joueur.getNom(),
-		                JOptionPane.INFORMATION_MESSAGE);
+						"Mode Stratégique : Vos deux cartes sont visibles \n" +
+								"Carte 1 : " + cartes.get(0) + "\nCarte 2 : " + cartes.get(1),
+						"Offre Créée pour " + joueur.getNom(),
+						JOptionPane.INFORMATION_MESSAGE);
 			} else {
 				System.out.println("Mode Stratégique : Vos deux cartes sont visibles :");
 				System.out.println("  1. " + cartes.get(0));
@@ -536,8 +545,8 @@ public class Jeu implements Serializable {
 			carteCachee = cartes.get(0);
 			carteVisible = cartes.get(1);
 			// Les deux cartes sont visibles en mode stratégique
-	        carteCachee.setVisible(true);
-	        carteVisible.setVisible(true);
+			carteCachee.setVisible(true);
+			carteVisible.setVisible(true);
 		} else {
 			// Mode standard : choisir la carte à cacher
 			int indexCachee = choisirIndiceCarte(cartes, "Quelle carte voulez-vous cacher " + joueur.getNom() + " ?");
@@ -547,8 +556,8 @@ public class Jeu implements Serializable {
 			carteCachee = cartes.get(indexCachee);
 			carteVisible = cartes.get(1 - indexCachee);
 			// Définir la visibilité
-	        carteCachee.setVisible(false);
-	        carteVisible.setVisible(true);
+			carteCachee.setVisible(false);
+			carteVisible.setVisible(true);
 		}
 
 		// Retirer les cartes du jest
@@ -559,11 +568,11 @@ public class Jeu implements Serializable {
 		Offre offre = new Offre(carteCachee, carteVisible, joueur);
 
 		String message = "[" + joueur.getNom() + "] Offre créée - ";
-	    if (offresVisibles) {
-	        message += "Carte 1: " + carteVisible + " | Carte 2: " + carteCachee + " (toutes visibles)";
-	    } else {
-	        message += "Visible: " + carteVisible + " | Cachée: [?]";
-	    }
+		if (offresVisibles) {
+			message += "Carte 1: " + carteVisible + " | Carte 2: " + carteCachee + " (toutes visibles)";
+		} else {
+			message += "Visible: " + carteVisible + " | Cachée: [?]";
+		}
 
 		if (avecGUI && interfaceGraphique != null) {
 			interfaceGraphique.ajouterLog(message);

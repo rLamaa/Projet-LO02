@@ -2,6 +2,15 @@ package jest_package1;
 
 import java.util.List;
 
+/**
+ * Classe implémentant la variante stratégique du jeu Jest.
+ * Toutes les cartes des offres sont visibles, ce qui change la stratégie du
+ * jeu.
+ * Utilise les mêmes règles de scoring que la variante standard.
+ * 
+ * @author LO02 Project Team
+ * @version 1.0
+ */
 public class RegleStrategique implements RegleJeu {
 
 	private static final long serialVersionUID = 1L;
@@ -28,7 +37,7 @@ public class RegleStrategique implements RegleJeu {
 
 	@Override
 	public void appliquerReglesSpeciales(Jeu jeu) {
-		//pas de règles spéciales, tout est dans la visibilité des cartes des offres
+		// pas de règles spéciales, tout est dans la visibilité des cartes des offres
 	}
 
 	@Override
@@ -44,5 +53,5 @@ public class RegleStrategique implements RegleJeu {
 		// TODO Auto-generated method stub
 		return true; // variante où toutes les cartes des offres sont visibles
 	}
-	
+
 }

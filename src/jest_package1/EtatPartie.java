@@ -1,13 +1,18 @@
 package jest_package1;
 
 /**
- * États possibles d'une partie de Jest
+ * Énumération représentant les différents états possibles d'une partie de Jest.
+ * 
+ * @author LO02 Project Team
+ * @version 1.0
  */
-
 public enum EtatPartie {
-	CONFIGURATION, // etat de configuration du jeu, pour le choix des parametres, joueurs,
-					// extensions...
-	EN_COURS, // etat de marche du jeu
-	TERMINEE, // etat de fin de jeu
-	SUSPENDUE // etat de jen en suspens
+	/** État de configuration : choix des paramètres, joueurs et extensions */
+	CONFIGURATION,
+	/** État de jeu en cours : la partie est active */
+	EN_COURS,
+	/** État de fin : la partie est terminée */
+	TERMINEE,
+	/** État suspendu : la partie a été sauvegardée et arrêtée */
+	SUSPENDUE
 }

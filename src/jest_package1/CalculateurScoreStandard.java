@@ -3,8 +3,14 @@ package jest_package1;
 import java.util.*;
 
 /**
- * Implémentation du patron Visitor pour calculer les scores selon les règles
- * standards.
+ * Classe implémentant le pattern Visiteur pour calculer les scores selon les
+ * règles standards.
+ * Gère le calcul des points en fonction des couleurs et valeurs des cartes.
+ * Applique aussi les bonus pour les paires noires et autres combinaisons
+ * spéciales.
+ * 
+ * @author LO02 Project Team
+ * @version 1.0
  */
 public class CalculateurScoreStandard implements VisiteurScore {
 
@@ -117,11 +123,13 @@ public class CalculateurScoreStandard implements VisiteurScore {
 		}
 	}
 
-	/*@Override
-	public int visiterExtension(CarteExtension c, Jest j) {
-		// À implémenter selon les cartes d'extension
-		return 0;
-	}*/
+	/*
+	 * @Override
+	 * public int visiterExtension(CarteExtension c, Jest j) {
+	 * // À implémenter selon les cartes d'extension
+	 * return 0;
+	 * }
+	 */
 
 	/**
 	 * Calcule le bonus pour les paires noires (Pique + Trèfle de même valeur)
