@@ -12,7 +12,7 @@ import java.io.Serializable;
  * - Une valeur numérique (As=1, Deux=2, Trois=3, Quatre=4)
  * - Un état de visibilité (visible ou cachée)
  * 
- * Implémente le pattern Visiteur permettant aux cartes d'accepter des visiteurs
+ * Implémente le patron Visitor permettant aux cartes d'accepter des visiteurs
  * pour calculer leur contribution au score selon les règles du jeu.
  * 
  * Implémente Serializable pour la sauvegarde/chargement des parties.

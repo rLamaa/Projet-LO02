@@ -1,13 +1,11 @@
 package Vue;
 
-import java.awt.EventQueue;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.List;
 
-import Controleur.ControleurJest;
 import jest_package1.*;
 
 /**

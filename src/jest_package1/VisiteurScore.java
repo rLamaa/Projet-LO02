@@ -1,24 +1,10 @@
 package jest_package1;
 
 /**
- * Interface définissant le pattern Visiteur pour le calcul des scores.
+ * Interface définissant le patron Visitor pour le calcul des scores.
  * 
- * Utilise le pattern Visiteur pour découpler la logique de scoring
- * des classes de cartes, permettant une évaluation flexible.
- * 
- * Chaque méthode correspond à une couleur:
- * - visiterPique() et visiterTrefle(): Ajoutent les points
- * - visiterCarreau(): Retranche les points
- * - visiterCoeur(): Peut être modifié par le Joker
- * - visiterEtoile(): Double les points
- * - visiterTriangle(): Peut être modifié par le Joker
- * - visiterSoleil(): Valeur dépend du pair/impair
- * - visiterJoker(): Modifie le comportement des autres cartes
- * 
- * Cette approche permet:
- * - Ajouter de nouvelles couleurs facilement
- * - Modifier les règles de scoring sans changer les cartes
- * - Implémenter différentes variantes de règles
+ * Chaque méthode correspond à une couleur, cette approche permet 
+ * d'ajouter ou modifier des règles sans difficulté.
  * 
  * @author David et Léna
  */

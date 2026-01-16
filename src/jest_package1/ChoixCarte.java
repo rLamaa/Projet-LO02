@@ -9,10 +9,6 @@ import java.io.Serializable;
  * - L'offre sélectionnée parmi les offres disponibles
  * - La carte spécifique choisie dans cette offre (visible ou cachée)
  * 
- * Cette classe est utilisée pour:
- * - Enregistrer les choix faits par les joueurs
- * - Passer les informations de choix entre les composants du jeu
- * - Valider que les choix sont légaux (offre disponible, carte existante)
  * 
  * Implémente Serializable pour la sauvegarde/chargement des parties.
  * 

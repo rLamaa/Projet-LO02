@@ -10,18 +10,6 @@ import java.util.List;
  * Chaque variante du jeu (Standard, Rapide, Stratégique) implémente cette
  * interface.
  * 
- * Responsabilités principales:
- * - Calcul des scores des Jest selon les règles spécifiques
- * - Vérification des conditions pour remporter les trophées
- * - Détermination de l'ordre de jeu basé sur les offres
- * - Sélection du gagnant pour chaque trophée
- * - Application des règles spéciales (e.g., limite de manches pour la variante
- * rapide)
- * - Gestion de la visibilité des cartes (visible/cachée vs totalement visible)
- * 
- * Cette interface facilite l'ajout de nouvelles variantes sans modification du
- * code principal.
- * 
  * @author David et Léna
  */
 public interface RegleJeu extends Serializable {

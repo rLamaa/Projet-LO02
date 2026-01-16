@@ -13,18 +13,11 @@ import Controleur.ControleurJest;
 /**
  * Classe principale du jeu de Jest.
  * 
- * Orchestrateur central du jeu qui gère l'ensemble du cycle de vie d'une
- * partie.
- * Responsable de:
- * - La configuration initiale du jeu (choix des joueurs, variantes, extensions)
- * - L'initialisation de l'interface utilisateur (console, GUI ou hybride)
- * - L'exécution de la boucle principale du jeu
- * - La gestion des sauvegardes et chargements de parties
+ *
  * 
  * Supporte trois modes de jeu:
  * - Mode Console: Interface textuelle simple
  * - Mode GUI: Interface graphique Swing complète
- * - Mode Hybride: Console et GUI simultanément
  * 
  * Implémente Serializable pour permettre la persistance des parties en cours.
  * 
@@ -112,26 +105,6 @@ public class Jeu implements Serializable {
 		// Compléter avec des bots jusqu'à 3 joueurs minimum
 		int nbBots = Math.max(0, 3 - nbJoueurs);
 		String[] nomsBots = { "Alpha", "Beta", "Gamma", "Delta" }; // noms des bots qui sont appender
-		/*
-		 * String info;
-		 * Random va = new Random();
-		 * int nombre;
-		 * nombre=va.nextInt(3);
-		 * // System.out.println(nombre);
-		 * switch(nombre) {
-		 * case 0:
-		 * info="SPORT";
-		 * break;
-		 * case 1:
-		 * info="POLITQUE";
-		 * break;
-		 * case 2:
-		 * info="ECONOMIE";
-		 * break;
-		 * default:
-		 * info="SPORT"; //cas par défaut mit à sport pour eviter les erreurs
-		 * }
-		 */
 		Strategie[] strategies = {
 				new StrategieOffensive(), // 1
 				new StrategieDefensive(), // 2
@@ -195,8 +168,6 @@ public class Jeu implements Serializable {
 		}
 	}
 
-	// utile pour que le joueur verifie qu'il a bien tout fait comme il voulait et
-	// pour nous debug
 	private void afficherRecapitulatif() {
 		System.out.println("\n╔════════════════════════════════════╗");
 		System.out.println("║        RÉCAPITULATIF               ║");
@@ -368,12 +339,6 @@ public class Jeu implements Serializable {
 		}
 	}
 
-	/**
-	 * Permet d'afficher les throphées de maniere clair
-	 */
-	/**
-	 * Permet d'afficher les trophées de manière claire avec leurs conditions
-	 */
 	private void afficherTrophees() {
 		System.out.println("\n╔════════════════════════════════════════╗");
 		System.out.println("║  🏆 TROPHÉES DE LA PARTIE 🏆            ║");
@@ -414,10 +379,6 @@ public class Jeu implements Serializable {
 		System.out.println("╚═══════════════════════════════════════════════════════╝\n");
 	}
 
-	// Sans Joker, les Triangles valent 0
-
-	// Avec Joker et 4 Triangles, les Triangles perdent leur valeur
-	// Avec Joker et 1-3 Triangles, les Triangles augmentent le score
 
 	/**
 	 * Affiche un dialogue sauvegarde/quitter qui fonctionne en console et GUI
@@ -488,6 +449,7 @@ public class Jeu implements Serializable {
 
 	/**
 	 * Dialogue de sauvegarde en mode console
+	 * @return boolean
 	 */
 	private boolean afficherDialogueSauvegardeConsole() {
 		System.out.print("\n💾 Sauvegarder la partie ? (o/n): ");
@@ -906,9 +868,8 @@ public class Jeu implements Serializable {
 		// Choix du mode d'affichage
 		System.out.println("Mode d'affichage :");
 		System.out.println("1. Console uniquement");
-		System.out.println("2. Interface graphique uniquement");
-		System.out.println("3. Console + Interface graphique (mode mixte)");
-		System.out.print("Votre choix (1-3): ");
+		System.out.println("2. Interface graphique");
+		System.out.print("Votre choix (1-2): ");
 
 		int choixMode = 1;
 		try {
@@ -947,11 +908,6 @@ public class Jeu implements Serializable {
 		// Configuration du mode d'affichage
 		switch (choixMode) {
 			case 2:
-				jeu.avecGUI = true;
-				jeu.modeConsoleEtGUI = false;
-				System.out.println("✓ Mode Interface Graphique activé");
-				break;
-			case 3:
 				jeu.avecGUI = true;
 				jeu.modeConsoleEtGUI = true;
 				System.out.println("✓ Mode Mixte (Console + GUI) activé");

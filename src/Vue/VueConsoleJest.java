@@ -25,6 +25,7 @@ import jest_package1.*;
  * 
  * @author David et Léna
  */
+@SuppressWarnings("deprecation")
 public class VueConsoleJest implements Observer {
 
     private Partie partie;

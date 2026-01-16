@@ -4,13 +4,11 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Classe Singleton représentant une partie de Jest.
+ * Classe représentant une partie de Jest.
  * 
- * Orchestrateur central du jeu qui gère l'ensemble du cycle de vie d'une
- * partie.
- * Utilise les patterns:
+ * Utilise les patrons:
  * - Singleton: Une seule instance par JVM
- * - Observable: Notifie les observateurs des changements d'état (pattern MVC)
+ * - Observable: Notifie les observateurs des changements d'état (patron MVC)
  * 
  * Responsabilités:
  * - Initialisation: Configure les joueurs, la pioche, les règles
@@ -23,17 +21,65 @@ import java.util.*;
  */
 @SuppressWarnings("deprecation")
 public class Partie extends Observable implements Serializable {
-	private static final long serialVersionUID = 1L;
+	/**
+	 * Instance unique de la partie (patron Singleton).
+	 * Garantit qu'une seule partie existe à la fois dans la JVM.
+	 */
 	private static Partie instance;
 
+	/**
+	 * Pioche contenant toutes les cartes disponibles pour la partie.
+	 * Permet de distribuer les cartes aux joueurs et de gérer le deck.
+	 */
 	private Pioche pioche = new Pioche();
+
+	/**
+	 * Liste des cartes trophées en jeu pour cette partie.
+	 * Les trophées sont attribués aux joueurs selon des conditions spécifiques
+	 * définies par les règles du jeu (1 trophée pour 4 joueurs, 2 sinon).
+	 */
 	private List<Carte> trophees;
+
+	/**
+	 * Liste des joueurs participant à la partie.
+	 * Peut contenir des joueurs humains et/ou virtuels.
+	 */
 	private List<Joueur> joueurs;
+
+	/**
+	 * Règles de jeu appliquées pour cette partie.
+	 * Détermine le comportement du jeu (standard, rapide, stratégique, etc.).
+	 */
 	private RegleJeu regleJeu;
+
+	/**
+	 * Numéro de la manche actuelle.
+	 * Commence à 1 et s'incrémente après chaque manche jouée.
+	 */
 	private int numeroManche;
+
+	/**
+	 * Liste des offres actuelles de tous les joueurs pour la manche en cours.
+	 * Chaque offre contient une carte visible et une carte cachée.
+	 */
 	private List<Offre> offresActuelles;
+
+	/**
+	 * Référence vers l'instance de Jeu pour la gestion de l'interface.
+	 * Marqué transient car non sérialisable (ne sera pas sauvegardé).
+	 */
 	private transient Jeu jeuReference;
+
+	/**
+	 * Indicateur d'état de la manche.
+	 * true si une manche est en cours, false sinon.
+	 */
 	private boolean mancheEnCours;
+
+	/**
+	 * Mode d'affichage de la partie.
+	 * true pour l'interface graphique (GUI), false pour le mode console.
+	 */
 	private boolean modeGUI = false;
 
 	public void setModeGUI(boolean modeGUI) {

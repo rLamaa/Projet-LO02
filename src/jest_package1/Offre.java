@@ -11,13 +11,6 @@ import java.io.Serializable;
  * - Une carte cachée: Dont la valeur est inconnue jusqu'au choix
  * - Un propriétaire: Le joueur qui propose l'offre
  * 
- * L'offre est le mécanisme central du jeu de Jest:
- * - Chaque joueur crée une offre avec ses deux cartes
- * - Les autres joueurs choisissent une carte de chaque offre
- * - Le dernier joueur doit prendre sa propre offre
- * 
- * En mode stratégique, les deux cartes peuvent être visibles,
- * changeant complètement la dynamique du jeu.
  * 
  * Implémente Serializable pour la sauvegarde/chargement des parties.
  * 

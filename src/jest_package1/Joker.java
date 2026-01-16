@@ -1,5 +1,7 @@
 package jest_package1;
-
+/*
+ * Classe permettant de gérer la carte Joker du Jest selon les règles
+ */
 public class Joker extends Carte {
 	/**
 	 * Identifiant de version pour la sérialisation.

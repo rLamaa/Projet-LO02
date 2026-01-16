@@ -8,18 +8,6 @@ import java.util.*;
  * Permet à un joueur humain de prendre des décisions via l'entrée console.
  * Gère l'interactivité complète du jeu en mode console.
  * 
- * Responsabilités:
- * - Créer des offres: Affiche les cartes et demande au joueur de choisir
- * quelle carte cacher/afficher
- * - Choisir des cartes: Affiche les offres disponibles et demande
- * au joueur de sélectionner une offre puis une carte
- * 
- * Comportement:
- * - Affichage formaté avec symboles Unicode et clarté
- * - Gestion des entrées invalides avec reprise de saisie
- * - Cas spéciaux gérés (dernier joueur, aucune offre disponible)
- * - Messages informatifs pour guider le joueur
- * 
  * @author David et Léna
  */
 public class JoueurHumain extends Joueur {
@@ -39,7 +27,6 @@ public class JoueurHumain extends Joueur {
 
 	/**
 	 * Permet au joueur humain de choisir une carte parmi les offres disponibles.
-	 * Gère les cas particuliers (dernier joueur, aucune offre disponible).
 	 * 
 	 * @param offres la liste des offres proposées
 	 * @return le choix de carte effectué par le joueur

@@ -3,19 +3,13 @@ package jest_package1;
 /**
  * Classe représentant un trophée dans le jeu de Jest.
  * 
- * Un trophée est une carte spéciale qui accorde des bonus de points
+ * Un trophée est une carte spéciale qui s'accorde
  * au joueur qui remplit les conditions associées.
  * 
  * Responsabilités:
  * - Vérifier si un Jest remplit les conditions du trophée
- * - Appliquer l'effet du trophée (modifier le score)
  * - Gérer les différents types de conditions (présence du Joker, meilleur Jest,
  * etc.)
- * 
- * Les trophées ajoutent une couche stratégique au jeu en:
- * - Créant des objectifs secondaires au-delà du simple accumulation de cartes
- * - Favorisant différents styles de jeu
- * - Récompensant les joueurs qui atteignent les conditions
  * 
  * @author David et Léna
  */

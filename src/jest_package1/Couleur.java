@@ -5,17 +5,6 @@ package jest_package1;
  * 
  * Comprend 7 couleurs réparties en deux catégories:
  * 
- * Couleurs Standards (jeu de base):
- * - PIQUE (♠): Couleur positive, force 7
- * - TREFLE (♣): Couleur positive, force 6
- * - CARREAU (♦): Couleur négative, force 4
- * - COEUR (♥): Couleur neutre, force 2
- * 
- * Couleurs d'Extension (si extension activée):
- * - ETOILE (☆): Double les points, force 5
- * - TRIANGLE (▲): Couleur spéciale, force 1
- * - SOLEIL (☼): Points selon pair/impair, force 3
- * 
  * Chaque couleur possède une force utilisée pour déterminer l'ordre de jeu
  * et un symbole Unicode pour l'affichage.
  * 

@@ -7,16 +7,9 @@ import java.util.*;
  * Classe représentant la pioche du jeu de Jest.
  * 
  * Gère l'ensemble du deck de cartes avec les responsabilités suivantes:
- * - Initialisation du deck complet (16 cartes standard + optionnellement 12
- * cartes d'extension)
+ * - Initialisation du deck complet 
  * - Distribution des cartes aux joueurs
  * - Mélange aléatoire des cartes
- * - Suivi de la taille et de l'état du deck
- * 
- * Le contenu de la pioche dépend de l'activation de l'extension:
- * - Sans extension: 4 couleurs (Pique, Trèfle, Carreau, Cœur) × 4 valeurs + 1
- * Joker = 17 cartes
- * - Avec extension: 7 couleurs × 4 valeurs + 1 Joker = 29 cartes
  * 
  * Implémente Serializable pour permettre la sauvegarde/chargement des parties.
  * 

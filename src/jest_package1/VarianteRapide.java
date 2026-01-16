@@ -7,20 +7,6 @@ import java.util.List;
  * 
  * Variante accélérée qui limite le jeu à 3 manches maximum.
  * 
- * Caractéristiques:
- * - Nombre de manches: Maximum 3 (vs illimité en standard)
- * - Scoring: Identique aux règles standard
- * - Trophées: Identiques au jeu standard
- * - Ordre de jeu: Identique au jeu standard
- * 
- * Utilité:
- * - Jeu plus court et rapide (10-20 minutes)
- * - Idéal pour sessions courtes
- * - Même profondeur stratégique en moins de temps
- * - Règles inchangées, seule la durée varie
- * 
- * Implémente l'interface RegleJeu en déléguant la plupart des calculs
- * à RegleStandard avec un comptage additionnel des manches.
  * 
  * @author David et Léna
  */

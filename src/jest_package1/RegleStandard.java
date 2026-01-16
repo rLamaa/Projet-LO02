@@ -16,9 +16,6 @@ import java.util.*;
  * - Soleils: Points selon pair/impair
  * - Joker: 4 points seul, modifie le scoring des autres couleurs
  * 
- * Système de trophées:
- * - Gère les trophées de manière standard
- * - Détermine les gagnants basé sur les conditions
  * 
  * Ordre de jeu:
  * - Basé sur la force des cartes visibles des offres

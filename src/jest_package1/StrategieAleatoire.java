@@ -10,14 +10,9 @@ import java.util.Random;
  * logique ou évaluation des cartes.
  * 
  * Utilité:
- * - Teste: Valide que le jeu fonctionne correctement quelles que soient les
- * décisions
  * - Imprévisibilité: Offre une variabilité complète du gameplay
  * - Équilibre: Permet de tester l'équilibre sans stratégie dominante
  * 
- * En pratique, cette stratégie est peu compétitive mais rend le jeu moins
- * prévisible
- * quand elle est utilisée contre d'autres stratégies.
  * 
  * @author David et Léna
  */

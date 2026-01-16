@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Interface définissant une stratégie de jeu pour les joueurs virtuels (bots).
  * 
- * Utilise le pattern Strategy pour permettre différents comportements de jeu.
+ * Utilise le patron Strategy pour permettre différents comportements de jeu.
  * Chaque implémentation fournit une logique d'IA différente pour:
  * 
  * - Créer des offres: Décider quelles cartes montrer/cacher
@@ -16,7 +16,7 @@ import java.util.List;
  * Les trois stratégies disponibles:
  * - Offensive: Prend les cartes fortes visibles
  * - Défensive: Évite les pièges, prend les cartes cachées
- * - Aléatoire: Décisions complètement aléatoires (pour les tests)
+ * - Aléatoire: Décisions complètement aléatoire
  * 
  * Facilite l'ajout de nouvelles stratégies en créant une nouvelle
  * implémentation.

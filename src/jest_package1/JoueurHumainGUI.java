@@ -10,21 +10,6 @@ import java.util.concurrent.CountDownLatch;
  * Étend JoueurHumain pour ajouter le support d'une interface graphique Swing
  * tout en maintenant la compatibilité avec le mode console.
  * 
- * Responsabilités:
- * - Supporter le jeu en mode console pure (hérité de JoueurHumain)
- * - Supporter le jeu en mode GUI (avec boutons et dialogues)
- * - Supporter le mode hybride (GUI + console simultanément)
- * 
- * Mécanisme de synchronisation:
- * - Utilise CountDownLatch pour bloquer le thread de jeu
- * - Attend que l'utilisateur fasse son choix dans la GUI
- * - Reprend l'exécution une fois la décision prise
- * 
- * Transitions:
- * - faireOffre(): Crée une offre via GUI ou console
- * - choisirCarte(): Sélectionne une carte via GUI ou console
- * - setOffreGUI() et setChoixCarteGUI(): Appelées par le contrôleur
- * quand l'utilisateur a terminé
  * 
  * @author David et Léna
  */

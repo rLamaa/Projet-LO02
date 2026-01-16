@@ -1,19 +1,14 @@
 package jest_package1;
 
 /**
- * Classe représentant une carte standard du jeu de Jest (pas un Joker).
+ * Classe représentant une carte standard du jeu de Jest.
  * 
- * Étend la classe abstraite Carte et fournit l'implémentation concrète
- * pour une carte ordinaire avec couleur et valeur.
+ * Étend la classe abstraite Carte et fournit l'implémentation 
+ * pour une carte avec couleur et valeur.
  * 
- * Implémente le pattern Visiteur en acceptant différents visiteurs de score
+ * Implémente le Patron Visitor en acceptant différents visiteurs de score
  * qui calculent la contribution de la carte au score final en fonction de sa
- * couleur:
- * - Piques et Trèfles ajoutent des points
- * - Carreaux retranchent des points
- * - Cœurs ont une valeur nulle (sauf avec Joker)
- * - Étoiles doublent les points
- * - Triangles et Soleils ont des règles spéciales
+ * couleur.
  * 
  * @author David et Léna
  */
@@ -33,7 +28,7 @@ public class CarteCouleur extends Carte {
 
     /**
      * Représentation textuelle de la carte.
-     * Format: Valeur + Symbole (ex: "5♠", "D♥")
+     * Format: Valeur + Symbole (ex: "4♠", "2♥")
      * 
      * @return la représentation textuelle
      */
@@ -44,7 +39,7 @@ public class CarteCouleur extends Carte {
 
     /**
      * Accepte un visiteur de score basé sur la couleur de la carte.
-     * Implémente le pattern Visiteur.
+     * Implémente le patron Visitor.
      * 
      * @param visiteur le visiteur de score
      * @param jest     le Jest dans lequel la carte est jouée

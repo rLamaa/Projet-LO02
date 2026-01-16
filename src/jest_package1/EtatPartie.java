@@ -20,12 +20,12 @@ package jest_package1;
  * @author David et Léna
  */
 public enum EtatPartie {
-	/** État de configuration : choix des paramètres, joueurs et extensions */
+	/** État de configuration  */
 	CONFIGURATION,
-	/** État de jeu en cours : la partie est active */
+	/** État de jeu en cours */
 	EN_COURS,
-	/** État de fin : la partie est terminée */
+	/** État de fin  */
 	TERMINEE,
-	/** État suspendu : la partie a été sauvegardée et arrêtée */
+	/** État suspendu  */
 	SUSPENDUE
 }
