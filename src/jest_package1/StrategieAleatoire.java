@@ -5,11 +5,21 @@ import java.util.Random;
 
 /**
  * Stratégie de jeu aléatoire pour les joueurs virtuels.
- * Le bot prend des décisions complètement aléatoires.
- * Utile pour le test et pour offrir une certaine imprévisibilité.
  * 
- * @author LO02 Project Team
- * @version 1.0
+ * Cette stratégie prend des décisions complètement aléatoires sans aucune
+ * logique ou évaluation des cartes.
+ * 
+ * Utilité:
+ * - Teste: Valide que le jeu fonctionne correctement quelles que soient les
+ * décisions
+ * - Imprévisibilité: Offre une variabilité complète du gameplay
+ * - Équilibre: Permet de tester l'équilibre sans stratégie dominante
+ * 
+ * En pratique, cette stratégie est peu compétitive mais rend le jeu moins
+ * prévisible
+ * quand elle est utilisée contre d'autres stratégies.
+ * 
+ * @author David et Léna
  */
 public class StrategieAleatoire implements Strategie {
     private static final long serialVersionUID = 1L;

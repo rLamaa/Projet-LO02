@@ -9,7 +9,25 @@ import java.io.IOException;
 import jest_package1.*;
 
 /**
- * Gestionnaire d'images pour les cartes
+ * Gestionnaire d'images pour les cartes du jeu de Jest.
+ * 
+ * Responsable du chargement, du cache et de l'affichage des images de cartes.
+ * 
+ * Responsabilités:
+ * - Charger les images des cartes depuis le système de fichiers ou les
+ * ressources
+ * - Mettre en cache les images chargées pour améliorer les performances
+ * - Fournir les images redimensionnées selon les besoins de l'interface
+ * - Gérer les images manquantes avec des images par défaut
+ * - Créer les représentations visuelles des cartes (symboles, couleurs,
+ * valeurs)
+ * 
+ * Optimisations:
+ * - Cache des images chargées
+ * - Redimensionnement efficace
+ * - Gestion des erreurs de chargement
+ * 
+ * @author David et Léna
  */
 public class GestionnaireImages {
 

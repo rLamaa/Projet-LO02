@@ -4,14 +4,25 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Interface définissant les règles du jeu de Jest.
+ * Interface définissant le contrat pour les différentes variantes et règles du
+ * jeu de Jest.
+ * 
  * Chaque variante du jeu (Standard, Rapide, Stratégique) implémente cette
  * interface.
- * Gère le calcul des scores, la vérification des conditions de trophée, et
- * l'ordre de jeu.
  * 
- * @author LO02 Project Team
- * @version 1.0
+ * Responsabilités principales:
+ * - Calcul des scores des Jest selon les règles spécifiques
+ * - Vérification des conditions pour remporter les trophées
+ * - Détermination de l'ordre de jeu basé sur les offres
+ * - Sélection du gagnant pour chaque trophée
+ * - Application des règles spéciales (e.g., limite de manches pour la variante
+ * rapide)
+ * - Gestion de la visibilité des cartes (visible/cachée vs totalement visible)
+ * 
+ * Cette interface facilite l'ajout de nouvelles variantes sans modification du
+ * code principal.
+ * 
+ * @author David et Léna
  */
 public interface RegleJeu extends Serializable {
 	/**

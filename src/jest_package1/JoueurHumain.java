@@ -4,10 +4,23 @@ import java.util.*;
 
 /**
  * Classe représentant un joueur humain du jeu de Jest.
- * Permet à un joueur humain de prendre des décisions via l'entrée console.
  * 
- * @author LO02 Project Team
- * @version 1.0
+ * Permet à un joueur humain de prendre des décisions via l'entrée console.
+ * Gère l'interactivité complète du jeu en mode console.
+ * 
+ * Responsabilités:
+ * - Créer des offres: Affiche les cartes et demande au joueur de choisir
+ * quelle carte cacher/afficher
+ * - Choisir des cartes: Affiche les offres disponibles et demande
+ * au joueur de sélectionner une offre puis une carte
+ * 
+ * Comportement:
+ * - Affichage formaté avec symboles Unicode et clarté
+ * - Gestion des entrées invalides avec reprise de saisie
+ * - Cas spéciaux gérés (dernier joueur, aucune offre disponible)
+ * - Messages informatifs pour guider le joueur
+ * 
+ * @author David et Léna
  */
 public class JoueurHumain extends Joueur {
 	/**

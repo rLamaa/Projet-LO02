@@ -6,11 +6,22 @@ import java.util.*;
 /**
  * Classe représentant un "Jest" : un ensemble de cartes appartenant à un
  * joueur.
- * Un Jest contient les cartes remportées par un joueur lors d'une phase de jeu.
- * Implémente Serializable pour la sauvegarde/chargement de parties.
  * 
- * @author LO02 Project Team
- * @version 1.0
+ * Un Jest accumule les cartes remportées par un joueur lors des différentes
+ * phases de jeu. C'est la collection principale gérée par chaque joueur.
+ * 
+ * Chaque joueur possède deux Jest:
+ * - Jest courant: Réinitialisé à chaque manche, contient les cartes de cette
+ * manche
+ * - Jest personnel: Conservé sur plusieurs manches, contient les cartes
+ * remportées précédemment
+ * 
+ * Les Jest sont évalués selon les règles du jeu pour déterminer les scores
+ * et les gagnants des trophées.
+ * 
+ * Implémente Serializable pour permettre la sauvegarde/chargement des parties.
+ * 
+ * @author David et Léna
  */
 public class Jest implements Serializable {
     private static final long serialVersionUID = 1L;

@@ -4,12 +4,27 @@ import java.util.List;
 
 /**
  * Classe implémentant la variante stratégique du jeu Jest.
- * Toutes les cartes des offres sont visibles, ce qui change la stratégie du
- * jeu.
- * Utilise les mêmes règles de scoring que la variante standard.
  * 
- * @author LO02 Project Team
- * @version 1.0
+ * Variante où toutes les cartes des offres sont visibles à tous les joueurs.
+ * 
+ * Différences avec le jeu standard:
+ * - Visibilité: TOUTES les cartes de chaque offre sont visibles
+ * (pas de carte cachée mystérieuse)
+ * - Stratégie: Les bots ne peuvent pas utiliser leur stratégie
+ * (puisque les deux cartes sont connues)
+ * - Décision: Plus difficile car aucune surprise possible
+ * 
+ * Impact stratégique:
+ * - Le jeu devient plus déterministe
+ * - L'information complète élimine le bluff
+ * - Les joueurs humains ont avantage (pas d'IA sophistiquée possible)
+ * - Focus sur l'évaluation correcte des cartes
+ * 
+ * Scoring: Identique aux règles standard
+ * Trophées: Identiques au jeu standard
+ * Ordre de jeu: Identique au jeu standard
+ * 
+ * @author David et Léna
  */
 public class RegleStrategique implements RegleJeu {
 

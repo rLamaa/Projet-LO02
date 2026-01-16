@@ -3,7 +3,25 @@ package jest_package1;
 import java.io.Serializable;
 
 /**
- * Représente une offre de deux cartes (une visible, une cachée)
+ * Représente une offre de deux cartes proposée par un joueur aux autres
+ * joueurs.
+ * 
+ * Une offre est composée de:
+ * - Une carte visible: Que tous les joueurs peuvent voir
+ * - Une carte cachée: Dont la valeur est inconnue jusqu'au choix
+ * - Un propriétaire: Le joueur qui propose l'offre
+ * 
+ * L'offre est le mécanisme central du jeu de Jest:
+ * - Chaque joueur crée une offre avec ses deux cartes
+ * - Les autres joueurs choisissent une carte de chaque offre
+ * - Le dernier joueur doit prendre sa propre offre
+ * 
+ * En mode stratégique, les deux cartes peuvent être visibles,
+ * changeant complètement la dynamique du jeu.
+ * 
+ * Implémente Serializable pour la sauvegarde/chargement des parties.
+ * 
+ * @author David et Léna
  */
 public class Offre implements Serializable {
 	private static final long serialVersionUID = 1L;

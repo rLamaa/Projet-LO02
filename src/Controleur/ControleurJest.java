@@ -11,8 +11,24 @@ import Vue.GestionnaireImages;
 import Vue.InterfaceGraphiqueJest;
 
 /**
- * Contrôleur pour l'interface graphique du jeu de Jest Gère les interactions
- * entre la vue (GUI) et le modèle (Partie, Joueur)
+ * Contrôleur pour l'interface graphique du jeu de Jest.
+ * 
+ * Constitue la couche de contrôle du pattern MVC.
+ * Gère les interactions entre la vue (GUI) et le modèle (Partie, Joueur).
+ * 
+ * Responsabilités:
+ * - Traduire les actions utilisateur en commandes métier
+ * - Valider les entrées utilisateur
+ * - Mettre à jour le modèle en fonction des clics/actions
+ * - Coordonner entre InterfaceGraphiqueJest et Partie
+ * - Gérer les sélections de cartes et les offres du joueur humain
+ * 
+ * Points clés:
+ * - ActionListener pour tous les boutons et éléments interactifs
+ * - Synchronisation entre thread GUI et thread de jeu
+ * - Gestion des références entre vue et modèle
+ * 
+ * @author David et Léna
  */
 public class ControleurJest {
 
@@ -75,22 +91,24 @@ public class ControleurJest {
 			joueurHumain.getJest().enleverCarte(c2);
 
 			// On définit les deux cartes comme visibles
-            c1.setVisible(true);
-            c2.setVisible(true);
-            
-            Offre offre = new Offre(c1, c2, joueurHumain);            
+			c1.setVisible(true);
+			c2.setVisible(true);
+
+			Offre offre = new Offre(c1, c2, joueurHumain);
 			joueurHumain.setOffreGUI(offre);
 
-			vue.ajouterLog("[" + joueurHumain.getNom() + "] Offre créée (stratégique)- Carte 1: " + c1 + " | Carte 2: " + c2);
+			vue.ajouterLog(
+					"[" + joueurHumain.getNom() + "] Offre créée (stratégique)- Carte 1: " + c1 + " | Carte 2: " + c2);
 			// Message informatif
-	        JOptionPane.showMessageDialog(vue.getFrame(),
-	                "Mode Stratégique : Vos deux cartes sont visibles :\n" +
-	                "Carte 1: " + c1 + "\nCarte 2: " + c2,
-	                "Offre Créée - " + joueurHumain.getNom(),
-	                JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(vue.getFrame(),
+					"Mode Stratégique : Vos deux cartes sont visibles :\n" +
+							"Carte 1: " + c1 + "\nCarte 2: " + c2,
+					"Offre Créée - " + joueurHumain.getNom(),
+					JOptionPane.INFORMATION_MESSAGE);
 		} else {
 			// Standard : dialogue avec images de cartes
-			JDialog dialog = new JDialog(vue.getFrame(), "Quelle carte voulez-vous cacher " + joueurHumain.getNom() + " ?", true);
+			JDialog dialog = new JDialog(vue.getFrame(),
+					"Quelle carte voulez-vous cacher " + joueurHumain.getNom() + " ?", true);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setLayout(new java.awt.GridLayout(1, 2, 20, 20));
 			dialog.setSize(500, 350);
@@ -103,8 +121,8 @@ public class ControleurJest {
 				joueurHumain.getJest().enleverCarte(c1);
 				joueurHumain.getJest().enleverCarte(c2);
 				// Définir la visibilité
-	            c1.setVisible(false);  // cachée
-	            c2.setVisible(true);   // visible
+				c1.setVisible(false); // cachée
+				c2.setVisible(true); // visible
 				Offre offre = new Offre(c1, c2, joueurHumain);
 				joueurHumain.setOffreGUI(offre);
 				vue.ajouterLog("[" + joueurHumain.getNom() + "] a caché la première carte");
@@ -118,8 +136,8 @@ public class ControleurJest {
 				joueurHumain.getJest().enleverCarte(c2);
 				joueurHumain.getJest().enleverCarte(c1);
 				// Définir la visibilité
-	            c2.setVisible(false);  // cachée
-	            c1.setVisible(true);   // visible
+				c2.setVisible(false); // cachée
+				c1.setVisible(true); // visible
 				Offre offre = new Offre(c2, c1, joueurHumain);
 				joueurHumain.setOffreGUI(offre);
 				vue.ajouterLog("[" + joueurHumain.getNom() + "] a caché la deuxième carte");
@@ -215,7 +233,8 @@ public class ControleurJest {
 
 		// Choisir l'offre
 		String choixOffre = (String) JOptionPane.showInputDialog(vue.getFrame(), "Choisissez une offre :",
-				"Sélection d'offre - " + joueurHumain.getNom(), JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+				"Sélection d'offre - " + joueurHumain.getNom(), JOptionPane.QUESTION_MESSAGE, null, options,
+				options[0]);
 
 		if (choixOffre == null) {
 			// Annulation
@@ -228,7 +247,8 @@ public class ControleurJest {
 		Offre offreChoisie = offresDisponibles.get(indexOffre);
 
 		// Choisir la carte avec images visuelles
-		JDialog dialogCarte = new JDialog(vue.getFrame(), "Quelle carte voulez-vous prendre " + joueurHumain.getNom() + " ?", true);
+		JDialog dialogCarte = new JDialog(vue.getFrame(),
+				"Quelle carte voulez-vous prendre " + joueurHumain.getNom() + " ?", true);
 		dialogCarte.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialogCarte.setLayout(new java.awt.GridLayout(1, 2, 20, 20));
 		dialogCarte.setSize(500, 350);

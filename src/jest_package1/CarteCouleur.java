@@ -2,10 +2,20 @@ package jest_package1;
 
 /**
  * Classe représentant une carte standard du jeu de Jest (pas un Joker).
- * Extends Carte et implémente le pattern Visiteur pour le calcul des scores.
  * 
- * @author LO02 Project Team
- * @version 1.0
+ * Étend la classe abstraite Carte et fournit l'implémentation concrète
+ * pour une carte ordinaire avec couleur et valeur.
+ * 
+ * Implémente le pattern Visiteur en acceptant différents visiteurs de score
+ * qui calculent la contribution de la carte au score final en fonction de sa
+ * couleur:
+ * - Piques et Trèfles ajoutent des points
+ * - Carreaux retranchent des points
+ * - Cœurs ont une valeur nulle (sauf avec Joker)
+ * - Étoiles doublent les points
+ * - Triangles et Soleils ont des règles spéciales
+ * 
+ * @author David et Léna
  */
 public class CarteCouleur extends Carte {
     private static final long serialVersionUID = 1L;

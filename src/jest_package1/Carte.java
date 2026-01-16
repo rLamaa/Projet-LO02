@@ -4,11 +4,20 @@ import java.io.Serializable;
 
 /**
  * Classe abstraite représentant une carte du jeu de Jest.
- * Une carte a une couleur et une valeur.
- * Implémente le pattern Visiteur pour le calcul des scores.
  * 
- * @author LO02 Project Team
- * @version 1.0
+ * Définit l'interface commune pour tous les types de cartes du jeu.
+ * Chaque carte possède:
+ * - Une couleur (parmi les 7 couleurs disponibles: Pique, Trèfle, Carreau,
+ * Cœur, Étoile, Triangle, Soleil)
+ * - Une valeur numérique (As=1, Deux=2, Trois=3, Quatre=4)
+ * - Un état de visibilité (visible ou cachée)
+ * 
+ * Implémente le pattern Visiteur permettant aux cartes d'accepter des visiteurs
+ * pour calculer leur contribution au score selon les règles du jeu.
+ * 
+ * Implémente Serializable pour la sauvegarde/chargement des parties.
+ * 
+ * @author David et Léna
  */
 public abstract class Carte implements Serializable {
     private static final long serialVersionUID = 1L;

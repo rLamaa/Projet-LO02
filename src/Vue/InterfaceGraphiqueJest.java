@@ -11,8 +11,28 @@ import Controleur.ControleurJest;
 import jest_package1.*;
 
 /**
- * Interface graphique pour le jeu de Jest
+ * Interface graphique pour le jeu de Jest.
+ * 
+ * Constitue la couche de présentation (Vue) du pattern MVC.
  * Implémente Observer pour être notifiée des changements dans le modèle
+ * (Partie).
+ * 
+ * Responsabilités:
+ * - Affichage du tableau de jeu (cartes, offres, joueurs, trophées)
+ * - Gestion des interactions utilisateur (clics sur cartes, boutons)
+ * - Mise à jour en temps réel lors des changements de partie
+ * - Communication avec le contrôleur pour valider les actions
+ * 
+ * Composants principaux:
+ * - Panneau des cartes du joueur
+ * - Panneau des offres disponibles
+ * - Panneau des joueurs avec leurs scores
+ * - Panneau des trophées remportés
+ * - Zone de log pour suivre le déroulement
+ * 
+ * Utilise Swing pour l'interface graphique multi-plateforme.
+ * 
+ * @author David et Léna
  */
 public class InterfaceGraphiqueJest implements Observer {
 

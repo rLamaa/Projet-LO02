@@ -5,12 +5,25 @@ import java.util.*;
 /**
  * Classe implémentant le pattern Visiteur pour calculer les scores selon les
  * règles standards.
- * Gère le calcul des points en fonction des couleurs et valeurs des cartes.
- * Applique aussi les bonus pour les paires noires et autres combinaisons
- * spéciales.
  * 
- * @author LO02 Project Team
- * @version 1.0
+ * Responsable du calcul complet du score d'un Jest en:
+ * - Additionnant les contributions de chaque carte selon sa couleur
+ * - Appliquant les bonus et pénalités spéciales
+ * - Gérant les interactions complexes (Joker avec les Cœurs/Triangles)
+ * 
+ * Règles implémentées:
+ * - Piques/Trèfles: +valeur
+ * - Carreaux: -valeur
+ * - Cœurs: 0 pts (sauf avec Joker)
+ * - Étoiles: +2×valeur
+ * - Triangles: 0 pts (sauf avec Joker)
+ * - Soleils: +valeur si impair, -valeur si pair
+ * - Joker: +4 pts seul, transforme les Cœurs/Triangles en points positifs si
+ * ≤3, négatifs si ≥4
+ * - Paires noires: +2 pts bonus pour Pique+Trèfle même valeur
+ * - As seul: Vaut 5 au lieu de 1 si c'est le seul As de sa couleur
+ * 
+ * @author David et Léna
  */
 public class CalculateurScoreStandard implements VisiteurScore {
 

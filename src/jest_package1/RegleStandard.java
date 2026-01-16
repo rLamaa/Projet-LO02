@@ -4,10 +4,26 @@ import java.util.*;
 
 /**
  * Classe implémentant les règles standard du jeu Jest.
- * Gère le calcul des scores, l'ordre de jeu et l'attribution des trophées.
  * 
- * @author LO02 Project Team
- * @version 1.0
+ * C'est l'implémentation de référence des règles du jeu avec:
+ * 
+ * Calcul des scores:
+ * - Piques et Trèfles: Ajoutent leurs valeurs
+ * - Carreaux: Retranchent leurs valeurs
+ * - Cœurs: Valeur nulle (sauf avec Joker)
+ * - Étoiles: Doublent les points
+ * - Triangles: Valeur nulle (sauf avec Joker)
+ * - Soleils: Points selon pair/impair
+ * - Joker: 4 points seul, modifie le scoring des autres couleurs
+ * 
+ * Système de trophées:
+ * - Gère les trophées de manière standard
+ * - Détermine les gagnants basé sur les conditions
+ * 
+ * Ordre de jeu:
+ * - Basé sur la force des cartes visibles des offres
+ * 
+ * @author David et Léna
  */
 public class RegleStandard implements RegleJeu {
 	private static final long serialVersionUID = 1L;

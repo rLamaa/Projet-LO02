@@ -4,11 +4,25 @@ import java.util.List;
 
 /**
  * Classe représentant un joueur virtuel (bot) du jeu de Jest.
- * Utilise une stratégie pour automatiser les décisions de jeu.
+ * 
+ * Utilise le pattern Strategy pour automatiser les décisions de jeu.
  * Permet à plusieurs bots avec différentes stratégies de jouer ensemble.
  * 
- * @author LO02 Project Team
- * @version 1.0
+ * Responsabilités:
+ * - Créer des offres en utilisant la stratégie (sauf mode stratégique où les
+ * deux cartes sont visibles)
+ * - Choisir des cartes selon la stratégie et les offres disponibles
+ * - Communiquer les actions au log GUI si disponible
+ * 
+ * Stratégies disponibles:
+ * - Offensive: Prend les cartes fortes
+ * - Défensive: Évite les pièges
+ * - Aléatoire: Décisions aléatoires
+ * 
+ * Chaque bot peut jouer avec une stratégie différente,
+ * créant une variété de comportements de jeu.
+ * 
+ * @author David et Léna
  */
 public class JoueurVirtuel extends Joueur {
     private static final long serialVersionUID = 1L;

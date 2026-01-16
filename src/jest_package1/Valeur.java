@@ -2,10 +2,18 @@ package jest_package1;
 
 /**
  * Énumération représentant les valeurs possibles des cartes du jeu de Jest.
- * Les valeurs numériques associées sont : AS(1), DEUX(2), TROIS(3), QUATRE(4).
  * 
- * @author LO02 Project Team
- * @version 1.0
+ * Le jeu utilise uniquement 4 valeurs au lieu des 13 standards:
+ * - AS (valeur 1): L'as peut avoir une valeur spéciale dans certaines
+ * conditions
+ * - DEUX (valeur 2): Valeur de base
+ * - TROIS (valeur 3): Valeur de base
+ * - QUATRE (valeur 4): Valeur de base
+ * 
+ * Ces valeurs sont combinées avec les couleurs pour former les 16 à 28 cartes
+ * du deck selon que l'extension est activée ou non.
+ * 
+ * @author David et Léna
  */
 public enum Valeur {
     /** Valeur As (1 point) */

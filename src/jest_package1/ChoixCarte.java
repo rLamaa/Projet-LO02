@@ -4,11 +4,19 @@ import java.io.Serializable;
 
 /**
  * Classe représentant le choix d'une carte effectué par un joueur.
- * Encapsule l'offre choisie et la carte sélectionnée dans cette offre.
- * Implémente Serializable pour la sauvegarde/chargement de parties.
  * 
- * @author LO02 Project Team
- * @version 1.0
+ * Encapsule les deux éléments critiques d'un choix de jeu:
+ * - L'offre sélectionnée parmi les offres disponibles
+ * - La carte spécifique choisie dans cette offre (visible ou cachée)
+ * 
+ * Cette classe est utilisée pour:
+ * - Enregistrer les choix faits par les joueurs
+ * - Passer les informations de choix entre les composants du jeu
+ * - Valider que les choix sont légaux (offre disponible, carte existante)
+ * 
+ * Implémente Serializable pour la sauvegarde/chargement des parties.
+ * 
+ * @author David et Léna
  */
 public class ChoixCarte implements Serializable {
 	/**

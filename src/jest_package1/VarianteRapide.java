@@ -4,11 +4,25 @@ import java.util.List;
 
 /**
  * Classe implémentant la variante rapide du jeu Jest.
- * Limite le nombre de manches à 3 pour accélérer le jeu.
- * Utilise les mêmes règles de scoring que la variante standard.
  * 
- * @author LO02 Project Team
- * @version 1.0
+ * Variante accélérée qui limite le jeu à 3 manches maximum.
+ * 
+ * Caractéristiques:
+ * - Nombre de manches: Maximum 3 (vs illimité en standard)
+ * - Scoring: Identique aux règles standard
+ * - Trophées: Identiques au jeu standard
+ * - Ordre de jeu: Identique au jeu standard
+ * 
+ * Utilité:
+ * - Jeu plus court et rapide (10-20 minutes)
+ * - Idéal pour sessions courtes
+ * - Même profondeur stratégique en moins de temps
+ * - Règles inchangées, seule la durée varie
+ * 
+ * Implémente l'interface RegleJeu en déléguant la plupart des calculs
+ * à RegleStandard avec un comptage additionnel des manches.
+ * 
+ * @author David et Léna
  */
 public class VarianteRapide implements RegleJeu {
     private static final long serialVersionUID = 1L;

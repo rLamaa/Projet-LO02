@@ -12,12 +12,23 @@ import Controleur.ControleurJest;
 
 /**
  * Classe principale du jeu de Jest.
- * Gère la configuration, l'initialisation et l'exécution du jeu.
- * Supporte les modes console, GUI et hybride.
- * Implémente Serializable pour la sauvegarde/chargement de parties.
  * 
- * @author LO02 Project Team
- * @version 1.0
+ * Orchestrateur central du jeu qui gère l'ensemble du cycle de vie d'une
+ * partie.
+ * Responsable de:
+ * - La configuration initiale du jeu (choix des joueurs, variantes, extensions)
+ * - L'initialisation de l'interface utilisateur (console, GUI ou hybride)
+ * - L'exécution de la boucle principale du jeu
+ * - La gestion des sauvegardes et chargements de parties
+ * 
+ * Supporte trois modes de jeu:
+ * - Mode Console: Interface textuelle simple
+ * - Mode GUI: Interface graphique Swing complète
+ * - Mode Hybride: Console et GUI simultanément
+ * 
+ * Implémente Serializable pour permettre la persistance des parties en cours.
+ * 
+ * @author David et Léna
  */
 public class Jeu implements Serializable {
 	/**

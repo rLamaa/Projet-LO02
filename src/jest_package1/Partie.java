@@ -4,9 +4,22 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Classe Partie implémentant le patron Singleton. Gère le déroulement d'une
- * partie de Jest.
- * Elle hérite de Observable pour le pattern MVC
+ * Classe Singleton représentant une partie de Jest.
+ * 
+ * Orchestrateur central du jeu qui gère l'ensemble du cycle de vie d'une
+ * partie.
+ * Utilise les patterns:
+ * - Singleton: Une seule instance par JVM
+ * - Observable: Notifie les observateurs des changements d'état (pattern MVC)
+ * 
+ * Responsabilités:
+ * - Initialisation: Configure les joueurs, la pioche, les règles
+ * - Déroulement: Gère les manches et les tours de jeu
+ * - Calcul des scores: Applique les règles pour évaluer les Jest
+ * - Attribution des trophées: Détermine les gagnants des trophées
+ * - Sauvegarde/Chargement: Permet la persistance des parties via Serializable
+ * 
+ * @author David et Léna
  */
 @SuppressWarnings("deprecation")
 public class Partie extends Observable implements Serializable {
@@ -323,84 +336,82 @@ public class Partie extends Observable implements Serializable {
 
 	private Joueur determinerPremierJoueur() {
 
-	    Joueur premier = null;
-	    int valeurMax = Integer.MIN_VALUE;
-	    Couleur couleurMax = null;
+		Joueur premier = null;
+		int valeurMax = Integer.MIN_VALUE;
+		Couleur couleurMax = null;
 
-	    // Trouver la première offre valide pour initialiser
-	    for (Joueur j : joueurs) {
-	        Offre offre = trouverOffreDeJoueur(j);
-	        if (offre != null && offre.estComplete()) {
-	            premier = j;
+		// Trouver la première offre valide pour initialiser
+		for (Joueur j : joueurs) {
+			Offre offre = trouverOffreDeJoueur(j);
+			if (offre != null && offre.estComplete()) {
+				premier = j;
 
-	            // Variante stratégique : 2 cartes visibles
-	            if (offre.getCarteCachee().estVisible()) {
-	                Carte v = offre.getCarteVisible();
-	                Carte c = offre.getCarteCachee();
+				// Variante stratégique : 2 cartes visibles
+				if (offre.getCarteCachee().estVisible()) {
+					Carte v = offre.getCarteVisible();
+					Carte c = offre.getCarteCachee();
 
-	                Carte meilleure = (c.getValeurNumerique() > v.getValeurNumerique()
-	                        || (c.getValeurNumerique() == v.getValeurNumerique()
-	                        && c.getCouleur().getForce() > v.getCouleur().getForce()))
-	                        ? c : v;
+					Carte meilleure = (c.getValeurNumerique() > v.getValeurNumerique()
+							|| (c.getValeurNumerique() == v.getValeurNumerique()
+									&& c.getCouleur().getForce() > v.getCouleur().getForce()))
+											? c
+											: v;
 
-	                valeurMax = meilleure.getValeurNumerique();
-	                couleurMax = meilleure.getCouleur();
-	            }
-	            // Variante normale
-	            else {
-	                Carte visible = offre.getCarteVisible();
-	                valeurMax = visible.getValeurNumerique();
-	                couleurMax = visible.getCouleur();
-	            }
-	            break;
-	        }
-	    }
+					valeurMax = meilleure.getValeurNumerique();
+					couleurMax = meilleure.getCouleur();
+				}
+				// Variante normale
+				else {
+					Carte visible = offre.getCarteVisible();
+					valeurMax = visible.getValeurNumerique();
+					couleurMax = visible.getCouleur();
+				}
+				break;
+			}
+		}
 
-	    if (premier == null) {
-	        throw new IllegalStateException("Impossible de déterminer le premier joueur : aucune offre valide");
-	    }
+		if (premier == null) {
+			throw new IllegalStateException("Impossible de déterminer le premier joueur : aucune offre valide");
+		}
 
-	    // Comparer avec les autres joueurs
-	    for (Joueur j : joueurs) {
-	        Offre offre = trouverOffreDeJoueur(j);
-	        if (offre == null || !offre.estComplete()) continue;
+		// Comparer avec les autres joueurs
+		for (Joueur j : joueurs) {
+			Offre offre = trouverOffreDeJoueur(j);
+			if (offre == null || !offre.estComplete())
+				continue;
 
-	        int valeur;
-	        Couleur couleur;
+			int valeur;
+			Couleur couleur;
 
-	        if (offre.getCarteCachee().estVisible()) {
-	            Carte v = offre.getCarteVisible();
-	            Carte c = offre.getCarteCachee();
+			if (offre.getCarteCachee().estVisible()) {
+				Carte v = offre.getCarteVisible();
+				Carte c = offre.getCarteCachee();
 
-	            Carte meilleure = (c.getValeurNumerique() > v.getValeurNumerique()
-	                    || (c.getValeurNumerique() == v.getValeurNumerique()
-	                    && c.getCouleur().getForce() > v.getCouleur().getForce()))
-	                    ? c : v;
+				Carte meilleure = (c.getValeurNumerique() > v.getValeurNumerique()
+						|| (c.getValeurNumerique() == v.getValeurNumerique()
+								&& c.getCouleur().getForce() > v.getCouleur().getForce()))
+										? c
+										: v;
 
-	            valeur = meilleure.getValeurNumerique();
-	            couleur = meilleure.getCouleur();
-	        } else {
-	            Carte visible = offre.getCarteVisible();
-	            valeur = visible.getValeurNumerique();
-	            couleur = visible.getCouleur();
-	        }
+				valeur = meilleure.getValeurNumerique();
+				couleur = meilleure.getCouleur();
+			} else {
+				Carte visible = offre.getCarteVisible();
+				valeur = visible.getValeurNumerique();
+				couleur = visible.getCouleur();
+			}
 
-	        if (valeur > valeurMax
-	                || (valeur == valeurMax && couleur.getForce() > couleurMax.getForce())) {
-	            valeurMax = valeur;
-	            couleurMax = couleur;
-	            premier = j;
-	        }
-	    }
+			if (valeur > valeurMax
+					|| (valeur == valeurMax && couleur.getForce() > couleurMax.getForce())) {
+				valeurMax = valeur;
+				couleurMax = couleur;
+				premier = j;
+			}
+		}
 
-	    System.out.println("[DEBUG] Premier joueur: " + premier.getNom());
-	    return premier;
+		System.out.println("[DEBUG] Premier joueur: " + premier.getNom());
+		return premier;
 	}
-
-
-
-
-
 
 	/**
 	 * Détermine le prochain joueur selon les règles : - C'est le propriétaire de
@@ -723,8 +734,8 @@ public class Partie extends Observable implements Serializable {
 	public List<Joueur> getJoueurs() {
 		return joueurs;
 	}
-	
+
 	public RegleJeu getRegleJeu() {
-	    return regleJeu;
+		return regleJeu;
 	}
 }

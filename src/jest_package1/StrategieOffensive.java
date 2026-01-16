@@ -4,11 +4,22 @@ import java.util.List;
 
 /**
  * Stratégie de jeu offensive pour les joueurs virtuels.
- * Le bot cherche à prendre les cartes les plus fortes visibles.
- * Montre ses meilleures cartes pour attirer les adversaires.
  * 
- * @author LO02 Project Team
- * @version 1.0
+ * Cette stratégie maximise les gains immédiats en:
+ * - Prenant toujours les cartes les plus fortes visibles disponibles
+ * - Évaluant les cartes par leur valeur positive brute
+ * - Montrant les meilleures cartes pour attirer les adversaires
+ * 
+ * Algorithme d'évaluation:
+ * - Piques/Trèfles: Valeur positive
+ * - Carreaux: Valeur négative (moins dangereux)
+ * - Joker: Valeur fixe (4 points)
+ * - Étoiles: Valeur doublée
+ * 
+ * Cette stratégie fonctionne mieux quand les cartes cachées sont faibles
+ * et moins bien quand les adversaires jouent de manière défensive.
+ * 
+ * @author David et Léna
  */
 public class StrategieOffensive implements Strategie {
     private static final long serialVersionUID = 1L;

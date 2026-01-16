@@ -3,6 +3,24 @@ package jest_package1;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Classe abstraite représentant un joueur du jeu de Jest.
+ * 
+ * Définit l'interface commune pour tous les types de joueurs.
+ * Utilise le pattern Template Method pour les décisions de jeu.
+ * 
+ * Responsabilités abstraites:
+ * - faireOffre(): Créer une offre avec deux cartes
+ * - choisirCarte(): Sélectionner une carte parmi les offres disponibles
+ * 
+ * Responsabilités concrètes:
+ * - Gestion du Jest courant (cartes de la manche)
+ * - Gestion du Jest personnel (cartes précédentes)
+ * - Gestion de l'identité (nom, numéro)
+ * - Évaluation des Jest (scoring)
+ * 
+ * @author David et Léna
+ */
 public abstract class Joueur implements Serializable {
 
     /**
@@ -47,7 +65,6 @@ public abstract class Joueur implements Serializable {
      * @return l'offre créée par le joueur
      */
     public abstract Offre faireOffre(boolean offresVisibles);
-    
 
     /**
      * Demande au joueur de choisir une carte parmi les offres disponibles.

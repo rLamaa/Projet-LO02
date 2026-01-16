@@ -4,12 +4,22 @@ import java.util.List;
 
 /**
  * Stratégie de jeu défensive pour les joueurs virtuels.
- * Le bot évite les cartes dangereuses et choisit les cartes cachées pour
- * limiter les risques.
- * Cache ses meilleures cartes pour piéger les adversaires.
  * 
- * @author LO02 Project Team
- * @version 1.0
+ * Cette stratégie minimise les risques en:
+ * - Choisissant les cartes cachées plutôt que visibles (élément de surprise)
+ * - Évitant les offres avec des cartes dangereuses (Carreaux)
+ * - Cachant les meilleures cartes dans les offres
+ * 
+ * Algorithme d'évaluation du danger:
+ * - Carreaux: Très dangereux (points négatifs doublés)
+ * - Cœurs/Soleils: Danger moyen (dépendent du contexte)
+ * - Piques/Trèfles/Triangles: Peu dangereux
+ * - Étoiles: Pas dangereux du tout (points positifs doublés)
+ * 
+ * Cette stratégie excelle contre les bots offensifs mais peut laisser
+ * des points sur la table contre d'autres défenseurs.
+ * 
+ * @author David et Léna
  */
 public class StrategieDefensive implements Strategie {
     private static final long serialVersionUID = 1L;
